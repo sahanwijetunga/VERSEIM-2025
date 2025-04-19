@@ -1,3 +1,5 @@
+# What is in this repo
+
 This is the repository for the *formalization project* of the [2025
 VERSEIM-REU](https://sites.tufts.edu/verseimreu/).
 
