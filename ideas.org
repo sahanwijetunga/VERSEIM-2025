@@ -1,0 +1,18 @@
+:PROPERTIES:
+:ID:       pa0l48e1mjk0
+:END:
+
+#+title: Some formalization ideas for VERSEIM-2025
+#+date: {{{current}}}
+#+author: George McNinch
+
+#+OPTIONS: toc:2 ':t 
+
+#+keywords: algebra, commutative-algebra, fields, galois-theory
+
+#+LATEX_CLASS: article
+#+INCLUDE: "../assets/title.org"
+#+INCLUDE: "../assets/macros.org" 
+
+
+* formalization ideas
