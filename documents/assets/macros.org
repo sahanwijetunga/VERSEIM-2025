@@ -1,0 +1,88 @@
+
+#+MACRO: current (eval (format "%s (%s@%s)" (format-time-string "%Y-%m-%d %H:%M:%S %Z" (current-time)) user-login-name system-name))
+
+#+name: latex macros
+#+BEGIN_SRC latex-macros
+
+  %%--------------------------------------------------------------------------------
+
+  \usepackage[svgnames]{xcolor}
+  \usepackage{mathrsfs}
+  \usepackage{tikz-cd}
+  \usepackage{svg}
+  \usepackage[top=25mm,bottom=25mm,left=25mm,right=30mm]{geometry}
+
+
+  \usepackage{amsthm}
+  \usepackage{thmtools}
+  \usepackage{cleveref}
+
+  %%\usepackage[outputdir=build]{minted}
+  \usepackage{minted}  
+  \usemintedstyle{tango}
+  \usepackage[svgnames]{xcolor}
+  \setminted[bash]{bgcolor=NavajoWhite}
+  \setminted[python]{bgcolor=Lavender}
+  \setminted[sage]{bgcolor=Lavender}
+
+  \usepackage{titlesec}
+  \newcommand{\sectionbreak}{\clearpage}
+
+
+  \renewcommand{\descriptionlabel}[1]{\hspace{\labelsep}#1}
+
+
+  \usepackage[cal=boondox]{mathalfa}
+
+
+  \newenvironment{referee}{\color{red}}{\color{black}}
+
+  \numberwithin{equation}{section}
+
+  \declaretheorem[numberwithin=subsection,Refname={Theorem,Theorems}]{theorem}
+  \declaretheorem[sibling=theorem,name=Proposition,Refname={Proposition,Propositions}]{proposition}
+  \declaretheorem[sibling=theorem,name=Corollary,Refname={Corollary,Corollaries}]{corollary}
+  \declaretheorem[sibling=theorem,name=Lemma,Refname={Lemma,Lemmas}]{lemma}
+  \declaretheorem[sibling=theorem,name=Remark,style=remark,Refname={Remark,Remarks}]{remark}
+  \declaretheorem[sibling=theorem,name=Problem,style=remark,Refname={Problem,Problems}]{problem}
+  \declaretheorem[sibling=theorem,name=Example,style=remark,Refname={Example,Examples}]{ex}  
+  \declaretheorem[sibling=theorem,name=Definition,style=remark,Refname={Definition,Definitions}]{definition}
+
+  \crefname{equation}{}{}
+
+  %%--------------------------------------------------------------------------------
+
+  \newenvironment{solution}
+                 {\par \color{red}\hrulefill \newline \noindent \textbf{Solution:} \vspace{2mm}}
+                 {\vspace{2mm} \color{black}}
+
+
+  \newcommand{\totdeg}{\operatorname{totdeg}}
+  \newcommand{\content}{\operatorname{content}}
+
+  \newcommand{\Mat}{\operatorname{Mat}}
+
+  \newcommand{\Aut}{\operatorname{Aut}}
+  \newcommand{\Gal}{\operatorname{Gal}}
+
+  \newcommand{\A}{\mathscr{A}}
+  \newcommand{\B}{\mathscr{B}}
+  \newcommand{\FF}{\mathscr{F}}
+  \newcommand{\LF}{\mathcal{LF}}
+
+  \newcommand{\HH}{\mathcal{H}}
+  \newcommand{\X}{\mathscr{X}}
+
+  \newcommand{\ff}{\mathfrak{f}}
+  \newcommand{\pp}{\mathfrak{p}}
+
+  \newcommand{\Z}{\mathbf{Z}}
+  \newcommand{\Q}{\mathbf{Q}}
+  \newcommand{\R}{\mathbf{R}}
+  \newcommand{\C}{\mathbf{C}}
+  \newcommand{\F}{\mathbf{F}}
+
+  \newcommand{\Poly}{\mathcal{P}}
+  %%--------------------------------------------------------------------------------
+#+END_SRC
+

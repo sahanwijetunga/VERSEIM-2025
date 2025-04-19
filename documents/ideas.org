@@ -11,8 +11,7 @@
 #+keywords: algebra, commutative-algebra, fields, galois-theory
 
 #+LATEX_CLASS: article
-#+INCLUDE: "../assets/title.org"
-#+INCLUDE: "../assets/macros.org" 
+#+INCLUDE: "assets/macros.org" 
 
 
 * formalization ideas
