@@ -16,6 +16,7 @@
   \usepackage{amsthm}
   \usepackage{thmtools}
   \usepackage{cleveref}
+  \usepackage{stmaryrd}
 
   %%\usepackage[outputdir=build]{minted}
   \usepackage{minted}  

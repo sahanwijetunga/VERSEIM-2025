@@ -1,4 +1,4 @@
-% Created 2025-04-18 Fri 22:07
+% Created 2025-04-19 Sat 21:50
 % Intended LaTeX compiler: pdflatex
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
@@ -25,6 +25,7 @@
 \usepackage{amsthm}
 \usepackage{thmtools}
 \usepackage{cleveref}
+\usepackage{stmaryrd}
 
 %%\usepackage[outputdir=build]{minted}
 \usepackage{minted}
@@ -94,12 +95,12 @@
 \newcommand{\Poly}{\mathcal{P}}
 %%--------------------------------------------------------------------------------
 \author{George McNinch}
-\date{2025-04-18 22:07:20 EDT (george@valhalla)}
+\date{2025-04-19 21:50:08 EDT (george@valhalla)}
 \title{Some formalization ideas for VERSEIM-2025}
 \hypersetup{
  pdfauthor={George McNinch},
  pdftitle={Some formalization ideas for VERSEIM-2025},
- pdfkeywords={algebra, commutative-algebra, fields, galois-theory},
+ pdfkeywords={formalization, algebra, finite-algebra},
  pdfsubject={},
  pdfcreator={Emacs 30.0.92 (Org mode 9.7.11)}, 
  pdflang={English}}
@@ -138,6 +139,112 @@
 \setcounter{tocdepth}{2}
 \tableofcontents
 
-\section{formalization ideas}
-\label{sec:org76063af}
+\section{Warm-up problems}
+\label{sec:warm-up-problems-}
+\subsection{linear algebra results}
+\label{sec:linear-algebra-results}
+\begin{itemize}
+\item formalize correspondence between linear transformations \(V \to W\)
+and matrices (where \(V\) and \(W\) are finite dimensional vector spaces
+over some field).
+
+\item e.g. formluate and prove statements about eigenvectors and
+eigenvalues of a linear endomorphism of a finite dimensional vector
+space V.
+
+Probably the ultimate target would be the Cayley-Hamilton theorem.
+\end{itemize}
+\subsection{finite group theory}
+\label{sec:finite-group-theory}
+\begin{itemize}
+\item prove that a finite p-group has a non-trivial center (and hence that
+a finite p-group is solvable)
+
+\item for a finite p-group G and a field k of char p>0, prove that for any
+finite dimensional k-vector space V and any homomorphism \(\rho:G
+  \to GL(V)\) that \(G\) fixes a non-zero vector in \(V\).
+\end{itemize}
+\subsection{commutative rings}
+\label{sec:commutative-rings}
+\begin{itemize}
+\item prove the Gauss Lemma and Eisenstein's criteria
+\href{https://leanprover-community.github.io/mathlib4\_docs/Mathlib/RingTheory/Polynomial/Content.html\#Polynomial.content}{Gauss Lemma already has a proof in mathlib}
+and so does \href{https://leanprover-community.github.io/mathlib4\_docs/Mathlib/RingTheory/Polynomial/Eisenstein/Basic.html\#Polynomial.IsEisensteinAt.irreducible}{Eisenstein's critera}
+\end{itemize}
+\subsection{Graph theory}
+\label{sec:graph-theory}
+\begin{itemize}
+\item mathlib has a proof of \href{https://leanprover-community.github.io/mathlib4\_docs/Mathlib/Combinatorics/Hall/Finite.html}{Hall's Marriage Theorem}
+\item prove elementary fact: sum of degrees of vertices is twice the
+number of edges.
+\end{itemize}
+\section{Formalization ideas}
+\label{sec:formalization-ideas}
+\subsection{\href{https://en.wikipedia.org/wiki/Projective\_space}{Projective spaces} and \href{https://en.wikipedia.org/wiki/Grassmannian}{grassmannians}}
+\label{sec:projective-spaces-and-grassmannians}
+\begin{itemize}
+\item mathlib has a formalization of \href{https://leanprover-community.github.io/mathlib4\_docs/Mathlib/LinearAlgebra/Projectivization/Basic.html\#Projectivization}{projective spaces} can we imitate this
+formalization to the Grassmannian? What results should be proved
+about it?
+
+Say something about Plücker embedding?
+
+Is there already a formalization of the \emph{exterior powers} of a vector
+space? Surely\ldots{}
+\end{itemize}
+\subsection{forms over a finite field}
+\label{sec:forms-over-a-finite-field}
+Defined on a finite dimensional vector space \(V\) over a finite field
+
+\begin{itemize}
+\item reflexive forms
+\item quadratic forms / symmetric forms (char 2 and \(p>2\))
+\item alternating forms
+\item Hermitian forms
+
+\item Can you give a formal proof of the theorem describing the number of
+points of a quadric (i.e. the zero set in \(\mathbb{P}(V)\) of a
+non-degenerate quadratic form \(q\) on the vector space \(V\) over a
+finite field.
+\end{itemize}
+\subsection{Polar spaces}
+\label{sec:polar-spaces}
+\begin{itemize}
+\item such a space is a ``point-line geometry''. Formalize the notion of
+point-line geometry.
+
+\item polar spaces arise from reflexive form on a vector space on a finite
+field.
+\end{itemize}
+\subsection{Fourier transforms for functions on vector spaces over a finite field}
+\label{sec:fourier-transforms-for-functions-on-vector-spaces-over-a-finite-field}
+\subsection{Algebraic combinatorics}
+\label{sec:algebraic-combinatorics}
+\begin{itemize}
+\item formalize proof of some results from book of R. Stanley.
+
+e.g. Theorem 1.1 which gives a condition for a formal power series
+\(f \in k\llbracket t \rrbracket\) to be a \emph{rational function.} Try
+to formalize this proof.
+
+or more generally, all the ``tool-results'' from the first section of
+Stanley's book.
+\end{itemize}
+\subsection{error-correcting codes}
+\label{sec:codes}
+\begin{itemize}
+\item formalize some basic results about codes - see Simeon Ball's book.
+\end{itemize}
+\subsection{quaternion algebras}
+\label{sec:quaternion-algebras}
+\begin{itemize}
+\item show they are simple
+
+\item describe in the form \((a,b)\) or (in char. 2) \((a,b]\).
+
+\item give criteria on \(a,b\) for when the algebra is division.
+
+\item formalize proof of result from P. Gilles book about quadratic forms
+\& quaternion algebras.
+\end{itemize}
 \end{document}
