@@ -23,10 +23,10 @@ The main place to find information is the [[https://leanprover-community.github.
   - [[https://lean-lang.org/functional_programming_in_lean/][Functional programming in Lean]]
 
 
-* Chat Room
+* Other on-line resources
 
-    A public chat room dedicated to Lean is open on [[https://leanprover.zulipchat.com/][Zulip]].
-
+  - there is a public chat room dedicated to Lean is open on [[https://leanprover.zulipchat.com/][Zulip]].
+  - more generally, see the [[https://lean-lang.org/links/][links on the lean site, here]]
     
 * [[https://proofassistants.stackexchange.com/][proof assistants stack-exchange]]
   
