@@ -1,0 +1,4 @@
+
+#+MACRO: current (eval (format "%s (%s@%s)" (format-time-string "%Y-%m-%d %H:%M:%S %Z" (current-time)) user-login-name system-name))
+
+
