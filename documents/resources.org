@@ -8,9 +8,7 @@
 
 #+INCLUDE: "assets/macros-markdown.org" 
 
-
-
-The main place to find information is the [[https://leanprover-community.github.io/][Lean Community website]] (https://leanprover-community.github.io/).
+* The main place to find information is the [[https://leanprover-community.github.io/][Lean Community website]] (https://leanprover-community.github.io/).
 
 * for information about installing Lean, see these links from the site just mentioned
   - [[https://leanprover-community.github.io/get_started.html][getting started]]
@@ -25,11 +23,10 @@ The main place to find information is the [[https://leanprover-community.github.
 
 * Other on-line resources
 
-  - there is a public chat room dedicated to Lean is open on [[https://leanprover.zulipchat.com/][Zulip]].
+  - there is a public chat room dedicated to Lean on [[https://leanprover.zulipchat.com/][Zulip]].
+  - [[https://proofassistants.stackexchange.com/][proof assistants stack-exchange]]    
   - more generally, see the [[https://lean-lang.org/links/][links on the lean site, here]]
-    
-* [[https://proofassistants.stackexchange.com/][proof assistants stack-exchange]]
-  
+
 * Some notes on formalization that I wrote for a Spring 2024 course at Tufts
 
   - [[file:notes-formal-00.md][notes-00]]

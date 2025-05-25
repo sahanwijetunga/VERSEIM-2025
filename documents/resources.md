@@ -1,11 +1,9 @@
 author: George McNinch
-date: 2025-05-24 19:58:25 EDT (george@valhalla)
+date: 2025-05-24 20:02:52 EDT (george@valhalla)
 keywords: algebra, commutative-algebra, fields, galois-theory
 title: Resources for formalization
 
-The main place to find information is the [Lean Community
-website](https://leanprover-community.github.io/)
-(<https://leanprover-community.github.io/>).
+# The main place to find information is the [Lean Community website](https://leanprover-community.github.io/) (<https://leanprover-community.github.io/>).
 
 # for information about installing Lean, see these links from the site just mentioned
 
@@ -27,12 +25,12 @@ website](https://leanprover-community.github.io/)
 
 # Other on-line resources
 
--   there is a public chat room dedicated to Lean is open on
+-   there is a public chat room dedicated to Lean on
     [Zulip](https://leanprover.zulipchat.com/).
+-   [proof assistants
+    stack-exchange](https://proofassistants.stackexchange.com/)
 -   more generally, see the [links on the lean site,
     here](https://lean-lang.org/links/)
-
-# [proof assistants stack-exchange](https://proofassistants.stackexchange.com/)
 
 # Some notes on formalization that I wrote for a Spring 2024 course at Tufts
 

@@ -5,8 +5,8 @@ VERSEIM-REU](https://sites.tufts.edu/verseimreu/).
 
 It contains some [documents](/documents/) with notes, including:
 
-A document storing [resources for
-formalization](/documents/resources.md).
+- A document storing [resources for
+  formalization](/documents/resources.md).
 
-And eventually we will put code in the [project
+Eventually we will put code in the [project
 directory](VERSEIM2025) for the formalization we carry out.
