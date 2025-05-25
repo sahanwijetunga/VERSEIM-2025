@@ -1,6 +1,6 @@
 author: George McNinch
-date: 2025-05-24 20:02:52 EDT (george@valhalla)
-keywords: algebra, commutative-algebra, fields, galois-theory
+date: 2025-05-24 20:04:13 EDT (george@valhalla)
+keywords: formalization, Lean, resources
 title: Resources for formalization
 
 # The main place to find information is the [Lean Community website](https://leanprover-community.github.io/) (<https://leanprover-community.github.io/>).

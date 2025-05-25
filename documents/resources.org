@@ -1,10 +1,10 @@
-#+title: Resources for formalization
-#+author: George McNinch
-#+date: {{{current}}}
+#+title: Resources for formalization  
+#+author: George McNinch  
+#+date: {{{current}}}  
 
 #+OPTIONS: toc:nil ':t 
 
-#+keywords: algebra, commutative-algebra, fields, galois-theory
+#+keywords: formalization, Lean, resources
 
 #+INCLUDE: "assets/macros-markdown.org" 
 
