@@ -7,9 +7,9 @@
 
   I’d like for us to meet as a group as follows:
 
-  Mon after lunch (2:30 PM or so?)
-  Tues, Thur 1:30-3:00 PM
-  Wed, Fri 10:30-12:00 AM
+  - Mon after lunch (2:30 PM or so?)  
+  - Tues, Thur 1:30-3:00 PM  
+  - Wed, Fri 10:30-12:00 AM  
 
 # Goals for the week:
 
