@@ -8,5 +8,7 @@ It contains some [documents](/documents/) with notes, including:
 - A document storing [resources for
   formalization](/documents/resources.md).
 
+- [week 01 information](/documents/week-01.md).
+
 Eventually we will put code in the [project
 directory](VERSEIM2025) for the formalization we carry out.
