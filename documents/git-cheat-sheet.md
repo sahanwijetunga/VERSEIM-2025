@@ -21,16 +21,17 @@
   `VERSEIM-2025` on your computer (below the current directory of the
   shell in which you executed the command).
 
-# you should make your own branch in the repository
+# make your own `branch` in the repository
 
-  on a `mac` or `linux` computer, I'd type 
+  To accomplish this on a `mac` or `linux` computer, type
   
   ```
   cd VERSEIM-2025
   git branch george
   ```
   
-  That will create a new branch named george, as you can confirm
+  (Here and below you should replace `"george"` with your name...!)
+  That will create a new `branch` named `george`; confirm this as follows:
   
   ```
   git branch 
@@ -44,8 +45,10 @@
   
   ```
   git checkout george
+
+  # or: git switch george
   
-  ## confirming...
+  ## confirm that this had some effect...
   git branch
 
   =>
@@ -55,13 +58,50 @@
   
   (Note that the asterisk `*` should have moved...)
   
+  When you make the branch, your new branch is identical to the `main`
+  branch. But now you can modify the contents of your branch without
+  affecting the contents of the `main` branch.
+  
 # let's see how to add content to your branch now
 
-  Let's make a new file. First make sure that you are in directory `VERSEIM-2025`
+  Later on we'll see how to do a good bit of this directly in the `VS
+  Code` editor, but maybe we'll understand it better if we do it first
+  from the command line.
+  
+  Our `lean` work will be contained in the subdirectory `VERSEIM2025` of the repository.
+  
+  Let's enter that subdirectory and make a new directory to work inside.
   
   
-  (In `linux` or on a `mac` type `pwd` at the terminal prompt to see
-  the current directory. In `windows` instead type `cwd`).
+
+  First make sure that while interacting with the shell, you are
+  currently in the top directory `VERSEIM-2025`. (In `linux` or on a
+  `mac` type `pwd` at the terminal prompt to see the current
+  directory. In `windows` instead type `cwd`).
+  
+  For example, for me `pwd` reports
+  ```
+  pwd
+  =>
+  /home/george/Prof-VC/VERSEIM-2025
+  ```
+  
+  Now proceed as follows
+  ```
+  # enter the work subdirectory
+  cd VERSEIM2025
+  
+  # then make a subdirectory of that directory
+  mkdir george
+  
+  # let's check by listing the contents of the current directory
+  ls                           # or dir in windows
+  =>
+  Basic.lean  george  graph.lean  mcninch-math190
+  
+  # we see the new directory `george`
+  ```
+  
   
   We are going to work
   
