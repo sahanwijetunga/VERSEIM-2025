@@ -1,16 +1,17 @@
 
 # set up ssh-keys for use with `git`
 
-  [this article more-or-less explains what needs to be done](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
-  
-  
+  [this linked
+  article](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
+  explains what needs to be done. Follow up if you have issues/need to
+  ask questions!
 
-# clone the repository 
+# clone our repository 
 
-  If you have installed `git` on your computer, and if you have your
-  `ssh key` set up for authentication to your github account, you
-  should be able to make a local copy of the repository by executing
-  the following command in a `shell`:
+  Once you have installed `git` on your computer, and once you have
+  your `ssh key` set up for authentication to your github account (see
+  previous step), you should be able to make a local copy of the
+  repository by executing the following command in a `shell`:
 
   ```
   git clone git@github.com:gmcninch-tufts
