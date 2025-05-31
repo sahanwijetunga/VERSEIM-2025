@@ -135,6 +135,7 @@
   
   => [george da25f7f] add new directory for lean work
      1 file changed, 19 insertions(+), 10 deletions(-) 
+	 create mode 100644 VERSEIM2025/george/empty.lean
   ```
   
   
