@@ -124,8 +124,17 @@
     main
   
   # now stage the new stuff 
+  # first return to the top level 
+  cd ../..    # this means change to the parent directory of the parent directory of george. In this case, that is
+              # the "top directory" of the repo, namely `VERSEIM-2025`
   git add .   # the dot "." means "stage everything that has been changed"
+  
+              # we could have skipped the `cd ../..` and did instead `git add ../..` from inside the directory `george`
   
   git commit -m "add new directory for lean work"
   
+  => [george da25f7f] add new directory for lean work
+     1 file changed, 19 insertions(+), 10 deletions(-) 
   ```
+  
+  
