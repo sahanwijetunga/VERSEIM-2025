@@ -102,21 +102,30 @@
   # we see the new directory `george`
   ```
   
+  Now let's make a dummy file in our new directory
   
-  We are going to work
   
-  Now let's make a dummy file
-  
-  In `linux` or on a `mac`
   ```
-  touch empty.txt
-  ```
-  
-  In `windows`, I'm told that you should do
-  ```
-  copy empty.txt+
+  cd george
+  touch empty.lean    # `linux` or `mac`
+  # copy emtpy.lean+   # I'm told this is how you make an empty file in windows
   ```
   
-  to make an empty file. Let me know if that is mistaken!
+  Now let's add these new contents to our the remote branch.
+  The required sequence of steps is "add (or stage) - commit - push".
   
-  Now let's add this emtpy file to the 
+  
+  
+  ```
+  # make sure we are on the right branch
+  git branch
+  =>
+  * george
+    main
+  
+  # now stage the new stuff 
+  git add .   # the dot "." means "stage everything that has been changed"
+  
+  git commit -m "add new directory for lean work"
+  
+  ```
