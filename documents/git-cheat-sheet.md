@@ -14,7 +14,7 @@
   repository by executing the following command in a `shell`:
 
   ```
-  git clone git@github.com:gmcninch-tufts
+  git clone git@github.com:gmcninch-tufts/VERSEIM-2025.git
   ```
 
   After executing that command, you will now have a directory
@@ -137,5 +137,7 @@
      1 file changed, 19 insertions(+), 10 deletions(-) 
 	 create mode 100644 VERSEIM2025/george/empty.lean
   ```
-  
-  
+
+  Now we have `staged` and `committed` our changes, and we need to
+  push them to the remote server (i.e. "to `github`").
+
