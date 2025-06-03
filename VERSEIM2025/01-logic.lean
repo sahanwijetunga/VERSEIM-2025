@@ -45,8 +45,10 @@ example (x y : ℕ) : x * y = y * x := by
 
 -- we can use the `rw` (rewrite) tactic which takes as argument an equality
 
+example (n : ℕ) : n = n := by rfl 
+
 example (x y z w : ℕ) : z * (x * y) * w = z * (y * x) * w := by  
-   rw [mul_comm x y]
+    rw [mul_comm x y]
 
 
 -- how would we avoid the awkwardness with the parentheses?
@@ -63,12 +65,13 @@ example (x y z w : ℕ) : z * x * y * w = z * y * x * w := by
 -- in this case, it is worth mentioning that the `ring` tactic can already close this goal
 -- (and without any shenanigans with the parenthesis)
 
-example (x y z w : ℕ) : z * x * y * w = z * y * x * w := by  
+example (x y z w : ℕ) : z * x * y * w = z * y * w * x := by  
    ring
 
 -- we can use hypotheses in our `rw` rewrites, as follows
 
- example (a b c d e : ℤ) (h: a * b = c * d) : a * b * e = c * d * e := by
+ example (a b d e : ℤ) (h: b * e = d * e) : a * b * e = a * d * e := by
+   rw [ mul_assoc a b e, mul_assoc a d e]
    rw [ h ]
 
 -- and we could have formulated that result as an implication  instead
@@ -82,7 +85,11 @@ example (a b c d e : ℤ) : a * b = c * d →  a * b * e = c * d * e := by
 
 example (a b c : ℤ) (ha : a = 2) (h : a * b = a * c)  : b = c := by
    rw [ ha ] at h
+   --refine Int.neg_inj.mp ?_
    linarith
+
+example (a b : ℝ) (h : a  + 2 = b + 2) : a =b := 
+  by linarith 
 
 
 example (a b : ℝ) (h : 2*a ≤ b) (k : 1 ≤ a) : 2 ≤ b := by linarith
@@ -93,15 +100,14 @@ example (a b : ℝ) (h : 2*a ≤ b) (k : 1 ≤ a) : 2 ≤ b := by linarith
 example (a b c d : ℤ) (h : c = d*a + b) (h' : b = d) : c = d*a + d := by
   rw [h'] at h
   -- Our assumption `h` is now exactly what we have to prove
-  exact h
-
+  -- exact h
+  assumption 
 
 -- you may need to use some of the following in the exercises below.
 
 #check add_comm
 #check add_mul
 #check mul_add
-#check add_mul
 
 --------------------------------------------------------------------------------
 -- exercises
@@ -127,7 +133,30 @@ example (a b c d : ℤ) (h : b = d + d) (h' : a = b + c) : a + b = c + 4 * d := 
 example : 2*3 = 6 := by norm_num
 
 example (x : ℤ) : x*x = x^2 := by 
-  rw [ pow_two ]
+  --rw [ pow_two ]
+  exact Eq.symm (Lean.Grind.Semiring.pow_two x)
+
+
+example ( x y :ℤ) (h: x+y = 2) : x^2 + 2*x*y + y^2 = 4 := by
+  have k  : x^2 + 2*x*y + y^2 = (x+y)*(x+y) := by 
+    rw [ mul_add, add_mul ]
+    rw [ pow_two, pow_two ]
+    rw [ add_mul ]
+    rw [ mul_comm y x ]
+    rw [ add_assoc (x*x) (x*y) _ ]
+    rw [ ← add_assoc (x*y) (x*y) _ ]
+    rw [ ← two_mul ]
+    rw [ ← mul_assoc 2 x y]
+    exact add_assoc (x*x) (2*x*y) _
+  rw [ k , h]
+  norm_num
+
+variable (x y : ℤ)
+
+#check add_assoc (y*x) (x*y) (y*y)
+
+example (a:ℤ) : 2*a = a + a := by exact two_mul a
+
 
 -- 4.
 
