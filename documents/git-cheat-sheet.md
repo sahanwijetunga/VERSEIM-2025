@@ -14,7 +14,7 @@
   repository by executing the following command in a `shell`:
 
   ```
-  git clone git@github.com:gmcninch-tufts
+  git clone git@github.com:gmcninch-tufts/VERSEIM-2025.git
   ```
 
   After executing that command, you will now have a directory
@@ -129,3 +129,6 @@
   git commit -m "add new directory for lean work"
   
   ```
+
+  Now we have `staged` and `committed` our changes, and we need to
+  push them to the remote server (i.e. "to `github`").
