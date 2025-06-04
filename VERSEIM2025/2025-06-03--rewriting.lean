@@ -114,8 +114,7 @@ example (a b c d : ℤ) (h : c = d*a + b) (h' : b = d) : c = d*a + d := by
 
 -- 1.
 
-example (x y z w  : ℤ) : x * y + x * z + x * w = x * (z + y + w) := by
-  rw [ ← mul_add x y z ]
+example (x y z w  : ℤ) : x * y + x * z + x * w = x * (z + y + w) := by sorry
 
 
 -- 2. 
@@ -134,39 +133,57 @@ example (a b c d : ℤ) (h : b = d + d) (h' : a = b + c) : a + b = c + 4 * d := 
 example : 2*3 = 6 := by norm_num
 
 example (x : ℤ) : x*x = x^2 := by 
-  --rw [ pow_two ]
-  exact Eq.symm (Lean.Grind.Semiring.pow_two x)
+  rw [ pow_two ]
+  -- exact Eq.symm (Lean.Grind.Semiring.pow_two x)
 
+
+-- here is a possible solution
+#check two_mul
 
 example ( x y :ℤ) (h: x+y = 2) : x^2 + 2*x*y + y^2 = 4 := by
-  have k  : x^2 + 2*x*y + y^2 = (x+y)*(x+y) := by 
-    rw [ mul_add, add_mul ]
-    rw [ pow_two, pow_two ]
-    rw [ add_mul ]
-    rw [ mul_comm y x ]
-    rw [ add_assoc (x*x) (x*y) _ ]
-    rw [ ← add_assoc (x*y) (x*y) _ ]
-    rw [ ← two_mul ]
-    rw [ ← mul_assoc 2 x y]
-    exact add_assoc (x*x) (2*x*y) _
-  rw [ k , h]
-  norm_num
+have k  : x^2 + 2*x*y + y^2 = (x+y)*(x+y) := by 
+  rw [ mul_add, add_mul ]
+  rw [ pow_two, pow_two ]
+  rw [ add_mul ]
+  rw [ mul_comm y x ]
+  rw [ add_assoc (x*x) (x*y) _ ]
+  rw [ ← add_assoc (x*y) (x*y) ]
+  rw [ ← two_mul ]
+  rw [ ← mul_assoc 2 x y]
+  exact add_assoc (x*x) (2*x*y) _
+rw [ k , h]
+norm_num
 
-variable (x y : ℤ)
-
-#check add_assoc (y*x) (x*y) (y*y)
-
-example (a:ℤ) : 2*a = a + a := by exact two_mul a
-
-
--- 4.
-
-
+--------------------------------------------------------------------------------
+example : (a + b) * (a + b) = a * a + 2 * (a * b) + b * b :=
+  calc
+    (a + b) * (a + b) = a * a + b * a + (a * b + b * b) := by rw [mul_add, add_mul, add_mul]
+    _ = a * a + (b * a + a * b) + b * b := by rw [← add_assoc, add_assoc (a * a)]
+    _ = a * a + 2 * (a * b) + b * b := by rw [mul_comm b a, ← two_mul]
 
 --------------------------------------------------------------------------------
 
+variable (x y z :ℤ)
 
--- a ring is a type `R` which has an operation of addition and an
--- operation of multiplication on it.
 
--- 
+example (h₀ : x ∣ y) (h₁ : y ∣ z) : x ∣ z :=
+  dvd_trans h₀ h₁
+
+example : x ∣ y * x * z := by
+  apply dvd_mul_of_dvd_left
+  exact dvd_mul_left x _
+
+def f : ℤ → ℤ → ℤ := by
+  intro x y
+  exact x^2 + y^2
+
+#check f
+
+#eval f 1 2 
+
+-- f 1 is really ℤ → ℤ  via y |--> f 1 y
+
+lemma foobar (x:ℕ) : x ∣ x ^ 2 := by
+  apply dvd_mul_left
+
+example : 4 ∣ 4^2 := foobar 4
