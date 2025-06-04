@@ -108,7 +108,8 @@ example (a b c d : ℤ) (h : c = d*a + b) (h' : b = d) : c = d*a + d := by
 
 -- 1.
 
-example (x y z w  : ℤ) : x * y + x * z + x * w = x * (z + y + w) := by sorry
+example (x y z w  : ℤ) : x * y + x * z + x * w = x * (z + y + w) := by
+  rw [ ← mul_add x y z ]
 
 
 -- 2. 
