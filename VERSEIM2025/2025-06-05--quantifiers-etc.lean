@@ -207,4 +207,26 @@ example (h : ∀ a, ∃ x, f x > a) : ¬FnHasUb f := by
 
 -- try this one:
 
--- 
+example (h : ∀ a, ∃ x, f x < a) : ¬FnHasLb f := by
+  sorry 
+
+example : ¬FnHasUb fun x ↦ x :=
+  sorry
+
+
+variable {α : Type*} (P : α → Prop) (Q : Prop)
+
+example (h : ¬∃ x, P x) : ∀ x, ¬P x := by
+  sorry
+
+example (h : ∀ x, ¬P x) : ¬∃ x, P x := by
+  sorry
+
+example (h : ∃ x, ¬P x) : ¬∀ x, P x := by
+  sorry
+
+
+--------------------------------------------------------------------------------
+
+example (h : ¬∀ x, P x) : ∃ x, ¬P x := by
+  sorry
