@@ -9,33 +9,6 @@ Author : George McNinch
 
 import Mathlib.Tactic
 
-def F : ℕ → (ℕ → ℕ) := 
-  fun x y =>  x^y + y
-
-#eval F 2 500 
-
-
-#check F 0
-
-def F' : ℤ × ℤ → ℤ :=
-  fun (x,y) => x + y
-
-
-
-def foo (s t :String) : ℤ := 
-   match s,t with
-   | "george",_ => 1
-   | "sahan" ,_=> 2
-   | "clea",_ => 3
-   | _,"zoo" => 5
-   | _,_ => 6
-
-#eval foo "asdfasdf" "zoo"
-
-
-
-
-
 -- let's talk about quantifiers
 
 -- (I'm borrowing these examples from math-in-lean...)
@@ -55,8 +28,6 @@ def foo (s t :String) : ℤ :=
 
 #check (x:ℝ) → 0 ≤ x → abs x = x
 
-#check abs_of_nonneg 
- 
 example : ∀ x : ℝ, 0 ≤ x → |x| = x := by
   intro x h
   exact abs_of_nonneg h
@@ -69,18 +40,13 @@ def FnUb (f : ℝ → ℝ) (a : ℝ) : Prop :=
 def FnLb (f : ℝ → ℝ) (a : ℝ) : Prop :=
   ∀ x, a ≤ f x
 
-def FnBoundedByFn (f g : ℝ → ℝ) : Prop :=
-  ∀ x, f x ≤ g x 
-
-
 -- read: `FnUB f a` means that the values of function `f` are bounded
 -- above by `a`
 
 section anon_functions
 
--- the keyword `fun` constructs a function. The `fun` construction is
--- often called a `lambda` in some programming languages ("anonomous
--- function")
+-- the keyword `fun` constructs a function. The `fun` construction is often
+-- called a `lambda` in some programming languages ("anonomous function")
 
 -- for example 
 
@@ -94,23 +60,20 @@ def f' : ℝ → ℝ → ℝ := by
 
 -- you can apply anonymous functions just by juxtaposition
 
-#eval (fun x y => x + y) 1 2
+#check (fun x y => x + y) 1 2
 
 end anon_functions
 
 -- in the following example, note how `apply`ing `add_le_add` results in two new goals.
 
-variable  (f g : ℝ → ℝ )
+variable { f g : ℝ → ℝ }
 
-example (hfa : FnUb f a) (hgb : FnUb g b) : 
-  FnUb (fun x ↦ f x + g x) (a + b) := by
+example (hfa : FnUb f a) (hgb : FnUb g b) : FnUb (fun x ↦ f x + g x) (a + b) := by
   intro x
   dsimp
   apply add_le_add
-  · --proving first goal
-    apply hfa 
-  · --proving second goal 
-    apply hgb 
+  apply hfa
+  apply hgb
 
 #check add_le_add
 
@@ -128,11 +91,3 @@ example (hfa : FnUb f a) (hgb : FnUb g b) (nng : FnLb g 0) (nna : 0 ≤ a) :
 
 
 --------------------------------------------------------------------------------
-
-example ( P Q : Prop) : P ∧ Q → Q := by
-  intro ⟨hp,hq⟩ 
-  exact hq
-
-example ( P Q : Prop) : P  → P ∨ Q := by
-
-   
