@@ -179,6 +179,8 @@ example (ef : FnEven f) (og : FnOdd g) : FnEven fun x ↦ f (g x) := by
   rw[og]
   rw[← ef]
 
+#eval (1 : ℝ)
+
 --------------------------------------------------------------------------------
 
 --negation
