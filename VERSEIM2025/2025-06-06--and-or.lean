@@ -37,9 +37,58 @@ example (p q : Prop) : p ∧ q → q ∧ p := by
   · exact y
   · exact x
 
+-- alternatively, you can use the same anonymous constructor notation
+-- to produce terms involving ands
+
+example (p q : Prop) : p ∧ q → q ∧ p := by
+  intro ⟨x,y⟩
+  exact ⟨y,x⟩
+
 --------------------------------------------------------------------------------
 
--- 
+-- you can "pattern match" via a `have`
+
+example {x y : ℝ} (h : x ≤ y ∧ x ≠ y) : ¬y ≤ x := by
+  have ⟨h₀, h₁⟩ := h
+  contrapose! h₁
+  exact le_antisymm h₀ h₁
+
+--------------------------------------------------------------------------------
+
+-- iff
+
+-- In Lean, A ↔ B is not defined to be (A → B) ∧ (B → A), but it could have been, and it behaves roughly the same way. 
+
+-- can use `constructor` when proving an iff statement, just like for an `∧`
+
+-- mp stands for `modus ponens` and mpr for `modus ponens reverse`
+-- these are the names of the goals after using `constructor` in the following:
+
+def iff_symm { P Q : Prop } (h: P ↔ Q) : (Q ↔ P) := by
+  exact ⟨ h.mpr, h.mp ⟩
+
+example : (P ↔ Q) ↔ (Q ↔ P) := by
+  constructor
+  · intro hf; exact iff_symm hf
+  · intro hr; exact iff_symm hr
+
+
+example : (P ↔ Q) → (Q ↔ R) → (P ↔ R) := by
+  sorry
+
+
+example {x y : ℝ} (h : x ≤ y) : ¬y ≤ x ↔ x ≠ y := by
+  constructor
+  · contrapose!
+    rintro rfl
+    rfl
+  · contrapose!
+    exact le_antisymm h
+
+example {x y : ℝ} (h : x ≤ y) : ¬y ≤ x ↔ x ≠ y :=
+  ⟨fun h₀ h₁ ↦ h₀ (by rw [h₁]), fun h₀ h₁ ↦ h₀ (le_antisymm h h₁)⟩
+
+--------------------------------------------------------------------------------
 
 
 example (p q : Prop) : p → p ∨ q := by
