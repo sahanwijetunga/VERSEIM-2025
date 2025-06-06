@@ -132,8 +132,19 @@ example (ubf : FnHasUb f) (ubg : FnHasUb g) : FnHasUb fun x => f x + g x := by
 
 def divis (n m : ℕ) : Prop := ∃ x:ℕ, x*n = m
 
+example {n : ℕ} : divis n n := by
+  use 1
+  norm_num
+
 example {n m p :ℕ} (h: divis n m) (k: divis m p) : divis n p := by
-  sorry
+  rcases h with ⟨x0, statement⟩
+  rcases k with ⟨x1, statement1⟩
+  use x0 * x1
+  rw[mul_assoc, mul_comm x1 n, ← mul_assoc]
+  rw[statement]
+  rw[mul_comm]
+  exact statement1
+
 
 -- exercise: give the proofs about even and odd functions:
 
@@ -151,13 +162,22 @@ example (ef : FnEven f) (eg : FnEven g) : FnEven fun x ↦ f x + g x := by
 
 
 example (of : FnOdd f) (og : FnOdd g) : FnEven fun x ↦ f x * g x := by
-  sorry
+  intro x0
+  dsimp
+  rw[of, og]
+  exact neg_mul_neg (f (-x0)) (g (-x0))
 
 example (ef : FnEven f) (og : FnOdd g) : FnOdd fun x ↦ f x * g x := by
-  sorry
+  intro x0
+  dsimp
+  rw[ef, og]
+  ring
 
 example (ef : FnEven f) (og : FnOdd g) : FnEven fun x ↦ f (g x) := by
-  sorry
+  intro x0
+  dsimp
+  rw[og]
+  rw[← ef]
 
 --------------------------------------------------------------------------------
 
@@ -194,12 +214,37 @@ example (h : a < b) : ¬b < a := by
 
 example (h : ∀ a, ∃ x, f x > a) : ¬FnHasUb f := by
   intro fnub
-  rcases fnub with ⟨a, fnuba⟩
-  rcases h a with ⟨x, hx⟩
-  have : f x ≤ a := fnuba x
+  rcases fnub with ⟨a', fnuba⟩
+  rcases h a' with ⟨x, hx⟩
+  have : f x ≤ a' := fnuba x
   linarith
 
 
 -- try this one:
 
---
+example (h: ∀ a, ∃ x, f x < a): ¬FnHasLb f := by
+  sorry
+
+example: ¬FnHasUb fun x ↦ x :=
+  sorry
+
+variable {α : Type*} (P: α → Prop) (Q: Prop)
+
+example (h: ¬∃ x, P x) : ∀ x, ¬ P x := by
+  intro y
+  intro py
+  exact h ⟨y, py⟩
+
+example(h: ∀ x, ¬ P x) : ¬∃ x, P x := by
+  sorry
+
+example(h : ∃ x, ¬ P x) : ¬ ∀ x, P x := by
+  sorry
+
+example (h : ¬∀ x, P x ) : ∃x, ¬P x := by
+  by_contra h'
+  apply h
+  intro x
+  show P x
+  by_contra h''
+  exact h' ⟨x, h''⟩
