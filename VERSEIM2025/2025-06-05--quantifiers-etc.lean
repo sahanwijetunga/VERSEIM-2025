@@ -217,10 +217,16 @@ example : ¬FnHasUb fun x ↦ x :=
 variable {α : Type*} (P : α → Prop) (Q : Prop)
 
 example (h : ¬∃ x, P x) : ∀ x, ¬P x := by
-  sorry
+  intro x
+  intro hpx 
+  apply h
+  use x
+
 
 example (h : ∀ x, ¬P x) : ¬∃ x, P x := by
-  sorry
+  intro kxp    
+  rcases kxp with ⟨x,hx⟩ 
+  exact h x hx
 
 example (h : ∃ x, ¬P x) : ¬∀ x, P x := by
   sorry
@@ -229,4 +235,9 @@ example (h : ∃ x, ¬P x) : ¬∀ x, P x := by
 --------------------------------------------------------------------------------
 
 example (h : ¬∀ x, P x) : ∃ x, ¬P x := by
-  sorry
+  by_contra h'
+  apply h
+  intro x
+  show P x
+  by_contra h''
+  exact h' ⟨x, h''⟩
