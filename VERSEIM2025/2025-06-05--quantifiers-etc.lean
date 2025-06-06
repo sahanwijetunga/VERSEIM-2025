@@ -72,11 +72,12 @@ example : ∃ x : ℝ, 0 < x ∧ x < 1 := by
 
 -- now let's see how to *use* a term of a type involving ∃ as a  hypothesis:
 
-def has_zero (f : ℝ → ℝ) : Prop := ∃ x, f x = 0
+def has_zero (f : ℝ → ℝ) : Prop := ∃ (x:ℝ), f x = 0
 
-example (f g: ℝ → ℝ) (h: has_zero f) : has_zero fun x => f x * g x := by
-  rcases h with ⟨x,hf⟩
-  use x
+example (f g: ℝ → ℝ) (h: has_zero f) : 
+  has_zero fun x => f x * g x := by
+  rcases h with ⟨y,hf⟩
+  use y
   dsimp
   rw [hf]
   norm_num
@@ -123,7 +124,7 @@ example (ubf : FnHasUb f) (ubg : FnHasUb g) : FnHasUb fun x => f x + g x := by
   rcases ubf with ⟨ a, ubfa ⟩
   rcases ubg with ⟨ b, ubgb ⟩
   use a + b
-  apply FnUb_add ubfa ubgb
+  exact FnUb_add ubfa ubgb
 
 
 -----
@@ -131,6 +132,9 @@ example (ubf : FnHasUb f) (ubg : FnHasUb g) : FnHasUb fun x => f x + g x := by
 -- exercise
 
 def divis (n m : ℕ) : Prop := ∃ x:ℕ, x*n = m 
+
+example { n : ℕ} : divis n n := by sorry
+
 
 example {n m p :ℕ} (h: divis n m) (k: divis m p) : divis n p := by
   sorry
@@ -177,7 +181,8 @@ variable (a b :ℝ)
 
 -- and we'll use the transitivity of the relation <, which is named `lt_trans`
 
-example (h : a < b) : ¬b < a := by
+--example (h : a < b) : ¬b < a := by
+example (h : a < b) : b < a → False := by
   intro h'
   have : a < a := lt_trans h h'
   apply lt_irrefl a this
@@ -194,12 +199,45 @@ example (h : a < b) : ¬b < a := by
 
 example (h : ∀ a, ∃ x, f x > a) : ¬FnHasUb f := by
   intro fnub
-  rcases fnub with ⟨a, fnuba⟩
-  rcases h a with ⟨x, hx⟩
-  have : f x ≤ a := fnuba x
+  rcases fnub with ⟨a', fnuba⟩
+  rcases h a' with ⟨x, hx⟩
+  have : f x ≤ a' := fnuba x
   linarith
 
 
 -- try this one:
 
--- 
+example (h : ∀ a, ∃ x, f x < a) : ¬FnHasLb f := by
+  sorry 
+
+example : ¬FnHasUb fun x ↦ x :=
+  sorry
+
+
+variable {α : Type*} (P : α → Prop) (Q : Prop)
+
+example (h : ¬∃ x, P x) : ∀ x, ¬P x := by
+  intro x
+  intro hpx 
+  apply h
+  use x
+
+
+example (h : ∀ x, ¬P x) : ¬∃ x, P x := by
+  intro kxp    
+  rcases kxp with ⟨x,hx⟩ 
+  exact h x hx
+
+example (h : ∃ x, ¬P x) : ¬∀ x, P x := by
+  sorry
+
+
+--------------------------------------------------------------------------------
+
+example (h : ¬∀ x, P x) : ∃ x, ¬P x := by
+  by_contra h'
+  apply h
+  intro x
+  show P x
+  by_contra h''
+  exact h' ⟨x, h''⟩
