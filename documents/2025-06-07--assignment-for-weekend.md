@@ -49,8 +49,8 @@ date: 2025-06-06
   - Sahan, can you do this for use of the `rcases` tactic, especially
     its use for unpacking an `or`
 
-  - Clea, I know you are traveling. But maybe you can give the group a
-    description of – and a couple of examples of the `ex falso` tactic.
+  - Clea, I know you are traveling. But maybe you do this for the `ex
+    falso` tactic at the end of §3.3
 
 
 * this week
