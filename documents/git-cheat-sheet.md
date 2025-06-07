@@ -1,12 +1,39 @@
 
-# set up ssh-keys for use with `git`
+# ongoing tasks
+## updating your local copy of the repository
+
+  You should do work in your personal directory; that should avoid
+  conflicts.
+
+  When you want/need to get an updated copy of the repository, do the following.
+
+  ```
+  # commit your personal changes
+  git branch george   ## just to make sure we are on the right branch. replace "george" with your name
+  git add .           ## stage all your work
+  git commit -m "some explanatory note for the commit"   ## commit your chagnes
+  git push            ## push the changes to the remote server -- i.e. to github
+  
+  # pull the changes from the server on the main branch
+  
+  git branch main
+  git pull
+  git branch george   ## again, replace george by your name...
+  git merge main
+  git branch george   ## return to work on your branch
+  ```
+  
+
+# initial set-up
+
+## set up ssh-keys for use with `git`
 
   [this linked
   article](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
   explains what needs to be done. Follow up if you have issues/need to
   ask questions!
 
-# clone our repository 
+## clone our repository 
 
   Once you have installed `git` on your computer, and once you have
   your `ssh key` set up for authentication to your github account (see
@@ -21,7 +48,7 @@
   `VERSEIM-2025` on your computer (below the current directory of the
   shell in which you executed the command).
 
-# make your own `branch` in the repository
+## make your own `branch` in the repository
 
   To accomplish this on a `mac` or `linux` computer, type
   
@@ -113,8 +140,7 @@
   
   Now let's add these new contents to our the remote branch.
   The required sequence of steps is "add (or stage) - commit - push".
-  
-  
+   
   
   ```
   # make sure we are on the right branch
@@ -141,3 +167,7 @@
   Now we have `staged` and `committed` our changes, and we need to
   push them to the remote server (i.e. "to `github`").
 
+
+  ```
+  git push
+  ```	  
