@@ -11,7 +11,7 @@
   # commit your personal changes
   git branch george   ## just to make sure we are on the right branch. replace "george" with your name
   git add .           ## stage all your work
-  git commit -m "some explanatory note for the commit"   ## commit your chagnes
+  git commit -m "some explanatory note for the commit"   ## commit your changes
   git push            ## push the changes to the remote server -- i.e. to github
   
   # pull the changes from the server on the main branch
@@ -20,7 +20,6 @@
   git pull
   git branch george   ## again, replace george by your name...
   git merge main
-  git branch george   ## return to work on your branch
   ```
   
 
