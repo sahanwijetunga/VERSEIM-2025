@@ -3,6 +3,8 @@
 This is the repository for the *formalization project* of the [2025
 VERSEIM-REU](https://sites.tufts.edu/verseimreu/).
 
+- [assignment for weekend of 2025-06-07 - 2025-06-08](/documents/2025-06-07--assignment-for-weekend.md)
+
 It contains some [documents](/documents/) with notes, including:
 
 - The slides for the ["kick-off talk"](/documents/2025-06-01--formalization-kickoff-talk-slides.pdf)
