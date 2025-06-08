@@ -17,4 +17,4 @@ VERSEIM-REU](https://sites.tufts.edu/verseimreu/).
 
 - this repository also contains [`Lean` code](/VERSEIM2025/)
 
-  
+- potential [topics for formalization](documents/domain-topics.md)
