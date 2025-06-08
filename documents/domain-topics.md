@@ -2,5 +2,7 @@
 
 # Here are some examples of math that we can attempt to formalize
 
-- [quaternion algebras (web)](/documents/quaternions/quaternion-algebras.md)
-  and [pdf](/documents/quaternions/quaternion-algebras.pdf)
+  These documents are PDFs, and it is better to download them than to view "in github..."
+
+- [quaternion algebras](/documents/quaternions/quaternion-algebras.pdf)
+
