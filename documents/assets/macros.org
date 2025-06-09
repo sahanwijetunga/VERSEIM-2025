@@ -62,6 +62,7 @@
   \newcommand{\content}{\operatorname{content}}
 
   \newcommand{\Mat}{\operatorname{Mat}}
+  \newcommand{\Hom}{\operatorname{Hom}}
 
   \newcommand{\Aut}{\operatorname{Aut}}
   \newcommand{\Gal}{\operatorname{Gal}}
@@ -89,4 +90,180 @@
   \newcommand{\Poly}{\mathcal{P}}
   %%--------------------------------------------------------------------------------
 #+END_SRC
+
+#+RESULTS: latex macros
+#+LATEX_HEADER: 
+#+LATEX_HEADER: %%--------------------------------------------------------------------------------
+#+LATEX_HEADER: 
+#+LATEX_HEADER: \usepackage[svgnames]{xcolor}
+#+LATEX_HEADER: \usepackage{mathrsfs}
+#+LATEX_HEADER: \usepackage{tikz-cd}
+#+LATEX_HEADER: \usepackage{svg}
+#+LATEX_HEADER: \usepackage[top=25mm,bottom=25mm,left=25mm,right=30mm]{geometry}
+#+LATEX_HEADER: 
+#+LATEX_HEADER: 
+#+LATEX_HEADER: \usepackage{amsthm}
+#+LATEX_HEADER: \usepackage{thmtools}
+#+LATEX_HEADER: \usepackage{cleveref}
+#+LATEX_HEADER: \usepackage{stmaryrd}
+#+LATEX_HEADER: 
+#+LATEX_HEADER: %%\usepackage[outputdir=build]{minted}
+#+LATEX_HEADER: \usepackage{minted}  
+#+LATEX_HEADER: \usemintedstyle{tango}
+#+LATEX_HEADER: \usepackage[svgnames]{xcolor}
+#+LATEX_HEADER: \setminted[bash]{bgcolor=NavajoWhite}
+#+LATEX_HEADER: \setminted[python]{bgcolor=Lavender}
+#+LATEX_HEADER: \setminted[sage]{bgcolor=Lavender}
+#+LATEX_HEADER: 
+#+LATEX_HEADER: \usepackage{titlesec}
+#+LATEX_HEADER: %%\newcommand{\sectionbreak}{\clearpage}
+#+LATEX_HEADER: 
+#+LATEX_HEADER: 
+#+LATEX_HEADER: \renewcommand{\descriptionlabel}[1]{\hspace{\labelsep}#1}
+#+LATEX_HEADER: 
+#+LATEX_HEADER: 
+#+LATEX_HEADER: \usepackage[cal=boondox]{mathalfa}
+#+LATEX_HEADER: 
+#+LATEX_HEADER: 
+#+LATEX_HEADER: \newenvironment{referee}{\color{red}}{\color{black}}
+#+LATEX_HEADER: 
+#+LATEX_HEADER: \numberwithin{equation}{section}
+#+LATEX_HEADER: 
+#+LATEX_HEADER: \declaretheorem[numberwithin=subsection,Refname={Theorem,Theorems}]{theorem}
+#+LATEX_HEADER: \declaretheorem[sibling=theorem,name=Proposition,Refname={Proposition,Propositions}]{proposition}
+#+LATEX_HEADER: \declaretheorem[sibling=theorem,name=Corollary,Refname={Corollary,Corollaries}]{corollary}
+#+LATEX_HEADER: \declaretheorem[sibling=theorem,name=Lemma,Refname={Lemma,Lemmas}]{lemma}
+#+LATEX_HEADER: \declaretheorem[sibling=theorem,name=Remark,style=remark,Refname={Remark,Remarks}]{remark}
+#+LATEX_HEADER: \declaretheorem[sibling=theorem,name=Problem,style=remark,Refname={Problem,Problems}]{problem}
+#+LATEX_HEADER: \declaretheorem[sibling=theorem,name=Example,style=remark,Refname={Example,Examples}]{ex}  
+#+LATEX_HEADER: \declaretheorem[sibling=theorem,name=Definition,style=remark,Refname={Definition,Definitions}]{definition}
+#+LATEX_HEADER: 
+#+LATEX_HEADER: \crefname{equation}{}{}
+#+LATEX_HEADER: 
+#+LATEX_HEADER: %%--------------------------------------------------------------------------------
+#+LATEX_HEADER: 
+#+LATEX_HEADER: \newenvironment{solution}
+#+LATEX_HEADER:                {\par \color{red}\hrulefill \newline \noindent \textbf{Solution:} \vspace{2mm}}
+#+LATEX_HEADER:                {\vspace{2mm} \color{black}}
+#+LATEX_HEADER: 
+#+LATEX_HEADER: 
+#+LATEX_HEADER: \newcommand{\totdeg}{\operatorname{totdeg}}
+#+LATEX_HEADER: \newcommand{\content}{\operatorname{content}}
+#+LATEX_HEADER: 
+#+LATEX_HEADER: \newcommand{\Mat}{\operatorname{Mat}}
+#+LATEX_HEADER: \newcommand{\Hom}{\operatorname{Hom}}
+#+LATEX_HEADER: 
+#+LATEX_HEADER: \newcommand{\Aut}{\operatorname{Aut}}
+#+LATEX_HEADER: \newcommand{\Gal}{\operatorname{Gal}}
+#+LATEX_HEADER: 
+#+LATEX_HEADER: \newcommand{\A}{\mathscr{A}}
+#+LATEX_HEADER: \newcommand{\B}{\mathscr{B}}
+#+LATEX_HEADER: \newcommand{\FF}{\mathscr{F}}
+#+LATEX_HEADER: \newcommand{\LF}{\mathcal{LF}}
+#+LATEX_HEADER: 
+#+LATEX_HEADER: \newcommand{\HH}{\mathcal{H}}
+#+LATEX_HEADER: \newcommand{\X}{\mathscr{X}}
+#+LATEX_HEADER: 
+#+LATEX_HEADER: \newcommand{\ff}{\mathfrak{f}}
+#+LATEX_HEADER: \newcommand{\pp}{\mathfrak{p}}
+#+LATEX_HEADER: 
+#+LATEX_HEADER: \newcommand{\Z}{\mathbb{Z}}
+#+LATEX_HEADER: \newcommand{\Nat}{\mathbb{N}}
+#+LATEX_HEADER: \newcommand{\Q}{\mathbb{Q}}
+#+LATEX_HEADER: \newcommand{\R}{\mathbb{R}}
+#+LATEX_HEADER: \newcommand{\C}{\mathbb{C}}
+#+LATEX_HEADER: \newcommand{\F}{\mathbb{F}}
+#+LATEX_HEADER: 
+#+LATEX_HEADER: \newcommand{\PP}{\mathbb{P}}
+#+LATEX_HEADER: 
+#+LATEX_HEADER: \newcommand{\Poly}{\mathcal{P}}
+#+LATEX_HEADER: %%--------------------------------------------------------------------------------
+#+HTML_HEAD_EXTRA: <div style="display: none"> \(
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: %%--------------------------------------------------------------------------------
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: \usepackage[svgnames]{xcolor}
+#+HTML_HEAD_EXTRA: \usepackage{mathrsfs}
+#+HTML_HEAD_EXTRA: \usepackage{tikz-cd}
+#+HTML_HEAD_EXTRA: \usepackage{svg}
+#+HTML_HEAD_EXTRA: \usepackage[top=25mm,bottom=25mm,left=25mm,right=30mm]{geometry}
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: \usepackage{amsthm}
+#+HTML_HEAD_EXTRA: \usepackage{thmtools}
+#+HTML_HEAD_EXTRA: \usepackage{cleveref}
+#+HTML_HEAD_EXTRA: \usepackage{stmaryrd}
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: %%\usepackage[outputdir=build]{minted}
+#+HTML_HEAD_EXTRA: \usepackage{minted}  
+#+HTML_HEAD_EXTRA: \usemintedstyle{tango}
+#+HTML_HEAD_EXTRA: \usepackage[svgnames]{xcolor}
+#+HTML_HEAD_EXTRA: \setminted[bash]{bgcolor=NavajoWhite}
+#+HTML_HEAD_EXTRA: \setminted[python]{bgcolor=Lavender}
+#+HTML_HEAD_EXTRA: \setminted[sage]{bgcolor=Lavender}
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: \usepackage{titlesec}
+#+HTML_HEAD_EXTRA: %%\newcommand{\sectionbreak}{\clearpage}
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: \renewcommand{\descriptionlabel}[1]{\hspace{\labelsep}#1}
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: \usepackage[cal=boondox]{mathalfa}
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: \newenvironment{referee}{\color{red}}{\color{black}}
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: \numberwithin{equation}{section}
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: \declaretheorem[numberwithin=subsection,Refname={Theorem,Theorems}]{theorem}
+#+HTML_HEAD_EXTRA: \declaretheorem[sibling=theorem,name=Proposition,Refname={Proposition,Propositions}]{proposition}
+#+HTML_HEAD_EXTRA: \declaretheorem[sibling=theorem,name=Corollary,Refname={Corollary,Corollaries}]{corollary}
+#+HTML_HEAD_EXTRA: \declaretheorem[sibling=theorem,name=Lemma,Refname={Lemma,Lemmas}]{lemma}
+#+HTML_HEAD_EXTRA: \declaretheorem[sibling=theorem,name=Remark,style=remark,Refname={Remark,Remarks}]{remark}
+#+HTML_HEAD_EXTRA: \declaretheorem[sibling=theorem,name=Problem,style=remark,Refname={Problem,Problems}]{problem}
+#+HTML_HEAD_EXTRA: \declaretheorem[sibling=theorem,name=Example,style=remark,Refname={Example,Examples}]{ex}  
+#+HTML_HEAD_EXTRA: \declaretheorem[sibling=theorem,name=Definition,style=remark,Refname={Definition,Definitions}]{definition}
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: \crefname{equation}{}{}
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: %%--------------------------------------------------------------------------------
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: \newenvironment{solution}
+#+HTML_HEAD_EXTRA:                {\par \color{red}\hrulefill \newline \noindent \textbf{Solution:} \vspace{2mm}}
+#+HTML_HEAD_EXTRA:                {\vspace{2mm} \color{black}}
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: \newcommand{\totdeg}{\operatorname{totdeg}}
+#+HTML_HEAD_EXTRA: \newcommand{\content}{\operatorname{content}}
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: \newcommand{\Mat}{\operatorname{Mat}}
+#+HTML_HEAD_EXTRA: \newcommand{\Hom}{\operatorname{Hom}}
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: \newcommand{\Aut}{\operatorname{Aut}}
+#+HTML_HEAD_EXTRA: \newcommand{\Gal}{\operatorname{Gal}}
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: \newcommand{\A}{\mathscr{A}}
+#+HTML_HEAD_EXTRA: \newcommand{\B}{\mathscr{B}}
+#+HTML_HEAD_EXTRA: \newcommand{\FF}{\mathscr{F}}
+#+HTML_HEAD_EXTRA: \newcommand{\LF}{\mathcal{LF}}
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: \newcommand{\HH}{\mathcal{H}}
+#+HTML_HEAD_EXTRA: \newcommand{\X}{\mathscr{X}}
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: \newcommand{\ff}{\mathfrak{f}}
+#+HTML_HEAD_EXTRA: \newcommand{\pp}{\mathfrak{p}}
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: \newcommand{\Z}{\mathbb{Z}}
+#+HTML_HEAD_EXTRA: \newcommand{\Nat}{\mathbb{N}}
+#+HTML_HEAD_EXTRA: \newcommand{\Q}{\mathbb{Q}}
+#+HTML_HEAD_EXTRA: \newcommand{\R}{\mathbb{R}}
+#+HTML_HEAD_EXTRA: \newcommand{\C}{\mathbb{C}}
+#+HTML_HEAD_EXTRA: \newcommand{\F}{\mathbb{F}}
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: \newcommand{\PP}{\mathbb{P}}
+#+HTML_HEAD_EXTRA: 
+#+HTML_HEAD_EXTRA: \newcommand{\Poly}{\mathcal{P}}
+#+HTML_HEAD_EXTRA: %%--------------------------------------------------------------------------------
+#+HTML_HEAD_EXTRA: \)</div>
 

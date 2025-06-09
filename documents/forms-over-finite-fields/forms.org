@@ -5,8 +5,164 @@
 #+OPTIONS: toc:nil ':t 
 
 #+keywords: linear-algebra, finite-fields, bilinear-forms
-
+#+bibliography: /home/george/Prof-Math/assets/math-bibliography.bib
+#+cite_export: csl ../assets/chicago-author-date.csl
 #+INCLUDE: "../assets/macros.org" 
 
 * Some references
 
+- Simeon Ball - "Finite Geometries and Combinatorial Applications" (2015, Cambridge Univ Press)
+
+  (available electronically via Tufts' Tisch Library)
+
+- /Linear algebra and matrices : topics for a second course/
+  Shapiro, Helene, 1954-
+  Providence, Rhode Island : American Mathematical Society, 2015
+
+- some [[https://personal.math.ubc.ca/~cass/siegel/FiniteFields.pdf][notes of Bill Casselmann (UBC)]]
+
+* Statements
+
+Here is an overview of the results I'd like to see formalized. For
+alternating forms, there is no need to put any hypotheses on the
+field. For symmetric forms, we'll consider finite fields.
+
+
+Let \(V\) be a finite dimensional vector space over a (any!) field
+\(k\) and let \(\beta:V \times V \to k\) be a bilinear form.
+
+We write \(V^\vee\) for the dual of \(V\) -- i.e. the set
+\(\Hom_k(V,k)\) of all linear maps \(V \to k\).  Then \(V^\vee\) is
+again a vector space over \(k\) and \(\dim V = \dim V^\vee.\)
+
+Notice that \(\beta\) determines a linear mapping
+\[\Phi_\beta:V \to \Hom_k(V,k)\] by the rule
+\(v \mapsto \beta(v,-).\)
+
+Thus for \(v \in V\), \(\Phi_\beta(v)\) is the linear mapping which for \(w\in V\) satisfies
+\[\Phi_\beta(v)(w) = \beta(v,w).\]
+
+The form \(\beta\) is /non-degenerate/ provided that the linear mapping
+\(\Phi_\beta\) is an invertible.
+
+If \(e_1,\cdots,e_d\) is a basis for \(V\), the /matrix of \(\beta\)/
+for this basis is the \(d \times d\) matrix whose \(i,j\) entry is
+\(\beta(e_i,e_j)\).
+
+#+name: lemma:non-deg-condition
+#+begin_lemma
+The following are equivalent for \(\beta\):
+- (1) :: \(\beta\) is non-degenerate
+- (2) :: \(\beta(v,w) = 0\) for every \(w \in V\) implies that \(v = 0\).
+- (3) :: \(\det M\ne 0\) where \(M\) is the matrix of \(\beta\) with
+  respect to some (any) basis of \(V\).
+#+end_lemma
+
+If \(W \subset V\) is a subspace, we say that \(W\) is nondegenerate
+if the restriction \(\beta_{\mid W}\) is a non-degenerate form on
+\(W\).
+
+(Notice!: we write \(\beta_{\mid W}\) for the restriction, but really
+this means the restriction of the function \(\beta\) from \(V\times V\)
+to \(W \times W\)).
+
+#+name: lemma:orthog-sum
+#+begin_lemma
+Let \(W_1,W_2\) be non-degenerate subspaces of \(V\).
+Suppose that
+- (1) :: \(W_1 \cap W_2 = 0\).
+- (2) :: \(\beta(W_1,W_2) = 0\) -- i.e. \(\beta(w_1,w_2) = 0\) for all
+  \(w_1 \in W_1\) and all \(w_2 \in W_2\).
+Then \(W_1 + W_2\) is a non-degenerate subspace.
+#+end_lemma
+
+Suppose that \(W\) is a subspace of \(V\). We say that Then \(W\) is
+said to be the /orthogonal sum/ of the subspaces \(W_1, W_2\)
+if \(W= W_1 + W_2\) and if \(W_1\) and \(W_2\) satisfy the hypotheses
+of the previous Lemma.
+
+** Equivalence of forms
+:PROPERTIES:
+:CUSTOM_ID: sec:equivalence-of-forms
+:END:
+
+Let \(V_1,\beta_1\) and \(V_2,\beta_2\) be pairs each consisting of a
+vector space together with a bilinear form.
+
+We say that \(V_1,\beta_1\) is /isomorphic/ to \(V_2,\beta_2\) if
+there is an invertible linear mapping \(\phi:V_1 \to V_2\) such that
+for every \(x,y \in V_1\), we have \[\beta_1(x,y) =
+\beta_2(\phi(x),\phi(y)).\]
+
+We then say that \(\phi\) is an /isomorphism/.
+
+#+name: lemma:isomorphism-preserves-nondegen
+#+begin_lemma
+Suppose that that \(V_1,\beta_1\) is /isomorphic/ to \(V_2,\beta_2\).
+Then \(\beta_1\) is non-degenerate if and only if \(\beta_2\) is
+non-degenerate.
+#+end_lemma
+
+** Alternating forms
+:PROPERTIES:
+:CUSTOM_ID: sec:alternating-forms
+:END:
+
+We say that \(\beta\) is /alternating/ (or /skew-symmetric/) if
+\(\beta(x,x) = 0\) for every \(x \in V\).
+
+#+name: lemma:alt-skew
+#+begin_lemma
+If \(\beta\) is alternating then \(\beta(x,y) = -\beta(y,x)\) for each
+\(x,y \in V\). If the characteristic of \(k\) is not 2, the converse
+also holds.
+#+end_lemma
+
+Suppose that \(\beta\) is alternating.
+A 2 dimensional subspace \(W\) of \(V\) is said to be /hyperbolic/ if \(W\) has a basis
+\(e,f\) such that \(\beta(e,f) = 1\).
+
+Note that a hyperbolic subspace is non-degenerate (use
+Cref:lemma:non-deg-condition and the fact that \(\det \begin{bmatrix}
+0 & 1 \\ -1 & 0 \end{bmatrix}\) is non-zero).
+
+More generally, a subspace \(W\) of dimension \(\ge 2\) is said to be
+/hyperbolic/ if \(W\) is the orthogonal sum of subspaces \(W_1,W_2\)
+where \(W_1\) is hyperbolic of dimension 2, and \(W_2\) is either
+itself hyperbolic or zero.
+
+#+name: lemma:hyperbolic-equiv
+#+begin_lemma
+Suppose that \(V_1,\beta_1\) and \(V_2,\beta_2\) are spaces of vector
+spaces together with alternating forms \(\beta_i\). If \(W_1\) is a
+hyperbolic subspace of \(V_1\) and if \(W_2\) is a hyperbolic subspace
+of \(V_2\) then \(W_1,\beta_{1\mid W_1}\) and \(W_2,\beta_{2\mid W_2}\)
+are isomorphic.
+#+end_lemma
+
+#+name: lemma:hyperbolic-even-dimensional
+#+begin_lemma
+If \(W\) is a hyperbolic subspace of \(V\), then \(W\) is
+non-degenerate and \(\dim W\) is even.
+#+end_lemma
+
+#+name: theorem:alternating-forms-are-hyperbolic
+#+begin_theorem
+Suppose that \(\beta\) is a non-degenerate alternating form on
+\(V\). Then \(V\) is hyperbolic. In particular, \(\dim V\) is even. 
+#+end_theorem
+
+#+name: corollary:alternating-forms-classified
+#+begin_corollary
+Suppose for \(i=1,2\) that \(V_i,\beta_i\) is a space \(V_i\) together
+with a non-degenerate alternating form \(\beta_i\) on \(V_i\).
+If \(\dim V_1 = \dim V_2\) then \(V_1,\beta_1\) is isomorphic to
+\(V_2,\beta_2\).
+#+end_corollary
+
+** Symmetric forms
+:PROPERTIES:
+:CUSTOM_ID: sec:symmetric-forms
+:END:
+
+...
