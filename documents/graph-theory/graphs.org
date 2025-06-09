@@ -1,0 +1,12 @@
+#+title: Graph theory
+#+author: George McNinch  
+#+date: {{{current}}}  
+
+#+OPTIONS: toc:nil ':t 
+
+#+keywords: graph-theory
+
+#+INCLUDE: "../assets/macros.org" 
+
+* Some references
+

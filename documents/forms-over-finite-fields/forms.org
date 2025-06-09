@@ -1,0 +1,12 @@
+#+title: Forms over a finite field
+#+author: George McNinch  
+#+date: {{{current}}}  
+
+#+OPTIONS: toc:nil ':t 
+
+#+keywords: linear-algebra, finite-fields, bilinear-forms
+
+#+INCLUDE: "../assets/macros.org" 
+
+* Some references
+

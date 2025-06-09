@@ -1,0 +1,22 @@
+#+title: Grassmannians etc.
+#+author: George McNinch  
+#+date: {{{current}}}  
+
+#+OPTIONS: toc:nil ':t 
+
+#+keywords: linear-algebra geometry
+
+#+INCLUDE: "../assets/macros.org" 
+
+* Some references
+
+* Projective spaces
+
+* Description of the grassmannian
+
+* Exterior powers of a vector space
+
+* Plücker embedding of the grassmannian
+
+
+
