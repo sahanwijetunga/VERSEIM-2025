@@ -122,59 +122,66 @@ example (p q : Prop) (hpq : p → q) (hnq : ¬q) : ¬p := by
 
 -- let's consider complex numbers with rational real and imaginary part
 
-@[ext]
+ @[ext]
 structure complex where
   re : ℚ
   im : ℚ
 
-def myZ0 : complex := complex.mk 1 2
-
-def myZ1 : complex := ⟨ 1, 2 ⟩
-
-#eval myZ1
-
--- the @[ext] stilpulation before the defn makes extensionality work
--- for our type
-
---e.g.
-
-example (a b : complex) (hre : a.re = b.re) (him : a.im = b.im) : a = b := by 
-  ext
-  repeat assumption
-
-example : myZ0 = myZ1 := by
-  ext
-  repeat rw [myZ0, myZ1]
-
-
--- how to define functions on structures??
-
 
 namespace complex
 
-def add (a b : complex) : complex where
+def myz0 : complex := ⟨ 1,2 ⟩
+def myz1 : complex := complex.mk 1 2
+
+#eval myz0
+#eval myz1 
+
+example ( a b : complex) (hr : a.re = b.re) (hi : a.im = b.im) : a= b := by
+  ext
+  repeat assumption 
+
+example : myz0 = myz1 := by
+  ext
+  repeat rw [ myz0, myz1]
+
+-- how to define functions on our new type??
+
+
+
+def add ( a b : complex) : complex where
   re := a.re + b.re
   im := a.im + b.im
 
+#eval add myz0 myz0 
+
 def mul (a b : complex) : complex where
-  re := a.re * b.re - a.im * b.im  
+  re := a.re * b.re - a.im * b.im
   im := a.re * b.im + b.re * a.im
 
 def conj (a:complex) : complex where
   re := a.re
   im := -a.im
 
-def norm_sq (a:complex) : ℚ :=
+#eval mul myz0 (conj myz0 )
+
+def norm_sq (a:complex) : ℚ := 
   (mul a (conj a)).re
 
-#check complex.add myZ0 myZ1
-
-#eval complex.add myZ0 myZ1
-
-#eval complex.norm_sq myZ0
-
-
-
+#eval norm_sq myz0 
 
 end complex
 
+structure mygroup where
+  carrier : Type
+  mul : carrier → carrier → carrier 
+  e : carrier
+  
+  identity_law_l (g:carrier) : mul e g = g
+  identity_law_r  (g:carrier) : mul g e = g
+
+  assoc ( g h k : carrier) : mul (mul g h) k = mul g (mul h k)
+
+  inverse (g : carrier) : ∃ h, mul g h = e
+
+-- example : mygroup := 
+--   mygroup.mk ....
