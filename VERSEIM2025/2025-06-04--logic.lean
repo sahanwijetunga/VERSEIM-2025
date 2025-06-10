@@ -9,10 +9,10 @@ Author : George McNinch
 
 import Mathlib.Tactic
 
-def F : ℕ → (ℕ → ℕ) := 
+def F : ℕ → (ℕ → ℕ) :=
   fun x y =>  x^y + y
 
-#eval F 2 500 
+#eval F 2 500
 
 
 #check F 0
@@ -22,7 +22,7 @@ def F' : ℤ × ℤ → ℤ :=
 
 
 
-def foo (s t :String) : ℤ := 
+def foo (s t :String) : ℤ :=
    match s,t with
    | "george",_ => 1
    | "sahan" ,_=> 2
@@ -55,11 +55,18 @@ def foo (s t :String) : ℤ :=
 
 #check (x:ℝ) → 0 ≤ x → abs x = x
 
-#check abs_of_nonneg 
- 
+#check abs_of_nonneg
+
 example : ∀ x : ℝ, 0 ≤ x → |x| = x := by
   intro x h
   exact abs_of_nonneg h
+
+example (x: ℝ): x + 0 = x := by
+  rw[add_zero]
+
+example (x: ℝ): x + 0 = x := by
+  exact add_zero x
+
 
 -- let's define some *predicates* on real-valued functions of a real variable
 
@@ -70,7 +77,7 @@ def FnLb (f : ℝ → ℝ) (a : ℝ) : Prop :=
   ∀ x, a ≤ f x
 
 def FnBoundedByFn (f g : ℝ → ℝ) : Prop :=
-  ∀ x, f x ≤ g x 
+  ∀ x, f x ≤ g x
 
 
 -- read: `FnUB f a` means that the values of function `f` are bounded
@@ -82,7 +89,7 @@ section anon_functions
 -- often called a `lambda` in some programming languages ("anonomous
 -- function")
 
--- for example 
+-- for example
 
 def f : ℝ → ℝ → ℝ := fun x y => x + y
 
@@ -102,15 +109,15 @@ end anon_functions
 
 variable  (f g : ℝ → ℝ )
 
-example (hfa : FnUb f a) (hgb : FnUb g b) : 
+example (hfa : FnUb f a) (hgb : FnUb g b) :
   FnUb (fun x ↦ f x + g x) (a + b) := by
   intro x
   dsimp
   apply add_le_add
   · --proving first goal
-    apply hfa 
-  · --proving second goal 
-    apply hgb 
+    apply hfa
+  · --proving second goal
+    apply hgb
 
 #check add_le_add
 
@@ -130,9 +137,7 @@ example (hfa : FnUb f a) (hgb : FnUb g b) (nng : FnLb g 0) (nna : 0 ≤ a) :
 --------------------------------------------------------------------------------
 
 example ( P Q : Prop) : P ∧ Q → Q := by
-  intro ⟨hp,hq⟩ 
+  intro ⟨hp,hq⟩
   exact hq
 
 example ( P Q : Prop) : P  → P ∨ Q := by
-
-   

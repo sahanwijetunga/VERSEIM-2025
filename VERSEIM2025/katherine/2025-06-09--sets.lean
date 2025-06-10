@@ -72,3 +72,18 @@ example : (s ∩ t) ∪ (s ∩ u) ⊆ s ∩ (t ∪ u) := by
   · use xs
     right
     exact xu
+
+example : (fun x y : ℝ ↦ (x + y) ^ 2) = fun x y : ℝ ↦ x ^ 2 + 2 * x * y + y ^ 2 := by
+  ext
+  ring
+
+example : s ∩ t = t ∩ s := by
+  ext x
+  simp only [mem_inter_iff]
+  constructor
+  · rintro ⟨xs, xt⟩; exact ⟨xt, xs⟩
+  · rintro ⟨xt, xs⟩; exact ⟨xs, xt⟩
+
+example : ({1}: Set ℕ) = ({1, 1}: Set ℕ) := by
+  ext y
+  simp
