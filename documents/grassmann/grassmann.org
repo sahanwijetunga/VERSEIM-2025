@@ -1,4 +1,4 @@
-#+title: Grassmannians etc.
+#+title: Grassmannians and exterior powers
 #+author: George McNinch  
 #+date: {{{current}}}  
 
@@ -9,6 +9,14 @@
 #+INCLUDE: "../assets/macros.org" 
 
 * Some references
+
+- These notes from an "undergraduate algebraic geometry" course of Joe
+  Harris at Harvard have some notes on the Grassmannian:
+
+  https://people.math.harvard.edu/~landesman/assets/harris-undergrad-algebraic-geometry-notes.pdf
+
+- Text of Shaferevich and Remizov [[https://link.springer.com/book/10.1007/978-3-642-30994-6][Linear Algebra and Geometry]]
+  (should be available electronically on campus)
 
 * Projective spaces
 

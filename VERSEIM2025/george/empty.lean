@@ -9,3 +9,9 @@ def option_to_string : Option String → String :=
 #eval option_to_string (some "foo")
 
 #eval option_to_string none
+
+
+example : ({ 1, 1, 2 }:Set ℕ) = ({ 1, 2 }:Set ℕ) := by
+  ext
+  
+
