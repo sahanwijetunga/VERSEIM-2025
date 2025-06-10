@@ -103,3 +103,65 @@ theorem convergesTo_mul {s t : ℕ → ℝ} {a b : ℝ}
   convert convergesTo_add h₁ (convergesTo_mul_const b cs) using 1
   · ext; ring
   ring
+
+--------------------------------------------------------------------------------
+
+-- structures
+
+-- let's consider complex numbers with rational real and imaginary part
+
+@[ext]
+structure complex where
+  re : ℚ
+  im : ℚ
+
+def myZ0 : complex := complex.mk 1 2
+
+def myZ1 : complex := ⟨ 1, 2 ⟩
+
+#eval myZ1
+
+-- the @[ext] stilpulation before the defn makes extensionality work
+-- for our type
+
+--e.g.
+
+example (a b : complex) (hre : a.re = b.re) (him : a.im = b.im) : a = b := by 
+  ext
+  repeat assumption
+
+example : myZ0 = myZ1 := by
+  ext
+  repeat rw [myZ0, myZ1]
+
+
+-- how to define functions on structures??
+
+
+namespace complex
+
+def add (a b : complex) : complex where
+  re := a.re + b.re
+  im := a.im + b.im
+
+def mul (a b : complex) : complex where
+  re := a.re * b.re - a.im * b.im  
+  im := a.re * b.im + b.re * a.im
+
+def conj (a:complex) : complex where
+  re := a.re
+  im := -a.im
+
+def norm_sq (a:complex) : ℚ :=
+  (mul a (conj a)).re
+
+#check complex.add myZ0 myZ1
+
+#eval complex.add myZ0 myZ1
+
+#eval complex.norm_sq myZ0
+
+
+
+
+end complex
