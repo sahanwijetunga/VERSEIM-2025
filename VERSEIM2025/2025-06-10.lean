@@ -41,7 +41,6 @@ example (α:Type) (A : ℕ → Set α) : Set α := by
   exact ⋃ i, A i
 
 
-
 --------------------------------------------------------------------------------
 
 def ConvergesTo (s : ℕ → ℝ) (a : ℝ) :=
@@ -104,6 +103,19 @@ theorem convergesTo_mul {s t : ℕ → ℝ} {a b : ℝ}
   · ext; ring
   ring
 
+
+--------------------------------------------------------------------------------
+
+example (p q : Prop) (hpq : p → q) (hnq : ¬q) : ¬p := by
+  intro p
+  have hq : q := hpq p
+  absurd hnq hq
+
+
+  -- fun hp : p =>
+  -- show False from hnq (hpq hp)
+
+
 --------------------------------------------------------------------------------
 
 -- structures
@@ -165,3 +177,4 @@ def norm_sq (a:complex) : ℚ :=
 
 
 end complex
+
