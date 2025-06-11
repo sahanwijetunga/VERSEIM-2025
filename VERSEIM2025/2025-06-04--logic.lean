@@ -61,13 +61,6 @@ example : ∀ x : ℝ, 0 ≤ x → |x| = x := by
   intro x h
   exact abs_of_nonneg h
 
-example (x: ℝ): x + 0 = x := by
-  rw[add_zero]
-
-example (x: ℝ): x + 0 = x := by
-  exact add_zero x
-
-
 -- let's define some *predicates* on real-valued functions of a real variable
 
 def FnUb (f : ℝ → ℝ) (a : ℝ) : Prop :=
