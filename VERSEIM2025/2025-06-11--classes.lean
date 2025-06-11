@@ -235,4 +235,32 @@ instance : Inhabited two_simplex where
 
 #eval (Inhabited.default : two_simplex)
 
+--------------------------------------------------------------------------------
 
+-- group as typeclass rather than as a structure.
+
+variable (G:Type) [Group G]
+
+#check Group 
+
+example ( x y : G) : G := x * y  -- Mul.mul x y 
+
+example ( x : G) : x*1 = x := by group -- here 1 is the `one` term defined by the group structure 
+
+--------------------------------------------------------------------------------
+
+-- in Lean we need to consider also additive groups
+
+variable (A : Type) [ aaa : AddGroup A ]
+
+example ( a b c : A) : a + b + c = a + (b + c) :=  by
+   rw [ add_assoc ]
+
+--------------------------------------------------------------------------------
+
+-- THis is how to say " let V be a vector space over k "
+
+variable ( k : Type ) [ Field k ]
+
+
+variable (V : Type) [AddCommGroup V ] [ Module k V ] 
