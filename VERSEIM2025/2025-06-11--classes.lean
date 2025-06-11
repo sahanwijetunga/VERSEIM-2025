@@ -154,3 +154,73 @@ def permGroup {α : Type*} : Group₁ (Equiv.Perm α)
 #check (@permGroup ℤ)
 
 
+--------------------------------------------------------------------------------
+
+-- can now prove statements about groups
+
+example (α :Type) (G:Group₁ α) : ∀ x : α, G.mul x x = x → x = G.one := by 
+  intro x h
+  let y : α := G.inv x
+  have k : G.mul y (G.mul x x) = G.mul y x :=  congrArg (fun t => G.mul y t) h
+  rw [←G.mul_assoc y x x] at k
+  unfold y at k
+  rw [G.inv_mul_cancel x] at k
+  rw [G.one_mul] at k
+  assumption
+
+--------------------------------------------------------------------------------
+
+-- an "programming" example for typeclasses
+
+-- producing a "string representation function" for a type
+
+-- there is actually already an existing such function, name reprStr
+
+#eval reprStr (1/2 : ℚ)
+
+
+class MyDisplay (α:Type) where
+  mydisp : α → String
+
+instance : MyDisplay two_simplex  where
+  mydisp a := "< x:" ++ reprStr a.x ++ ", y:" ++ reprStr a.y ++ ", z:" ++ reprStr a.z ++ " >"
+
+
+-- remember that `a:two_simplex`
+
+#eval MyDisplay.mydisp a
+
+
+-- in the type signature of a function, we can stipulate that a type
+-- must have an instance of a some class, as in the following:
+
+def doubleString {α:Type} [ MyDisplay α ] (a:α) : String := by
+  open MyDisplay  in
+  exact mydisp a ++ mydisp a 
+
+
+-- notice that we can call doubleString on `a:two_simplex` since we
+-- have defined a `MyDisplay` instance for `two_simplex
+
+#eval doubleString a
+
+-- and I don't have to give any sort of argument to `doubleString`
+-- confirming that this instance exists -- Lean *finds* the instance.
+
+
+--------
+-- another example
+
+-- in Lean's standard library, there is typeclass used for indicating
+-- that a Type is non-empty. That typeclass is `Inhabited`
+
+-- for our simplex, we could choose a point to indicate that `two_simplex` is non-empty:
+
+instance : Inhabited two_simplex where
+  default := by
+    apply two_simplex.mk (1/3) (1/3) (1/3) 
+    <;> linarith
+
+#eval (Inhabited.default : two_simplex)
+
+
