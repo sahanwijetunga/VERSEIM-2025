@@ -186,11 +186,13 @@ example (α :Type) (G:Group₁ α) : ∀ x : α, G.mul x x = x → x = G.one := 
 
 #eval reprStr (1/2 : ℚ)
 
+#eval reprStr ([1,2,3/2] : List ℚ)
+
 
 class MyDisplay (α:Type) where
   mydisp : α → String
 
-instance : MyDisplay two_simplex  where
+instance my_instance : MyDisplay two_simplex  where
   mydisp a := "< x:" ++ reprStr a.x ++ ", y:" ++ reprStr a.y ++ ", z:" ++ reprStr a.z ++ " >"
 
 
@@ -216,6 +218,7 @@ def doubleString {α:Type} [ MyDisplay α ] (a:α) : String := by
 -- confirming that this instance exists -- Lean *finds* the instance.
 
 
+
 --------
 -- another example
 
@@ -227,8 +230,37 @@ or indicating
 instance : Inhabited two_simplex where
   default := by
     apply two_simplex.mk (1/3) (1/3) (1/3) 
-    <;> linarith
+    repeat  linarith
 
 #eval (Inhabited.default : two_simplex)
 
+--------------------------------------------------------------------------------
 
+-- group as typeclass rather than as a structure.
+
+variable (G:Type) [Group G]
+
+#check Group 
+
+example ( x y : G) : G := x * y  -- Mul.mul x y 
+
+example ( x : G) : x*1 = x := by group -- here 1 is the `one` term defined by the group structure 
+
+--------------------------------------------------------------------------------
+
+-- in Lean we need to consider also additive groups
+
+variable (A : Type) [ aaa : AddGroup A ]
+
+example ( a b c : A) : a + b + c = a + (b + c) :=  by
+   rw [ add_assoc ]
+   
+
+
+--------------------------------------------------------------------------------
+
+-- THis is how to say " let V be a vector space over k "
+
+variable ( k : Type ) [ Field k ]
+
+variable (V : Type) [AddCommGroup V ] [ Module k V ] 
