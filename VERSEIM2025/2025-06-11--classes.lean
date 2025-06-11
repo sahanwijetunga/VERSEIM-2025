@@ -70,7 +70,7 @@ def midpt (n : ℕ) (a b : StandardSimplex n) : StandardSimplex n
 end StandardSimplex
 
 
-#check midpt 
+--#check midpt 
 
 #check StandardSimplex.midpt 
 
@@ -161,12 +161,20 @@ def permGroup {α : Type*} : Group₁ (Equiv.Perm α)
 example (α :Type) (G:Group₁ α) : ∀ x : α, G.mul x x = x → x = G.one := by 
   intro x h
   let y : α := G.inv x
-  have k : G.mul y (G.mul x x) = G.mul y x :=  congrArg (fun t => G.mul y t) h
+  have k : G.mul y (G.mul x x) = G.mul y x :=  by rw [h]
   rw [←G.mul_assoc y x x] at k
   unfold y at k
   rw [G.inv_mul_cancel x] at k
   rw [G.one_mul] at k
   assumption
+
+
+-- I got confused by this statement this afternoon -- the above proof
+-- hypothesis `k` is the argument that Sahan suggested.  I think the
+-- reason I got rattled is that I didn't think it all the way through
+-- the point is that you do the `rw [h]` and then find an equality
+-- that is definitionally true (i.e. true by `rfl`).
+
 
 --------------------------------------------------------------------------------
 
@@ -211,7 +219,7 @@ def doubleString {α:Type} [ MyDisplay α ] (a:α) : String := by
 --------
 -- another example
 
--- in Lean's standard library, there is typeclass used for indicating
+or indicating
 -- that a Type is non-empty. That typeclass is `Inhabited`
 
 -- for our simplex, we could choose a point to indicate that `two_simplex` is non-empty:
