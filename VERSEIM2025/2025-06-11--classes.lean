@@ -10,3 +10,143 @@ Author : George McNinch
 import Mathlib.Tactic
 
 
+structure two_simplex where
+  x : ℚ
+  y : ℚ 
+  z : ℚ 
+  x_nonneg : 0 ≤ x
+  y_nonneg : 0 ≤ y
+  z_nonneg : 0 ≤ z
+  sum_eq : x + y + z = 1
+
+def a : two_simplex where
+  x := 1
+  y := 0
+  z := 0
+  x_nonneg := by linarith
+  y_nonneg := by linarith
+  z_nonneg := by linarith
+  sum_eq := by ring
+
+#eval a
+
+def swapXy (a : two_simplex) : two_simplex
+    where
+  x := a.y
+  y := a.x
+  z := a.z
+  x_nonneg := a.y_nonneg
+  y_nonneg := a.x_nonneg
+  z_nonneg := a.z_nonneg
+  sum_eq := by rw [add_comm a.y a.x] 
+               rw [  a.sum_eq]
+
+#eval swapXy a
+
+--open BigOperators
+
+structure StandardSimplex (n : ℕ) where
+  V : Fin n → ℝ
+  NonNeg : ∀ i : Fin n, 0 ≤ V i
+  sum_eq_one : (∑ i, V i) = 1
+
+
+namespace StandardSimplex
+
+noncomputable
+def midpt (n : ℕ) (a b : StandardSimplex n) : StandardSimplex n
+    where
+  V i := (a.V i + b.V i) / 2
+  NonNeg := by
+    intro i
+    apply div_nonneg
+    · linarith [a.NonNeg i, b.NonNeg i]
+    norm_num
+  sum_eq_one := by
+    simp [div_eq_mul_inv, ← Finset.sum_mul, Finset.sum_add_distrib,
+      a.sum_eq_one, b.sum_eq_one]
+    field_simp
+
+end StandardSimplex
+
+
+#check midpt 
+
+#check StandardSimplex.midpt 
+
+open StandardSimplex 
+
+#check midpt 
+
+
+--------------------------------------------------------------------------------
+
+structure mygroup where
+  carrier : Type
+  mul : carrier → carrier → carrier 
+  e : carrier
+  
+  identity_law_l (g:carrier) : mul e g = g
+  identity_law_r  (g:carrier) : mul g e = g
+
+  assoc ( g h k : carrier) : mul (mul g h) k = mul g (mul h k)
+
+  inverse (g : carrier) : ∃ h, mul g h = e
+
+structure Group₁ (α : Type*) where
+  mul : α → α → α
+  one : α
+  inv : α → α
+  mul_assoc : ∀ x y z : α, mul (mul x y) z = mul x (mul y z)
+  mul_one : ∀ x : α, mul x one = x
+  one_mul : ∀ x : α, mul one x = x
+  inv_mul_cancel : ∀ x : α, mul (inv x) x = one
+
+--- examples?
+
+--------------------------------------------------------------------------------
+-- e.g. "symmetric group on a set"
+
+variable (α β γ : Type)
+
+#check Equiv α β 
+#check α ≃ β 
+
+variable (f : α ≃ β) (g:β ≃ γ)
+
+#check f.toFun 
+#check f.invFun 
+
+#check Equiv.refl 
+
+#check f.right_inv 
+
+#check Function.RightInverse 
+
+#check f.left_inv  
+
+
+-- want to view `Equiv α α` i.e. `α ≃ α` as a group.
+
+#check (Equiv.refl α : α ≃ α)
+#check (f.symm : β ≃ α)
+#check (f.trans g : α ≃ γ)
+#check Equiv.trans f g 
+
+
+
+
+example : Group₁ (α ≃ α) := by sorry 
+  mul := Equiv.trans 
+
+def permGroup {α : Type*} : Group₁ (Equiv.Perm α)
+    where
+  mul f g := Equiv.trans g f
+  one := Equiv.refl α
+  inv := Equiv.symm
+  mul_assoc f g h := (Equiv.trans_assoc _ _ _).symm
+  one_mul := Equiv.trans_refl
+  mul_one := Equiv.refl_trans
+  inv_mul_cancel := Equiv.self_trans_symm
+
+
