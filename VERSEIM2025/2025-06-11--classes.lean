@@ -135,9 +135,13 @@ variable (f : α ≃ β) (g:β ≃ γ)
 
 
 
+-- here is the goal
 
 example : Group₁ (α ≃ α) := by sorry 
-  mul := Equiv.trans 
+--  mul := Equiv.trans 
+
+
+-- `Equiv.Perm α` is by definition `α ≃ α`.
 
 def permGroup {α : Type*} : Group₁ (Equiv.Perm α)
     where
@@ -149,4 +153,4 @@ def permGroup {α : Type*} : Group₁ (Equiv.Perm α)
   mul_one := Equiv.refl_trans
   inv_mul_cancel := Equiv.self_trans_symm
 
-
+#check (@permGroup ℤ)
