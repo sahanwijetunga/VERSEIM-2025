@@ -136,6 +136,7 @@ variable (f : α ≃ β) (g:β ≃ γ)
 -- here is the goal
 
 example : Group₁ (α ≃ α) := by sorry 
+
 --  mul := Equiv.trans 
 
 
@@ -186,13 +187,11 @@ example (α :Type) (G:Group₁ α) : ∀ x : α, G.mul x x = x → x = G.one := 
 
 #eval reprStr (1/2 : ℚ)
 
-#eval reprStr ([1,2,3/2] : List ℚ)
-
 
 class MyDisplay (α:Type) where
   mydisp : α → String
 
-instance my_instance : MyDisplay two_simplex  where
+instance : MyDisplay two_simplex  where
   mydisp a := "< x:" ++ reprStr a.x ++ ", y:" ++ reprStr a.y ++ ", z:" ++ reprStr a.z ++ " >"
 
 
@@ -212,55 +211,28 @@ def doubleString {α:Type} [ MyDisplay α ] (a:α) : String := by
 -- notice that we can call doubleString on `a:two_simplex` since we
 -- have defined a `MyDisplay` instance for `two_simplex
 
-#eval doubleString a
-
+--#eval doubleString 
 -- and I don't have to give any sort of argument to `doubleString`
 -- confirming that this instance exists -- Lean *finds* the instance.
-
 
 
 --------
 -- another example
 
-or indicating
--- that a Type is non-empty. That typeclass is `Inhabited`
+-- Lean has a typeclass for indicating that a Type is non-empty. That
+-- typeclass is `Inhabited`
 
--- for our simplex, we could choose a point to indicate that `two_simplex` is non-empty:
+-- to create an instance for a type, you must indicate a `default`
+-- element for the type.
+
+-- for our simplex, we could choose a point to indicate that
+-- `two_simplex` is non-empty:
 
 instance : Inhabited two_simplex where
   default := by
     apply two_simplex.mk (1/3) (1/3) (1/3) 
-    repeat  linarith
+    <;> linarith
 
 #eval (Inhabited.default : two_simplex)
 
---------------------------------------------------------------------------------
 
--- group as typeclass rather than as a structure.
-
-variable (G:Type) [Group G]
-
-#check Group 
-
-example ( x y : G) : G := x * y  -- Mul.mul x y 
-
-example ( x : G) : x*1 = x := by group -- here 1 is the `one` term defined by the group structure 
-
---------------------------------------------------------------------------------
-
--- in Lean we need to consider also additive groups
-
-variable (A : Type) [ aaa : AddGroup A ]
-
-example ( a b c : A) : a + b + c = a + (b + c) :=  by
-   rw [ add_assoc ]
-   
-
-
---------------------------------------------------------------------------------
-
--- THis is how to say " let V be a vector space over k "
-
-variable ( k : Type ) [ Field k ]
-
-variable (V : Type) [AddCommGroup V ] [ Module k V ] 
