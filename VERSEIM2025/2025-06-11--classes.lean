@@ -133,8 +133,6 @@ variable (f : α ≃ β) (g:β ≃ γ)
 #check (f.trans g : α ≃ γ)
 #check Equiv.trans f g 
 
-
-
 -- here is the goal
 
 example : Group₁ (α ≃ α) := by sorry 
@@ -154,3 +152,5 @@ def permGroup {α : Type*} : Group₁ (Equiv.Perm α)
   inv_mul_cancel := Equiv.self_trans_symm
 
 #check (@permGroup ℤ)
+
+
