@@ -70,7 +70,7 @@ def midpt (n : ℕ) (a b : StandardSimplex n) : StandardSimplex n
 end StandardSimplex
 
 
-#check midpt 
+--#check midpt 
 
 #check StandardSimplex.midpt 
 
@@ -136,6 +136,7 @@ variable (f : α ≃ β) (g:β ≃ γ)
 -- here is the goal
 
 example : Group₁ (α ≃ α) := by sorry 
+
 --  mul := Equiv.trans 
 
 
@@ -161,12 +162,20 @@ def permGroup {α : Type*} : Group₁ (Equiv.Perm α)
 example (α :Type) (G:Group₁ α) : ∀ x : α, G.mul x x = x → x = G.one := by 
   intro x h
   let y : α := G.inv x
-  have k : G.mul y (G.mul x x) = G.mul y x :=  congrArg (fun t => G.mul y t) h
+  have k : G.mul y (G.mul x x) = G.mul y x :=  by rw [h]
   rw [←G.mul_assoc y x x] at k
   unfold y at k
   rw [G.inv_mul_cancel x] at k
   rw [G.one_mul] at k
   assumption
+
+
+-- I got confused by this statement this afternoon -- the above proof
+-- hypothesis `k` is the argument that Sahan suggested.  I think the
+-- reason I got rattled is that I didn't think it all the way through
+-- the point is that you do the `rw [h]` and then find an equality
+-- that is definitionally true (i.e. true by `rfl`).
+
 
 --------------------------------------------------------------------------------
 
@@ -202,8 +211,7 @@ def doubleString {α:Type} [ MyDisplay α ] (a:α) : String := by
 -- notice that we can call doubleString on `a:two_simplex` since we
 -- have defined a `MyDisplay` instance for `two_simplex
 
-#eval doubleString a
-
+--#eval doubleString 
 -- and I don't have to give any sort of argument to `doubleString`
 -- confirming that this instance exists -- Lean *finds* the instance.
 
@@ -211,10 +219,14 @@ def doubleString {α:Type} [ MyDisplay α ] (a:α) : String := by
 --------
 -- another example
 
--- in Lean's standard library, there is typeclass used for indicating
--- that a Type is non-empty. That typeclass is `Inhabited`
+-- Lean has a typeclass for indicating that a Type is non-empty. That
+-- typeclass is `Inhabited`
 
--- for our simplex, we could choose a point to indicate that `two_simplex` is non-empty:
+-- to create an instance for a type, you must indicate a `default`
+-- element for the type.
+
+-- for our simplex, we could choose a point to indicate that
+-- `two_simplex` is non-empty:
 
 instance : Inhabited two_simplex where
   default := by
@@ -223,4 +235,32 @@ instance : Inhabited two_simplex where
 
 #eval (Inhabited.default : two_simplex)
 
+--------------------------------------------------------------------------------
 
+-- group as typeclass rather than as a structure.
+
+variable (G:Type) [Group G]
+
+#check Group 
+
+example ( x y : G) : G := x * y  -- Mul.mul x y 
+
+example ( x : G) : x*1 = x := by group -- here 1 is the `one` term defined by the group structure 
+
+--------------------------------------------------------------------------------
+
+-- in Lean we need to consider also additive groups
+
+variable (A : Type) [ aaa : AddGroup A ]
+
+example ( a b c : A) : a + b + c = a + (b + c) :=  by
+   rw [ add_assoc ]
+
+--------------------------------------------------------------------------------
+
+-- THis is how to say " let V be a vector space over k "
+
+variable ( k : Type ) [ Field k ]
+
+
+variable (V : Type) [AddCommGroup V ] [ Module k V ] 
