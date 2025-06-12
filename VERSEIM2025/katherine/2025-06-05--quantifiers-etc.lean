@@ -162,10 +162,10 @@ example (ef : FnEven f) (eg : FnEven g) : FnEven fun x ↦ f x + g x := by
 
 
 example (of : FnOdd f) (og : FnOdd g) : FnEven fun x ↦ f x * g x := by
-  intro x0
+  intro x₀
   dsimp
   rw[of, og]
-  exact neg_mul_neg (f (-x0)) (g (-x0))
+  exact neg_mul_neg (f (-x₀)) (g (-x₀))
 
 example (ef : FnEven f) (og : FnOdd g) : FnOdd fun x ↦ f x * g x := by
   intro x0
