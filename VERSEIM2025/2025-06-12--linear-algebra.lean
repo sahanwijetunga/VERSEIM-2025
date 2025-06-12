@@ -9,6 +9,8 @@ Author : George McNinch
 
 import Mathlib.Tactic
 
+-- well, first some group theory
+
 -- yesterday, we made a structure defining groups and proved in that structure
 -- that `x*x = x → x = 1`
 
@@ -56,3 +58,91 @@ example (G :Type) [Group G] (x:G) (h:x * x = x) :  x = 1 := by
 -- operators like * and + are tied to lean-functions.
 
 --------------------------------------------------------------------------------
+
+
+-- a field is a commutative ring in which every non-zero element has an inverse
+
+-- in lean, the inversion function has a funny property(!)
+
+#eval ((2/3)⁻¹:ℚ)
+#eval (0⁻¹:ℚ)
+
+example : Field ℚ := inferInstance
+
+-- OTOH this fails because ℤ doesn't have a field instance
+
+--example : Field ℤ := inferInstance  
+
+-- for any commutative ring we can consider a module over it
+
+-- in such a structure we can form linear combinations of elements
+
+example (R:Type) [CommRing R] (M:Type) [AddCommGroup M] [Module R M] (r s:R) (m n:M) : M 
+  := r • m + s • n
+
+-- for the time being, we are going to be interested in *vector spaces*, which just amount
+-- to *modules over field* -- i.e the special case in which R is a field
+
+--
+
+variable (k:Type*) [Field k]
+variable (V:Type*) [AddCommGroup V] [Module k V]
+
+-- some "built-in" properties reflecting axioms you probably saw in
+-- linear algebra class
+
+example (a : k) (u v : V) : a • (u + v) = a • u + a • v :=
+  smul_add a u v
+
+example (a b : k) (u : V) : (a + b) • u = a • u + b • u :=
+  add_smul a b u
+
+example (a b : k) (u : V) : a • b • u = b • a • u :=
+  smul_comm a b u
+
+example (u:V) : 1 • u = u := by
+  module 
+
+
+-- a standard example of vector space is " k ^ n " which Lean writes as `Fin n → k`
+
+example (n :ℕ) : AddCommGroup (Fin n → k) := inferInstance
+
+example (n :ℕ) : Module k (Fin n → k) := inferInstance
+
+
+-- for example, we can add and scalar-multiply terms of type `Fin n → k`
+
+example (n : ℕ) (v w : Fin n → k) (t : k ) : Fin n → k := t • v + w
+
+-- similarly, k can be treated as a (1-dimensional) vector space over
+-- itself
+
+example : Module k k := inferInstance
+
+-- in `Module k k` scalar multiplication is just multiplication 
+
+example (t s:k) : t•s = t*s := by simp
+
+-- Linear maps
+
+variable (W:Type*) [AddCommGroup W] [Module k W]
+
+-- the type of linear maps from V to W is an "arrow type", with extra syntax, namely
+
+#check V →ₗ[k] W
+
+variable (φ ψ : V →ₗ[k] W)
+
+-- note that `V →ₗ[k] W` is itself a vector space
+
+example : Module k (V →ₗ[k] W) := inferInstance
+
+-- thus we can form linear combinations of our φ and ψ:
+
+#check 2•φ + ψ
+
+-- how to generate a "skeleton" for a structure ...
+
+--example : V →ₗ[k] V : _
+  
