@@ -31,6 +31,14 @@ variable (W : Type) [ AddCommGroup W ] [ Module k W ]
 -- You should read about how Lean represents a basis of our vector space(s):
 
 variable {ι : Type} (B : Basis ι k V) [DecidableEq ι] [Fintype ι] 
+
+-- terms i:ι index the basis vectors `B i`
+
+noncomputable
+example (i:ι) : V := B i
+
+-- B i is a vector in V 
+
 variable {μ : Type} (C : Basis μ k W) [DecidableEq μ] [Fintype μ]
 
 -- Read this as: "`B` is a basis for the `k`-vector space `V` with
