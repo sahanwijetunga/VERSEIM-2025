@@ -36,14 +36,10 @@ variable {μ : Type} (C : Basis μ k W) [DecidableEq μ] [Fintype μ]
 -- Read this as: "`B` is a basis for the `k`-vector space `V` with
 -- index set `ι`".
 
--- N.B. I haven't understood (or more likely: have forgotten) how to
--- deduce the finiteness of our index set `ι` from the
--- `FiniteDimensional` hypotheses. Maybe you can work this out?
+noncomputable
+example : Fintype ι := FiniteDimensional.fintypeBasisIndex B
 
--- There are two ways of stipulating that ι is finite:
--- [Finite ι] and [FinType ι]
 
---
 
 -- Bilinear forms are precisely terms of type `V →ₗ[k] V →ₗ[k] k`
 
@@ -205,8 +201,3 @@ def Nondeg (β:Bilinear V k): Prop := sorry
 
 -- meanwhile, give a formalized proof of this for β satisfying the
 -- Alternating predicate
-
--- the target theorem about non-degeneracy is this:
-
-theorem nondeg_iff_equiv (β : Bilinear V k) : Nondeg β ↔ 
-  := by sorry
