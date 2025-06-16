@@ -11,6 +11,10 @@
 
 * Some references
 
+- /Linear Algebra/ - Jörg Liesen , Volker Mehrmann  
+
+  (available electronically via Tufts' Tisch Library)
+
 - Simeon Ball - "Finite Geometries and Combinatorial Applications" (2015, Cambridge Univ Press)
 
   (available electronically via Tufts' Tisch Library)
