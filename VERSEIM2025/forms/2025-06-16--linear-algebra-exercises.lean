@@ -126,8 +126,61 @@ section lattice_vector_space
 
 section exercises
 
+-- problem 1
+-- =========
 
-variable {k : Type} [Field k]
+section problem1
+
+-- prove these "absorption" properties of lattices.
+-- you can read more about lattices in math-in-lean §2.5
+
+variable {α : Type*} [Lattice α]
+variable (x y z : α)
+
+theorem absorb1 : x ⊓ (x ⊔ y) = x := by
+  sorry
+
+theorem absorb2 : x ⊔ x ⊓ y = x := by
+  sorry
+
+end problem1
+
+-- ==============================================================================
+
+-- now let's talk about linear algebra
+
+variable {k : Type*} [Field k]
+
+-- problem 2
+-- =========
+
+section problem2
+
+variable {V : Type*} [ AddCommGroup V ] [ Module k V ]
+variable {f g : V →ₗ[k] k}
+open LinearMap
+
+-- let's prove: if f is a non-zero multiple of g then f and g have the
+-- same kernel
+
+-- we can use the following. Presumably this is in the library, but ...
+lemma non_zero_multiple (t:k) (hnz : t ≠ 0) (v:V) : 
+  t•v = 0 → v = 0 := by 
+  intro h
+  have tinv_nz : t⁻¹ ≠ 0 := inv_ne_zero hnz
+  rw [ ← one_smul k v ]
+  rw [ ← Field.mul_inv_cancel t⁻¹ tinv_nz , inv_inv ]
+  rw [ ← smul_eq_mul ]
+  rw [ smul_assoc ]
+  rw [ h ]
+  simp
+  
+theorem ker_eq_of_multiple (t:k) (ht: t ≠ 0) (hfg :f = t•g) : 
+  ker f = ker g := by sorry
+
+end problem2
+
+
 
 variable {V : Type} [ AddCommGroup V ] [ Module k V ]
 variable {W : Type} [ AddCommGroup W ] [ Module k W ]
@@ -143,12 +196,17 @@ variable {ψ : W →ₗ[k] X}
 --
 
 
--- the kernel of the linear transformation q in blackboard math
+-- the kernel of the linear transformation π in blackboard math
 -- is { x ∈ V ∣ π x = 0 }.
 
 -- for example, we have
 
 example : LinearMap.ker π = ⊤ → π = 0 :=  by simp
+
+-- and
+
+example : (LinearMap.ker π = ⊥) → Function.Injective π := 
+  LinearMap.ker_eq_bot.mp
 
 -- Let's avoid some typing:
 
@@ -158,7 +216,7 @@ open LinearMap
 -- try to finish the proofs of the following:
 
 
--- problem 1.
+-- problem 3.
 -- ==========
 
 example (hpsi :  ker ψ = ⊥) : ker (ψ ∘ₗ π) = ker π := by 
@@ -168,7 +226,7 @@ example (hpsi :  ker ψ = ⊥) : ker (ψ ∘ₗ π) = ker π := by
 
 -- the symbol ∘ₗ stands for LinearMap.comp -- i.e. for the composition of linear maps
 
--- problem 2.
+-- problem 4.
 -- ==========
 
 example (hpi : map ψ ⊤ = ⊤) : map (ψ ∘ₗ π) ⊤ = (map ψ ⊤ : Submodule k X) := by 
@@ -185,7 +243,7 @@ example (hpi : map ψ ⊤ = ⊤) : map (ψ ∘ₗ π) ⊤ = (map ψ ⊤ : Submod
 -- characterization
 
 
--- problem 3.
+-- problem 5.
 -- ==========
 
 -- let's work with a three dimensional ℚ vector space
@@ -244,23 +302,6 @@ example (a b c : ℚ) : (a•(![1,1,0]:Fin 3 → ℚ) + b•![1,-1,0] + c•![3,
    (a =0 ∧ b = 0 ∧ c = 0) := by
    norm_num 
    intro h1 h2 h3 _
-   rw [h3, zero_mul, add_zero ] at h1
-   rw [h3, zero_mul, add_zero ] at h2
-   have k1 : a = 0 := by
-     rw [ zero_iff_two_mul_zero, two_mul ] 
-     calc 
-       a + a = a + a + b + -b     := by ring
-       _     = (a + b) + (a + -b) := by ring
-       _     = 0                  := by rw [h1, h2]; ring
-     
-   have k2 : b = 0 := by 
-     rw [ zero_iff_two_mul_zero, two_mul ]
-     calc 
-       b + b = a + -a + b + b     := by ring
-       _     = (a + b) - (a + -b) := by ring
-       _     = 0                  := by rw [h1,h2]; ring
-   exact ⟨ k1, k2, h3⟩
-   
-
+   sorry
   
 end exercises
