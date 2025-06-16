@@ -44,14 +44,10 @@ variable {μ : Type} (C : Basis μ k W) [DecidableEq μ] [Fintype μ]
 -- Read this as: "`B` is a basis for the `k`-vector space `V` with
 -- index set `ι`".
 
--- N.B. I haven't understood (or more likely: have forgotten) how to
--- deduce the finiteness of our index set `ι` from the
--- `FiniteDimensional` hypotheses. Maybe you can work this out?
+noncomputable
+example : Fintype ι := FiniteDimensional.fintypeBasisIndex B
 
--- There are two ways of stipulating that ι is finite:
--- [Finite ι] and [FinType ι]
 
---
 
 -- Bilinear forms are precisely terms of type `V →ₗ[k] V →ₗ[k] k`
 
@@ -155,13 +151,19 @@ def Bilinear (V:Type) (k:Type) [Field k] [AddCommGroup V] [Module k V] : Type
 -- Task 3.
 -- ======
 
--- define a structure
+-- define predicates
 
--- structure Alternating V k 
+def Alternating (β:Bilinear V k) : Prop := sorry
 
--- which has a carrier field which is a bilinear form and has a proof
--- that the given form is alternating, where that should be defined to mean
--- ∀ x, carrier x x = 0
+-- and
+
+def Alternating' (β:Bilinear V k): Prop := sorry
+
+-- for alternating (i.e. anti-symmetric, also called skew-symmetric)
+-- where the first one stipulates β x x = 0 for all x and the second
+-- requires β x y = - β y x for all x, y.
+
+-- Give a formalized proof that `Alternating β → Alternating' β`
 
 
 -- Task 4.
@@ -175,3 +177,35 @@ def Bilinear (V:Type) (k:Type) [Field k] [AddCommGroup V] [Module k V] : Type
 -- converse holds. We'll need to read about the characteristic to do
 -- this, but the above implication should work without knowing about
 -- this...
+
+
+-- Task 5.
+-- ======
+
+-- define a predicate "Nondegenerate" for bilinear forms.  
+
+def Nondeg (β:Bilinear V k): Prop := sorry
+
+-- One says
+-- that a bilinear form β is non-degenerate if we have the implication
+
+-- (*)
+-- ∀ x, (∀ y, β x y = 0 → x = 0)
+
+-- in words: "for a fixed x, if β x y = 0 for every y, then x = 0".
+
+
+-- On the other hand, we could formulate this non-degeneracy "in the
+-- other variable", like this:
+
+-- (**)
+-- ∀ y, (∀ x, β x y = 0 → y = 0)
+
+-- in words: "for a fixed y, if β x y = 0 for every x, then y = 0".
+
+
+-- onece we have the matrix representation of β we'll be able to prove
+-- that (*) ↔ (**)
+
+-- meanwhile, give a formalized proof of this for β satisfying the
+-- Alternating predicate
