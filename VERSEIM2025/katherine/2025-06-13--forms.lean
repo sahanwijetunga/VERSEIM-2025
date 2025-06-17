@@ -1,4 +1,5 @@
 
+
 import Mathlib.Tactic
 
 
@@ -29,25 +30,24 @@ variable (W : Type) [ AddCommGroup W ] [ Module k W ]
 
 -- You should read about how Lean represents a basis of our vector space(s):
 
-variable {ι : Type} (B : Basis ι k V) [DecidableEq ι] [Fintype ι]
---terms i : ι index the basis vectos `B i`
+variable {ι : Type} (B : Basis ι k V) [DecidableEq ι] [Fintype ι] 
+
+-- terms i:ι index the basis vectors `B i`
+
 noncomputable
-example (i: ι) : V := B i
--- B i is a vector in V
+example (i:ι) : V := B i
+
+-- B i is a vector in V 
 
 variable {μ : Type} (C : Basis μ k W) [DecidableEq μ] [Fintype μ]
 
 -- Read this as: "`B` is a basis for the `k`-vector space `V` with
 -- index set `ι`".
 
--- N.B. I haven't understood (or more likely: have forgotten) how to
--- deduce the finiteness of our index set `ι` from the
--- `FiniteDimensional` hypotheses. Maybe you can work this out?
+noncomputable
+example : Fintype ι := FiniteDimensional.fintypeBasisIndex B
 
--- There are two ways of stipulating that ι is finite:
--- [Finite ι] and [FinType ι]
 
---
 
 -- Bilinear forms are precisely terms of type `V →ₗ[k] V →ₗ[k] k`
 
@@ -119,8 +119,8 @@ example : (V →ₗ[k] W) ≃ₗ[k] Matrix μ ι k := toMatrix B C
 -- Let's make a definition (mainly to avoid typing all the arrows).
 
 @[simp]
-def Bilinear (V:Type) (k:Type) [Field k] [AddCommGroup V] [Module k V] : Type
-  := V →ₗ[k] V →ₗ[k] k
+def Bilinear (V:Type) (k:Type) [Field k] [AddCommGroup V] [Module k V] : Type 
+  := V →ₗ[k] V →ₗ[k] k 
 
 -- Task 1.
 -- ======
@@ -129,13 +129,12 @@ def Bilinear (V:Type) (k:Type) [Field k] [AddCommGroup V] [Module k V] : Type
 
 -- a mapping
 
-def Bilinear.toMatrix (V:Type) (k:Type) (B: Basis ι k V) (β:Bilinear V k) : Matrix ι ι k :=
-  sorry
+-- def Bilinear.toMatrix (V:...) (k:...) (B: ...) (β:Bilinear V k) : Matrix ι ι k := ...
 
 -- and eventually we want to prove this mapping "is" a linear
--- equivalence.
+-- equivalence. 
 
--- Task 2.
+-- Task 2. 
 -- ======
 
 -- formulate theorems confirming the linearity properties of our
@@ -143,22 +142,28 @@ def Bilinear.toMatrix (V:Type) (k:Type) (B: Basis ι k V) (β:Bilinear V k) : Ma
 
 -- (it looks to me like the simplifier tactic can prove them).
 
---  β.toFun (t•x + y) z = t•β.toFun x z + β.toFun y z
+--  β.toFun (t•x + y) z = t•β.toFun x z + β.toFun y z 
 
 -- and
 
---  β.toFun x (t•y + z) = t•β.toFun x y + β.toFun x z
+--  β.toFun x (t•y + z) = t•β.toFun x y + β.toFun x z 
 
 -- Task 3.
 -- ======
 
--- define a structure
+-- define predicates
 
--- structure Alternating V k
+def Alternating (β:Bilinear V k) : Prop := sorry
 
--- which has a carrier field which is a bilinear form and has a proof
--- that the given form is alternating, where that should be defined to mean
--- ∀ x, carrier x x = 0
+-- and
+
+def Alternating' (β:Bilinear V k): Prop := sorry
+
+-- for alternating (i.e. anti-symmetric, also called skew-symmetric)
+-- where the first one stipulates β x x = 0 for all x and the second
+-- requires β x y = - β y x for all x, y.
+
+-- Give a formalized proof that `Alternating β → Alternating' β`
 
 
 -- Task 4.
@@ -172,3 +177,35 @@ def Bilinear.toMatrix (V:Type) (k:Type) (B: Basis ι k V) (β:Bilinear V k) : Ma
 -- converse holds. We'll need to read about the characteristic to do
 -- this, but the above implication should work without knowing about
 -- this...
+
+
+-- Task 5.
+-- ======
+
+-- define a predicate "Nondegenerate" for bilinear forms.  
+
+def Nondeg (β:Bilinear V k): Prop := sorry
+
+-- One says
+-- that a bilinear form β is non-degenerate if we have the implication
+
+-- (*)
+-- ∀ x, (∀ y, β x y = 0 → x = 0)
+
+-- in words: "for a fixed x, if β x y = 0 for every y, then x = 0".
+
+
+-- On the other hand, we could formulate this non-degeneracy "in the
+-- other variable", like this:
+
+-- (**)
+-- ∀ y, (∀ x, β x y = 0 → y = 0)
+
+-- in words: "for a fixed y, if β x y = 0 for every x, then y = 0".
+
+
+-- onece we have the matrix representation of β we'll be able to prove
+-- that (*) ↔ (**)
+
+-- meanwhile, give a formalized proof of this for β satisfying the
+-- Alternating predicate

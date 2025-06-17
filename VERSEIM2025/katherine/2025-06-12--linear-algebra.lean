@@ -144,4 +144,9 @@ example : Module k (V →ₗ[k] W) := inferInstance
 
 -- how to generate a "skeleton" for a structure ...
 
---example : V →ₗ[k] V : _
+--example : V →ₗ[k] V := _
+
+example : V →ₗ[k] V where
+  toFun := sorry
+  map_add' := sorry
+  map_smul' := sorry
