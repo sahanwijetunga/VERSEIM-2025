@@ -1,12 +1,3 @@
- --------------------------------------------------------------------------------
-/-
-Copyright (c) 2025 George McNinch. All rights reserved.
-Released under the Apache 2.0 license as described in the file LICENSE.
-Authors: Clea Bergsman, Katherine Buesing, George McNinch, Sahan Wijetunga
--/
-
-/- VERSEIM-2025 REU -/
-
 
 import Mathlib.Tactic
 
@@ -197,7 +188,9 @@ lemma non_zero_multiple (t:k) (hnz : t ≠ 0) (v:V) :
   simp
   
 theorem ker_eq_of_multiple (t:k) (ht: t ≠ 0) (hfg :f = t•g) : 
-  ker f = ker g := by sorry
+  ker f = ker g := by 
+  ext
+  sorry
 
 end problem2
 
@@ -268,7 +261,7 @@ example (hpi : map ψ ⊤ = ⊤) : map (ψ ∘ₗ π) ⊤ = (map ψ ⊤ : Submod
 -- ==========
 
 -- let's work with a three dimensional ℚ vector space
--- in Lean the standard model for such a thing is `Fin 3 → k`
+-- in Lean the standard model for such a thing is `Fin 3 → ℚ`
 
 -- let's define some vectors
 

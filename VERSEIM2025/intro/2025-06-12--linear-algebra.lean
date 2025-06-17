@@ -2,7 +2,7 @@
 /-
 Copyright (c) 2025 George McNinch. All rights reserved.
 Released under the Apache 2.0 license as described in the file LICENSE.
-Author : George McNinch
+Authors: Clea Bergsman, Katherine Buesing, George McNinch, Sahan Wijetunga
 -/
 
 /- VERSEIM-2025 REU -/
@@ -46,7 +46,6 @@ lemma cancel {G : Type} [Group G] {g x y  : G} (h : g*x = g*y) : x = y := by
   rw [← inv_mul_cancel g]
   rw [mul_assoc _ g x , mul_assoc _ g y]
   rw [h]
-
 
 example (G :Type) [Group G] (x:G) (h:x * x = x) :  x = 1 := by 
    nth_rw 3 [ ← mul_one x ] at h
