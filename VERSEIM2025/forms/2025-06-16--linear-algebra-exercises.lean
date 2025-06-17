@@ -1,8 +1,17 @@
+ --------------------------------------------------------------------------------
+/-
+Copyright (c) 2025 George McNinch. All rights reserved.
+Released under the Apache 2.0 license as described in the file LICENSE.
+Authors: Clea Bergsman, Katherine Buesing, George McNinch, Sahan Wijetunga
+-/
+
+/- VERSEIM-2025 REU -/
+
 
 import Mathlib.Tactic
 
 
--- Lean has a typeclass `Lattice` for Complete Lattices -- see
+-- Lean has a typeclass `Lattice` for (Complete) Lattices -- see
 -- [Math-in-Lean] §2.5
 
 --   "A lattice is a structure that extends a partial order with
@@ -24,6 +33,8 @@ import Mathlib.Tactic
 
 example : Lattice ℝ := inferInstance
 
+--#check (⊥:ℝ) 
+
 --------------------------------------------------------------------------------
 
 -- for any type `X`, `Set X` is a lattice
@@ -34,6 +45,9 @@ variable (X : Type)
 
 example : Lattice (Set X) := inferInstance
 
+
+#check (⊥:Set X)
+ 
 -- ⊥ is the emptyset 
 
 example :  ⊥ = (∅:Set X) := rfl
@@ -41,6 +55,7 @@ example :  ⊥ = (∅:Set X) := rfl
 -- and ⊤ is X itself
 
 example : ⊤ = (Set.univ : Set X) := rfl
+
 
 -- ⊔ is ∪ and ⊓ is ∩ 
 
@@ -55,6 +70,9 @@ end Sets
 noncomputable
 
 example : Lattice Prop := inferInstance
+
+#check False
+#check True 
 
 example : ⊥ = False := rfl
 example : ⊤ = True := rfl
@@ -86,6 +104,9 @@ example (W₁ W₂ : Submodule k V) : ↑(W₁ ⊓ W₂) = ((↑W₁ ∩ ↑W₂
 
 --  so `↑(W₁ ⊓ W₂)` means "the subset corresponding to the subspace
 -- `W₁ ⊓ W₂`"
+
+variable (U:Submodule k V) in
+#check (U:Set V)
 
 -- put another way, we have
 
