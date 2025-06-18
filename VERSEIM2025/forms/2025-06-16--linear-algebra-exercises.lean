@@ -250,10 +250,13 @@ example (hpsi :  ker ψ = ⊥) : ker (ψ ∘ₗ π) = ker π := by
 -- problem 4.
 -- ==========
 
-example (hpi : map ψ ⊤ = ⊤) : map (ψ ∘ₗ π) ⊤ = (map ψ ⊤ : Submodule k X) := by 
+example (hpi : map π ⊤ = ⊤) : map (ψ ∘ₗ π) ⊤ = (map ψ ⊤ : Submodule k X) := by 
   ext
   simp
   sorry
+
+variable (ι κ : Type) in
+#check ι ⊕ κ 
 
 -- here `map ψ A` is the image under the linear map `ψ` of the submodule `A:Submodule k W`
 -- i.e. in blackboard math we have
