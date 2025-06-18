@@ -234,12 +234,13 @@ example (hpsi :  ker ψ = ⊥) : ker (ψ ∘ₗ π) = ker π := by
   ·
     intro h
     -- need to show that since hpsi, the only way to get ψ(x) = 0 is if x = 0
-    sorry
+    rw[← LinearMap.mem_ker] at h
+    rw[hpsi] at h
+    exact h
   ·
     intro h₀
     rw[h₀]
-    sorry
-    -- again hpsi here should show that ψ(0) = 0 but idk how to show it
+    simp
 
 
 -- the symbol ∘ₗ stands for LinearMap.comp -- i.e. for the composition of linear maps
@@ -253,14 +254,25 @@ example (hpi : map ψ ⊤ = ⊤) : map (ψ ∘ₗ π) ⊤ = (map ψ ⊤ : Submod
   apply Iff.intro
   ·
     intro h₁
-    apply?
-     -- i want to do 'use π y' here but its not working!!!!!!!!
-    sorry
+    rcases h₁ with ⟨h₃, h₄⟩
+    use π h₃
 
   ·
     intro h₂
-    -- idk how to do this at all tbh
+    rcases h₂ with ⟨h₃, h₄⟩
+    --have k1: ∀ z,  ∃ y, π y = z  := by
+      --rw[Submodule.mem_map]
+      -- idk why this isnt working!!!
+
     sorry
+
+#check Submodule.mem_map
+#check Submodule.mem_map_of_mem
+
+
+    -- idk how to do this at all tbh
+    -- Submodule.mem_map
+    -- x ∈ map f p ↔ ∃ y ∈ p, f y = x
 
 -- here `map ψ A` is the image under the linear map `ψ` of the submodule `A:Submodule k W`
 -- i.e. in blackboard math we have
