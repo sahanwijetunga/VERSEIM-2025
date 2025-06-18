@@ -37,5 +37,16 @@ inductive MyNat where
 open Nat in
 example : 3 = succ ( succ (succ zero)) := rfl
 
+-- let's define addition for the `MyNat` type
 
+open MyNat in
+def add : MyNat → MyNat → MyNat
+ | x , .zero => x 
+ | x , .succ n => succ (add x n)
 
+namespace MyNat
+
+theorem zero_add (n : MyNat) : add zero n = n := by
+  induction' n with n ih
+  · rfl
+  · rw [add, ih]
