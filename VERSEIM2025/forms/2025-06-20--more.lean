@@ -48,7 +48,14 @@ def fin_disjoint_fin_equiv_fin (n m: ℕ) : DisjointUnion (Fin n) (Fin m) ≃ Fi
     | right x => by
         rw [ add_comm ] 
         exact Fin.castAdd n x 
-  invFun := by sorry
+  invFun := by 
+    rintro ⟨i,_⟩
+    if i < n then 
+       have : NeZero n := NeZero.mk (by linarith)
+       exact left (Fin.ofNat n i)
+    else
+       have : NeZero m := NeZero.mk (by linarith)
+       exact right (Fin.ofNat m (n-i))
   left_inv := by sorry
   right_inv := by sorry
 
