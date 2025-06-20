@@ -38,3 +38,5 @@ example (x y z : V) : β (x+y) z = β x z + β y z := by
   simp
 
 end test
+
+
