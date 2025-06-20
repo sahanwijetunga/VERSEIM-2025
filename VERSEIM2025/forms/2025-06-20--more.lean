@@ -68,3 +68,17 @@ theorem lin_indep_by_transverse_subspaces
    (hbw2 : ∀ i, b₂ i ∈ W₂)
    : LinearIndependent k (disjointUnion_funs b₁ b₂) := by sorry
 
+
+
+--------------------------------------------------------------------------------
+
+-- notation question
+
+structure foo  where
+  a : ℝ
+  b : ℝ
+  hyp : a < b
+
+#check foo.mk 0 1 (by linarith)
+
+#check { a:=0, b:=1, hyp := by linarith : foo }
