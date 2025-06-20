@@ -128,3 +128,18 @@ theorem fac_three : fac 3 = 6 := by
 theorem fac_five : fac 5 = 120 := by
   norm_num
 
+
+theorem choose_2  (n:ℕ) (nge2 : 2 ≤ n):  binom n 2 = n*(n-1)/2 := by
+  unfold binom 
+  rw [ @factorial_fac_2 n nge2  ]
+  have h : fac (n-2) ≠ 0 := by
+    have : fac (n-2) > 0 := factorial_pos (n-2)
+    linarith
+  rw [fac_two ]
+  field_simp     -- (!!)
+  ring
+
+
+-- exercise
+
+example  (n m:ℕ) (hmn : m ≤ n) : fac m ∣ fac n := by sorry
