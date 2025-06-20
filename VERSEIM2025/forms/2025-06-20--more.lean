@@ -54,6 +54,11 @@ def fin_disjoint_fin_equiv_fin (n m: ℕ) : DisjointUnion (Fin n) (Fin m) ≃ Fi
 
 --------------------------------------------------------------------------------
 
+#check Fin.ofNat 3 1
+#eval Fin.ofNat 3 5
+
+-- `i:Fin n` is a natural number, together with a proof that `i < n`
+
 -- this result is perhaps what should be proved first before proving
 -- the result I earlier described as `lin_indep_of_orthog`.
 
