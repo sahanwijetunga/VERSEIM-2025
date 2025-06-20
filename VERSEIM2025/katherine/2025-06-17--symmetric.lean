@@ -146,4 +146,27 @@ theorem lin_indep_of_orthog (V : Type) [AddCommGroup V] [Module ℝ V] (β:V →
   (ι₁ ι₂: Type) [Fintype ι₁] [Fintype ι₂]
   (f₁:ι₁ → V) (f₂:ι₂ → V)
   (hi₁:LinearIndependent ℝ f₁) (hi₂:LinearIndependent ℝ f₂) :
-  LinearIndependent ℝ (disjointUnion_funs f₁ f₂) := by sorry
+  LinearIndependent ℝ (disjointUnion_funs f₁ f₂) := by
+  intro h₀ h₁ h₂
+  ext x₀
+  rcases h₀ with ⟨y₁, y₂, y₃⟩
+  rcases h₁ with ⟨z₁, z₂, z₃⟩
+  simp
+  sorry
+
+#check Submodule
+#check LinearIndependent
+#check Finsupp.linearCombination
+-- what does →₀ mean ??
+--------------------------------------------------------------------------------
+
+-- 3.  direct sum
+
+-- If W₁ and W₁ are subspaces of a vector space, we want to give
+-- conditions under which V is the *direct sum*. I believe (hope) that
+-- [Liesen and Hemrmann] defines the notion. (I'll check!)
+
+theorem direct_sum_unique_repr (k V : Type) [Field k] [AddCommGroup V] [Module k V]
+  (W₁ W₂ : Submodule k V) (h_span : V = W₁ ⊔ W₂) (h_int : ⊥ = W₁ ⊓ W₂)
+  (x₁ x₂ y₁ y₂ : V) (h₁ : x₁ ∈ W₁ ∧ y₁ ∈ W₁) (h₂ : x₂ ∈ W₂ ∧ y₂ ∈ W₂ ) :
+  x₁ + x₂ = y₁ + y₂ → x₁ = y₁ ∧ x₂ = y₂ := by sorry

@@ -248,26 +248,28 @@ example (hpsi :  ker ψ = ⊥) : ker (ψ ∘ₗ π) = ker π := by
 -- problem 4.
 -- ==========
 
-example (hpi : map ψ ⊤ = ⊤) : map (ψ ∘ₗ π) ⊤ = (map ψ ⊤ : Submodule k X) := by
+example (hpi : map π ⊤ = ⊤) : map (ψ ∘ₗ π) ⊤ = (map ψ ⊤ : Submodule k X) := by
   ext x₀
-  simp
+  simp only [Submodule.mem_map]
   apply Iff.intro
-  ·
-    intro h₁
-    rcases h₁ with ⟨h₃, h₄⟩
-    use π h₃
-
-  ·
-    intro h₂
-    rcases h₂ with ⟨h₃, h₄⟩
-    --have k1: ∀ z,  ∃ y, π y = z  := by
-      --rw[Submodule.mem_map]
-      -- idk why this isnt working!!!
-
-    sorry
+  · intro h₁
+    rcases h₁ with ⟨z, hz_top, h_comp⟩
+    use π z
+    constructor
+    · rw [← hpi]
+      exact ⟨z, hz_top, rfl⟩
+    · exact h_comp
+  · intro h₂
+    rcases h₂ with ⟨a, ha_top, hψ⟩
+    rw [← hpi] at ha_top
+    rcases ha_top with ⟨z, hz_top, hπ⟩
+    use z
+    rw [← hπ] at hψ
+    exact ⟨hz_top, hψ⟩
 
 #check Submodule.mem_map
 #check Submodule.mem_map_of_mem
+#check  Submodule.map_eq_top_iff
 
 
     -- idk how to do this at all tbh
