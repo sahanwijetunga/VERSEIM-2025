@@ -40,3 +40,30 @@ example (x y z : V) : β (x+y) z = β x z + β y z := by
 end test
 
 
+
+example (h : p ∧ q) : q ∧ p := by
+  have hp : p := h.left
+  suffices hq: q from ?_
+  . exact And.intro hq hp
+  . show q; exact And.right h
+
+
+example (p q r : Prop) : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by
+  apply Iff.intro
+  . intro h
+    cases h.right with
+    | inl hq =>
+      show (p ∧ q) ∨ (p ∧ r)
+      exact Or.inl ⟨h.left, hq⟩
+    | inr hr =>
+      show (p ∧ q) ∨ (p ∧ r)
+      exact Or.inr ⟨h.left, hr⟩
+  . intro h
+    cases h with
+    | inl hpq =>
+      show p ∧ (q ∨ r)
+      exact ⟨hpq.left, Or.inl hpq.right⟩
+    | inr hpr =>
+      show p ∧ (q ∨ r)
+      exact ⟨hpr.left, Or.inr hpr.right⟩
+>>>>>>> 00465bc91eac49f76c9642a4c4a5622f59a1b7c1

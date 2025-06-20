@@ -34,6 +34,8 @@ inductive MyNat where
 -- e.g. Lean already has a Nat type -- also attached to the symbol ℕ
 -- -- which is like that just introduced. We can see that:
 
+#check MyNat.succ (MyNat.succ MyNat.zero)
+
 open Nat in
 example : 3 = succ ( succ (succ zero)) := rfl
 
@@ -46,7 +48,14 @@ def add : MyNat → MyNat → MyNat
 
 namespace MyNat
 
+#example (n: MyNat) : add n zero = n := rfl
+
 theorem zero_add (n : MyNat) : add zero n = n := by
   induction' n with n ih
   · rfl
   · rw [add, ih]
+
+
+--------------------------------------------------------------------------------
+
+#check ( (α:Type) , Option α  )
