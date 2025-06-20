@@ -70,15 +70,3 @@ theorem lin_indep_by_transverse_subspaces
 
 
 
---------------------------------------------------------------------------------
-
--- notation question
-
-structure foo  where
-  a : ℝ
-  b : ℝ
-  hyp : a < b
-
-#check foo.mk 0 1 (by linarith)
-
-#check { a:=0, b:=1, hyp := by linarith : foo }

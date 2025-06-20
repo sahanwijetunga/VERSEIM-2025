@@ -9,6 +9,20 @@ Authors: Clea Bergsman, Katherine Buesing, George McNinch, Sahan Wijetunga
 
 import Mathlib.Tactic
 
+--------------------------------------------------------------------------------
+
+-- first, a notation question
+
+structure foo  where
+  a : ℝ
+  b : ℝ
+  hyp : a < b
+
+#check foo.mk 0 1 (by linarith)
+
+#check { a:=0, b:=1, hyp := by linarith : foo }
+
+
 -- let's prove some statements about factorials.
 -- we'll first define them
 
