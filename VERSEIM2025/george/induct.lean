@@ -16,3 +16,4 @@ theorem sum_n_eq_expr (n:ℕ) : sum_n n = n*(n+1)/2 := by
   | succ => sorry
 
 
+#check Decidable.casesOn

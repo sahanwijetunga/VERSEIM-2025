@@ -50,7 +50,7 @@ def fin_disjoint_fin_equiv_fin (n m: ℕ) : DisjointUnion (Fin n) (Fin m) ≃ Fi
         exact Fin.castAdd n x 
   invFun := by 
     rintro ⟨i,_⟩
-    if i < n then 
+    if h : i < n then 
        have : NeZero n := NeZero.mk (by linarith)
        exact left (Fin.ofNat n i)
     else
