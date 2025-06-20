@@ -66,4 +66,3 @@ example (p q r : Prop) : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := by
     | inr hpr =>
       show p ∧ (q ∨ r)
       exact ⟨hpr.left, Or.inr hpr.right⟩
->>>>>>> 00465bc91eac49f76c9642a4c4a5622f59a1b7c1

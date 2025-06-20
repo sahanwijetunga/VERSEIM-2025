@@ -1,12 +1,15 @@
 import Mathlib.Tactic
 
-variable (a b c d e : ℕ)
+variable {a b : ℕ}
 variable (h1 : a = b)
-variable (h2 : b = c + 1)
-variable (h3 : c = d)
-variable (h4 : e = 1 + d)
 
-theorem T : a = e := 
+def foo : a = b := by exact h1 
+
+example : a = b := by exact h1
+
+theorem bar : a = b := by exact h1
+
+theorem T : a = e := by
   calc
     a = b      := h1
     _ = c + 1  := h2
