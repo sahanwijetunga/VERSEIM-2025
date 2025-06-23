@@ -41,7 +41,6 @@ end test
 
 
 
-
 example (h : p ∧ q) : q ∧ p := by
   have hp : p := h.left
   suffices hq: q from ?_

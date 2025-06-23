@@ -20,7 +20,7 @@ structure foo  where
 
 #check foo.mk 0 1 (by linarith)
 
-#check { a:=0, b:=1, hyp := by linarith : foo }
+#check { b:=2, a:=1, hyp := by linarith : foo }
 
 
 -- let's prove some statements about factorials.
@@ -31,6 +31,13 @@ def fac (n:ℕ) : ℕ :=
   match n with
    | 0 => 1
    | m+1 => (m+1)*fac m
+
+def fac' : (n:ℕ) → ℕ 
+   | 0 => 1
+   | m+1 => (m+1)*fac m
+
+
+#eval fac 20
 
 -- we can also define binomial coefficients, though since in the end
 -- they are natural numbers, defining them as rationals isn't optimal
@@ -43,6 +50,7 @@ def binom (n m :ℕ) : ℚ :=
 
 example :  3 - 5 = (0:ℕ) := rfl
 
+#check binom 50 3 
 #eval binom 50 3 
 
 -- let's give some induction proofs
@@ -72,7 +80,7 @@ theorem factorial_fac (n:ℕ) : fac (n+1) = (n+1)*fac n := by
   induction n with
    | zero => rfl
    | succ n ih => 
-      rw [ih]
+          -- rw [ih]
       rfl
 
 -- and a slightly more complicated result...        
@@ -114,17 +122,16 @@ example (n:ℕ) (nge3 : 3 ≤ n) : 6 ≤ 2*n :=  by
 
 theorem factorial_fac' (n:ℕ) (nge1 : 1 ≤ n) : fac n = n*fac (n-1) := by
   induction n, nge1 using Nat.le_induction with
-  | base => norm_num
+  | base => rfl 
   | succ => rfl
-
 
 -- and another factorization result
 
 theorem factorial_fac_2 (n:ℕ) {nge2:2 ≤ n} : fac n = n * (n-1) * fac (n-2) := by
   induction n, nge2 using Nat.le_induction  with
-  | base =>  norm_num
-  | succ m h a => 
-        rw [ factorial_fac' m (by linarith) ] at a
+  | base => rfl -- norm_num
+  | succ m h _ => 
+        -- rw [ factorial_fac' m (by linarith) ] at a
         simp
         rw [ factorial_fac' m (by linarith) ]
         ring
@@ -163,8 +170,8 @@ theorem fac_five : fac 5 = 120 := by
 theorem choose_2  (n:ℕ) (nge2 : 2 ≤ n):  binom n 2 = n*(n-1)/2 := by
   unfold binom 
   rw [ @factorial_fac_2 n nge2  ]
-  have h : fac (n-2) ≠ 0 := factorial_ne_zero _
   rw [fac_two ]
+  have h : fac (n-2) ≠ 0 := factorial_ne_zero _
   field_simp     -- (!!)
   ring
 
@@ -177,6 +184,7 @@ theorem choose_2  (n:ℕ) (nge2 : 2 ≤ n):  binom n 2 = n*(n-1)/2 := by
 example (a b : ℚ) (_:b≠ 0) 
    : a*b/b = a := by field_simp 
 
+--------------------------------------------------------------------------------
 -- exercise!
 
 example  (n m:ℕ) (hmn : m ≤ n) : fac m ∣ fac n := by sorry
@@ -261,4 +269,5 @@ example (n:ℕ)
     induction i using Fin.inductionOn with 
      | zero => exact h0
      | succ i ih => exact hsucc i ih
+
 

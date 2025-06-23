@@ -201,10 +201,5 @@ open Matrix
 def TA {V:Type} [AddCommGroup V] [Module ℚ V] {B:Basis (Fin 2) ℚ V} (A:Matrix (Fin 2) (Fin 2) ℚ): V →ₗ[ℚ] V := by
   exact (toLin B B).toFun A 
 
-#check TA A 
-
-example  (v:V) :  V := TA A v
-
-
 
 end Bases2
