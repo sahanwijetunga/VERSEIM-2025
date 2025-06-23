@@ -121,8 +121,74 @@ theorem sbv_lin_indep (n:ℕ) : LinearIndependent ℚ (sbv n) := by
   rw [ sbv_lin_comb' n ] at h
   intro i
   exact congrFun h i
-  
 
+
+-- to talk about spanning, we must transform the function 
+-- `sbv n : Fin n → (Fin n → ℚ)` into a *subset*.
+
+-- in general, if `f : X → Y` and `s: Set X`, the image of s via f is written
+-- `image f s` or in symbols `f '' s`.
+
+-- So the set we want to consider the span of is:
+
+-- (sbv n) '' (⊤:Set (Fin n))
+
+
+example : Set (Fin n → ℚ) := (sbv n) '' ⊤
+
+example : Set (Fin n → ℚ) := Set.image (sbv n) ⊤
+
+theorem sbv_span (n:ℕ) : Submodule.span ℚ (Set.image (sbv n) ⊤) = (⊤:Submodule ℚ (Fin n → ℚ)) := by 
+  ext v
+  have : v = ∑ j, v j • sbv n j := by 
+    ext k
+    unfold sbv
+    rw [ ← Fintype.sum_congr _ _ (single_smul n v) ]
+    simp
   
+  
+--------------------------------------------------------------------------------
+
+-- note that the linear independence of the standard basis is actually
+-- already proved in lean (see below).
+
+-- dimension of a finite dimensional space is known as `Module.finrank`
+
+example : Module.finrank ℚ (Fin 5 → ℚ) = 5 := by simp  
+
+example : Module.finrank ℝ ℂ = 2 := by 
+  exact Complex.finrank_real_complex 
+
+-- I'm not actually sure at the moment how to do this one...
+example : Module.finrank ℝ (Fin 5 → ℂ) = 10 := by 
+  sorry
+
+example : Module ℚ (Matrix (Fin 4) (Fin 5) ℚ) := inferInstance
+
+example : Module.finrank ℚ  (Matrix (Fin 4) (Fin 4) ℚ) = 16 := by 
+  sorry
+
+
+-- so what is a basis in mathlib?
+
+-- there is a structure `Basis` (find it in Mathlib.LinearAlgebra.Basis.Def )
+
+-- for a k-vector space V, a basis of V *is* the data of an linear
+-- equivalence `repr`
+
+-- between V and `ι →₀ k` for some type ι -- i.e.
+
+-- `φ: V ≃ₗ[k] ι →₀ k`
+
+example (k V : Type) [Field k] [AddCommGroup V] [Module k V] : Basis ι k V where
+  repr := sorry -- the type of `repr` should be `V ≃ₗ[k] ι →₀ k`
+
+-- The idea is that such a linear equivalence indeed determines 
+-- basis vectors parametrized by `ι` in the usual, black-board math sense. Indeed, for a term
+
+-- `x:ι`
+
+
+
   
   
