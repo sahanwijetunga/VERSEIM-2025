@@ -79,7 +79,7 @@ theorem posdef_has_orthog_basis (V : Type) [AddCommGroup V] [ Module ℝ V ]
   unfold OrthogBasis
   sorry
 
-
+#check Basis.mk
 
 -- I believe the simplest way to prove this will be to use what is
 -- known as the *Gram-Schmidt orthogonalization process*.

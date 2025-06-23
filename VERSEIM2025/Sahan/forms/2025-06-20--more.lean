@@ -11,16 +11,6 @@ import Mathlib.Tactic
 
 -- recall we introduced the disjoint union
 
-inductive DisjointUnion (ι₁ ι₂ : Type) where
- | left : ι₁ → DisjointUnion ι₁ ι₂
- | right : ι₂ → DisjointUnion ι₁ ι₂
-
-def disjointUnion_funs {ι₁ ι₂ X: Type} ( f₁:ι₁ → X) (f₂:ι₂ → X) (u:DisjointUnion ι₁ ι₂) : X :=
-   match u with
-    | DisjointUnion.left x => f₁ x
-    | DisjointUnion.right y => f₂ y
-
-
 -- here are some statements about disjoint_union that should be established
 
 -- first establish an equivalence of types between the disjoint union
@@ -44,49 +34,47 @@ example (n: ℕ): (n ≤ 2) ∨ (n > 2) := by exact le_or_lt n 2
 
 -- #check Fin.
 
-open DisjointUnion in
-def invFun (n m :ℕ) : Fin (n+m) → DisjointUnion (Fin n) (Fin m) := by
+def invFun (n m :ℕ) : Fin (n+m) → (Fin n) ⊕ (Fin m) := by
   rintro ⟨i,_⟩  -- here (i:ℕ) is the underlying Nat of the Fin (n+m) argument
   if i < n then
      have : NeZero n := NeZero.mk (by linarith)
-     exact left (Fin.ofNat n i)
+     left
+     exact Fin.ofNat n i
   else
      have : NeZero m := NeZero.mk (by linarith)
-     exact right (Fin.ofNat m (n-i))
+     right
+     exact Fin.ofNat m (n-i)
 
-open DisjointUnion in
-def forwardFun (n m :ℕ) : Fin (n+m) → DisjointUnion (Fin n) (Fin m) := by
-  rintro ⟨i,_⟩  -- here (i:ℕ) is the underlying Nat of the Fin (n+m) argument
-  if i < n then
-     have : NeZero n := NeZero.mk (by linarith)
-     exact left (Fin.ofNat n i)
-  else
-     have : NeZero m := NeZero.mk (by linarith)
-     exact right (Fin.ofNat m (n-i))
-
-
-open DisjointUnion
-def fin_disjoint_fin_equiv_fin' (n m: ℕ) : DisjointUnion (Fin n) (Fin m) ≃ Fin (n+m) where
-  toFun := fun i =>
+def forwardFun (n m :ℕ) : Fin n ⊕ Fin m → Fin (n+m) :=
+  fun i =>
     match i with
-    | left x => Fin.castAdd m x
-    | right x => by
+    | Sum.inl x => Fin.castAdd m x
+    | Sum.inr x => by
         rw [ add_comm ]
         exact Fin.castAdd n x
+
+
+def fin_disjoint_fin_equiv_fin' (n m: ℕ) : Fin n ⊕ Fin m ≃ Fin (n+m) where
+  toFun := forwardFun n m
   invFun :=
     invFun n m
-  left_inv := by sorry
+  left_inv := by
+    unfold Function.LeftInverse
+    intro A
+    unfold invFun
+    unfold forwardFun
+    simp
+    sorry
   right_inv := by sorry
 
-open DisjointUnion in
-def invFun (n m :ℕ) : Fin (n+m) → DisjointUnion (Fin n) (Fin m) := by
+def invFun' (n m :ℕ) : Fin (n+m) → Fin n ⊕ Fin m:= by
   rintro ⟨i,_⟩  -- here (i:ℕ) is the underlying Nat of the Fin (n+m) argument
   if i < n then
      have : NeZero n := NeZero.mk (by linarith)
-     exact left (Fin.ofNat n i)
+     exact Sum.inl (Fin.ofNat n i)
   else
      have : NeZero m := NeZero.mk (by linarith)
-     exact right (Fin.ofNat m (n-i))
+     exact Sum.inr (Fin.ofNat m (n-i))
 
 --------------------------------------------------------------------------------
 
@@ -102,4 +90,4 @@ theorem lin_indep_by_transverse_subspaces
    (h_int : W₁ ⊓ W₂ = ⊥)
    (hbw1 : ∀ i, b₁ i ∈ W₁)
    (hbw2 : ∀ i, b₂ i ∈ W₂)
-   : LinearIndependent k (disjointUnion_funs b₁ b₂) := by sorry
+   : LinearIndependent k (Sum.elim b₁ b₂) := by sorry
