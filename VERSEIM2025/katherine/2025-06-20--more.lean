@@ -67,18 +67,12 @@ def fin_disjoint_fin_equiv_fin (n m: ℕ) : DisjointUnion (Fin n) (Fin m) ≃ Fi
       have : NeZero m := NeZero.mk (by linarith)
       exact right (Fin.ofNat m (n-i))
   left_inv := by
-    rintro ⟨i, _ ⟩
-    rcases i with ⟨x, y⟩
-    simp
-    -- this produces some pretty unreadable slop
-    ·
-      sorry
-    ·
-      sorry
+    intro x₀
+    match x₀ with
+    | left y => simp
+    | right z =>
+    sorry
   right_inv := by
-    rintro ⟨i, _⟩
-    rcases i with ⟨ x, y ⟩
-    simp
     sorry
 
 #check Fin.castAdd
@@ -97,4 +91,10 @@ theorem lin_indep_by_transverse_subspaces
    (h_int : W₁ ⊓ W₂ = ⊥)
    (hbw1 : ∀ i, b₁ i ∈ W₁)
    (hbw2 : ∀ i, b₂ i ∈ W₂)
-   : LinearIndependent k (disjointUnion_funs b₁ b₂) := by sorry
+   : LinearIndependent k (disjointUnion_funs b₁ b₂) := by
+    unfold disjointUnion_funs
+    rw[linearIndependent_iff]
+    intro x₀ x₁
+
+
+    sorry

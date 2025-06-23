@@ -197,7 +197,7 @@ example  (n m:ℕ) (hmn : m ≤ n) : fac m ∣ fac n := by
       rw[k₂] -- idk if this is even helpful, i dont think so
       rw[mul_comm]
       sorry
-
+      -- have to use "use" since this is an ∃ due to divisibility
        -- i don't know how to get hmn and ih to properly interact to close this out
 
 --------------------------------------------------------------------------------
