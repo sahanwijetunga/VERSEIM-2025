@@ -145,7 +145,7 @@ theorem sbv_span (n:ℕ) : Submodule.span ℚ (Set.image (sbv n) ⊤) = (⊤:Sub
     unfold sbv
     rw [ ← Fintype.sum_congr _ _ (single_smul n v) ]
     simp
-  
+  sorry
   
 --------------------------------------------------------------------------------
 
