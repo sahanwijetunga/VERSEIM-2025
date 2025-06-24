@@ -32,9 +32,14 @@ lemma alt_iff_skew (β:V →ₗ[k] V →ₗ[k] k)
    : Alt β ↔ Skew β := by
    sorry
 
+-- REMARK: we are really only interested in the case of forms which
+-- are either alternating or symmetric.  We are going to formulate a
+-- number of predicates on forms which in the general case (of a form
+-- which is neither alternating nor symmetric) should have a more
+-- complicated definition.
 
-def OrthogSubspaces (k V:Type) [AddCommGroup V] [Field k] [Module k V] (β:V →ₗ[k] V →ₗ[k] k)
-  (W₁ W₂ : Submodule k V) : Prop :=
+
+def OrthogSubspaces (β:V →ₗ[k] V →ₗ[k] k) (W₁ W₂ : Submodule k V) : Prop :=
   ∀ (x:W₁), ∀ (y:W₂), β x y = 0
 
 def fun_is_orthog (β:V →ₗ[k] V →ₗ[k] k) {n:ℕ} (vect : Fin n → V) : Prop :=
@@ -42,3 +47,11 @@ def fun_is_orthog (β:V →ₗ[k] V →ₗ[k] k) {n:ℕ} (vect : Fin n → V) : 
 
 theorem lin_indep_of_orthog (β:V →ₗ[k] V →ₗ[k] k) (f : Fin n → V) :  LinearIndependent k f := by sorry
 
+
+-- predicate for orthogonality of sets
+def OrthogSets  (β:V →ₗ[k] V →ₗ[k] k) (s₁ s₂ : Set V) : Prop :=
+  ∀ x₁ ∈ s₁, ∀ x₂ ∈ s₂, β x₁ x₂ = 0
+
+
+lemma orthog_sets_iff_orthog_subspaces (β:V →ₗ[k] V →ₗ[k] k) (s₁ s₂ : Set V) :
+  OrthogSets β s₁ s₂ ↔ OrthogSubspaces β (Submodule.span k s₁) (Submodule.span k s₂) := by sorry

@@ -9,10 +9,9 @@ VERSEIM-2025 REU VERSEIM-2025 REU @ Tufts University
 -/
 
 import Mathlib.Tactic
+import VERSEIM2025.BilinearForms
 
-namespace VERSEIM2025.Subspaces
-
-
+--------------------------------------------------------------------------------
 
 inductive DisjointUnion (ι κ : Type) where
  | left : ι → DisjointUnion ι κ
@@ -24,11 +23,44 @@ def disjointUnion_funs {ι κ X: Type} ( f₁:ι → X) (f₂:κ → X) (u:Disjo
     | DisjointUnion.right y => f₂ y
 
 
-theorem lin_indep_of_orthog (V : Type) [AddCommGroup V] [Module ℝ V] (β:V →ₗ[ℝ] V →ₗ[ℝ] ℝ)
-  (hp:PosDef V β) (W₁ W₂ : Submodule ℝ V) (ho:OrthogSubspaces ℝ V β W₁ W₂) 
-  (ι₁ ι₂: Type) [Fintype ι₁] [Fintype ι₂] 
-  (f₁:ι₁ → V) (f₂:ι₂ → V)
-  (hi₁:LinearIndependent ℝ f₁) (hi₂:LinearIndependent ℝ f₂) : 
-  LinearIndependent ℝ (disjointUnion_funs f₁ f₂) := by sorry
+open DisjointUnion
+def fin_disjoint_fin_equiv_fin (n m: ℕ) : DisjointUnion (Fin n) (Fin m) ≃ Fin (n+m) where
+  toFun := fun i => 
+    match i with
+    | left x => Fin.castAdd m x
+    | right x => by
+        rw [ add_comm ] 
+        exact Fin.castAdd n x 
+  invFun := by 
+    rintro ⟨i,_⟩
+    if h : i < n then 
+       have : NeZero n := NeZero.mk (by linarith)
+       exact left (Fin.ofNat n i)
+    else
+       have : NeZero m := NeZero.mk (by linarith)
+       exact right (Fin.ofNat m (n-i))
+  left_inv := by sorry
+  right_inv := by sorry
+
+
+--------------------------------------------------------------------------------
+
+theorem lin_indep_by_transverse_subspaces 
+   (k V : Type) [Field k] [AddCommGroup V] [Module k V] (I₁ I₂ : Type)
+   (b₁ : I₁ → V) (b₂ : I₂ → V)
+   (b1_indep : LinearIndependent k b₁) 
+   (b2_indep : LinearIndependent k b₂) 
+   (W₁ W₂ : Submodule k V)               
+   (h_int : W₁ ⊓ W₂ = ⊥)
+   (hbw1 : ∀ i, b₁ i ∈ W₁)
+   (hbw2 : ∀ i, b₂ i ∈ W₂)
+   : LinearIndependent k (disjointUnion_funs b₁ b₂) := by sorry
+
+
+
+--------------------------------------------------------------------------------
+
+
+
 
 
