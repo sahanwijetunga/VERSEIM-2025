@@ -30,14 +30,13 @@ def orthog_by_gs {V:Type} [AddCommGroup V] [Module ℝ V]
 def restrict {X:Type} {m:ℕ} (f:Fin (m+1) → X) : Fin m → X :=
   fun i => f i.castSucc 
 
+#eval restrict ![2,3,4,5,8]
 
 def extend {X:Type} {m:ℕ} (f:Fin m → X) (x :X) : Fin (m+1) → X :=
   fun i =>
   if h:i ≠ Fin.last m then f (i.castPred h) else x
 
-#eval restrict ![2,3,4,5,8]
-
-#eval extend ![1,1,1] 2
+#eval extend ![1,1,1] 4
 
 -- let's write a function which takes as argument
 -- a vector-values function w and returns the function
