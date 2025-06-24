@@ -148,6 +148,7 @@ theorem lin_indep_of_orthog (V : Type) [AddCommGroup V] [Module ℝ V] (β:V →
   (hi₁:LinearIndependent ℝ f₁) (hi₂:LinearIndependent ℝ f₂) :
   LinearIndependent ℝ (disjointUnion_funs f₁ f₂) := by
   intro h₀ h₁ h₂
+  -- maybe use linearIndependent_iff
   ext x₀
   rcases h₀ with ⟨y₁, y₂, y₃⟩
   rcases h₁ with ⟨z₁, z₂, z₃⟩
@@ -157,7 +158,7 @@ theorem lin_indep_of_orthog (V : Type) [AddCommGroup V] [Module ℝ V] (β:V →
 #check Submodule
 #check LinearIndependent
 #check Finsupp.linearCombination
--- what does →₀ mean ??
+
 --------------------------------------------------------------------------------
 
 -- 3.  direct sum

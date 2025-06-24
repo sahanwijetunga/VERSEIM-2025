@@ -71,9 +71,13 @@ def fin_disjoint_fin_equiv_fin (n m: ℕ) : DisjointUnion (Fin n) (Fin m) ≃ Fi
     match x₀ with
     | left y => simp
     | right z =>
+    simp
     sorry
   right_inv := by
+    intro ⟨ x₀, h₁⟩
+    simp
     sorry
+
 
 #check Fin.castAdd
 #check Fin.toNat
@@ -94,7 +98,16 @@ theorem lin_indep_by_transverse_subspaces
    : LinearIndependent k (disjointUnion_funs b₁ b₂) := by
     unfold disjointUnion_funs
     rw[linearIndependent_iff]
-    intro x₀ x₁
+    intro a h
+    have k₁ : b₁ a  = b₂ a := by
+      exact h
+      sorry
+      -- "a" is not working here, i think i need to put something into a
+    have k₂ : a ∈
+    -- a is coefficients, b1 (x) is the vectors, b2 (x) is the other vectors
+    -- step zero: make a hypothesis that b1a1 = -b2a2 and then show =>
+    -- step one: show its in the intersection
+    -- step two: the intersection is zero.
 
 
     sorry

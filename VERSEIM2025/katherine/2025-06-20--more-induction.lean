@@ -194,11 +194,20 @@ example  (n m:ℕ) (hmn : m ≤ n) : fac m ∣ fac n := by
     | succ n ih =>
       have k₂ : fac (n + 1) = (n + 1) * fac (n) := by
         rfl
-      rw[k₂] -- idk if this is even helpful, i dont think so
-      rw[mul_comm]
-      sorry
-      -- have to use "use" since this is an ∃ due to divisibility
-       -- i don't know how to get hmn and ih to properly interact to close this out
+      have k₃ : fac (n) ∣  fac (n + 1) := by
+        use (n + 1)
+        rw[k₂]
+        rw[mul_comm]
+      by_cases h : m ≤ n
+      · rw[k₂]
+        rw[mul_comm]
+        rcases (ih h) with ⟨ j₀, j₁ ⟩
+        · use (j₀ * (n+1))
+          rw[j₁]
+          ring
+      · simp at h
+        have k₃ : m = n + 1 := by linarith
+        rw[k₃]
 
 --------------------------------------------------------------------------------
 
