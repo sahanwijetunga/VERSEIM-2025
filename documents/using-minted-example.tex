@@ -1,0 +1,54 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+
+\usepackage{minted}
+\usepackage{minted}
+\usemintedstyle{tango}
+\setminted[bash]{bgcolor=NavajoWhite}
+
+\newmintinline[lean]{lean4}{bgcolor=white}
+\newminted[leancode]{lean4}{fontsize=\footnotesize,bgcolor=white}
+%\setminted[lean]{bgcolor=LightBlue}
+
+\usepackage{newunicodechar}
+%\newfontfamily{\freeserif}{DejaVu Sans}
+\newunicodechar{✝}{\freeserif{✝}}
+\newunicodechar{��}{\ensuremath{\mathcal{O}}}
+\newunicodechar{∀}{\ensuremath{\forall}}
+\newunicodechar{→}{\ensuremath{\to}}
+\newunicodechar{≤}{\ensuremath{\le}}
+\newunicodechar{⧸}{/}
+
+
+\title{example-minted}
+\author{gmcninch }
+\date{June 2025}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+ \begin{itemize}
+\item example: defn of convergence of a sequence
+
+\begin{minted}[]{lean}
+-- definition of "u tends to ℓ" 
+def seq_limit (u : ℕ → ℝ) (ℓ : ℝ) :=
+  ∀ ε > 0, ∃ N, ∀ n ≥ N, |u n - ℓ| ≤ ε
+\end{minted}
+
+\item statement of the ``squeeze theorem''  
+\begin{minted}[]{lean}
+-- squeeze theorem
+theorem (hu : seq_limit u ℓ)
+        (hw : seq_limit w ℓ)
+        (h : ∀ n, u n ≤ v n)
+        (h' : ∀ n, v n ≤ w n) :
+        seq_limit v ℓ := by
+   sorry
+\end{minted}
+\end{itemize}
+
+\end{document}
