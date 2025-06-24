@@ -8,6 +8,8 @@ VERSEIM-2025 REU VERSEIM-2025 REU @ Tufts University
 -/
 
 import Mathlib.Tactic
+import VERSEIM2025.BilinearForms
+
 
 -- In this file we consider a vector space over the real numbers ℝ
 -- equipped with a positive definite bilinear form
@@ -40,18 +42,15 @@ def extend {X:Type} {m:ℕ} (f:Fin m → X) (x :X) : Fin (m+1) → X :=
   fun i =>
   if h:i ≠ Fin.last m then f (i.castPred h) else x
 
--- this def produces the (proposed) orthogonal set
+-- this def needs to produce the orthogonal set
 
-def orthog_by_gs {V:Type} [AddCommGroup V] [Module ℝ V] 
-  (β:V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (hp : PosDef β)
-  {m:ℕ}
-  (b:Fin (m+1) → V) (hnz : (i:Fin (m+1)) → b i ≠ 0)
-  : Fin m → V := match m with 
-   | Nat.zero => b
-   | Nat.succ m => 
-       let initial : Fun m → V := orthog_by_gs (restrict b) (by sorry)
-       let last : V := by sorry
-       exact extend initial last
+structure orthog_fun (β:V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (n:ℕ) where
+   vect : Fin n → V
+   is_orthog : fun_is_orthog β vect 
+
+def orthog_by_gram_schmidt (β:V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (hs : Symm β) {hp : PosDef β} {m:ℕ}
+  (b : Fin n → V) (hb : LinearIndependent ℝ b) : 
+  orthog_fun β n := by sorry
 
 
 

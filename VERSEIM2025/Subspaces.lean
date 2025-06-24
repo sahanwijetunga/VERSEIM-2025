@@ -1,4 +1,18 @@
 
+--------------------------------------------------------------------------------
+/-
+Copyright (c) 2025 Clea Bergsman, Katherine Buesing, George McNinch, Sahan Wijetunga. All rights reserved.
+
+Released under the Apache 2.0 license as described in the file LICENSE.
+
+VERSEIM-2025 REU VERSEIM-2025 REU @ Tufts University 
+-/
+
+import Mathlib.Tactic
+
+namespace VERSEIM2025.Subspaces
+
+
 
 inductive DisjointUnion (ι κ : Type) where
  | left : ι → DisjointUnion ι κ
