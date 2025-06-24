@@ -24,6 +24,12 @@ variable (n :ℕ) [NeZero n]
 
 #eval ![(1:ℚ),2,3,4] 3
 
+#eval (![1,2,3,4]:Fin 4 → ℚ) 3
+
+
+#eval ![(1:ℚ),1] + ((1:ℚ)/3)•![2,2]
+
+example : Module ℚ (Fin 3 → ℚ) := inferInstance
 
 -- you can systematically get the standard basis vectors using `Pi.single`
 
@@ -34,7 +40,7 @@ example : Fin 3 → ℚ :=  Pi.single (0:Fin 3) (1:ℚ)
 #check (Pi.single (0:Fin 3) (1:ℚ): Fin 3 → ℚ)
 
 #check (Pi.single (0:Fin 3) (1:ℚ) : Fin 3 → ℚ) (0:Fin 3)
-
+#eval (Pi.single (0:Fin 3) (1:ℚ) : Fin 3 → ℚ) (1:Fin 3)
 
 example : (Pi.single (0:Fin 3) (1:ℚ) : Fin 3 → ℚ) = ![1,0,0] := by trivial
 
@@ -62,15 +68,16 @@ def sbv (n:ℕ) : Fin n → Fin n → ℚ := by
   exact Pi.single i (1:ℚ)
 
 
--- term form seems to need parens...
-def sbv' (n:ℕ)  [NeZero n] : Fin n → (Fin n → ℚ) := (fun i => 
-  Pi.single i (1:ℚ) )
+def sbv' (n:ℕ) : Fin n → Fin n → ℚ := fun i => 
+  Pi.single i (1:ℚ) 
 
 
 -- so `sbv n 0`, `sbv n 1`, ... `sbv n (n-1)` are the standard basis vectors of
 -- `Fin n → ℚ`
 
-#eval sbv 8 
+#eval sbv 3 
+
+#check LinearIndependent 
 
 -- lets try to use the theorem `linearIndependent_iff` to get linear independence
 
@@ -85,7 +92,7 @@ def sbv' (n:ℕ)  [NeZero n] : Fin n → (Fin n → ℚ) := (fun i =>
 -- ∀ (l:Fin 3 → ℚ), whenever (Finsupp.linearCombination k v) l = 0, then l = 0.
 
 variable (l:Fin n → ℚ) in
-#check Fintype.linearCombination_apply ℚ (sbv n) l
+#check Fintype.linearCombination_apply ℚ (sbv n) l 
 
 example (l:Fin n →ℚ) :  Fintype.linearCombination ℚ (sbv n) l = ∑ i:Fin n, l i • (sbv n) i := by
   rw [ ←Fintype.linearCombination_apply ℚ (sbv n) ]
