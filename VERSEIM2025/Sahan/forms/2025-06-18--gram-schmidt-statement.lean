@@ -197,98 +197,32 @@ theorem orthog_sub_perp_align {V:Type} [AddCommGroup V] [Module ℝ V]
 theorem orthog_intermediate {V:Type} [AddCommGroup V] [Module ℝ V]
   (β:V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (hp : PosDef β) (hs : Symm β)
   {n:ℕ} (b:Fin n → V) (hb: OrthogPred β b) (x: V): OrthogPred β (intermediate β b x) := by
-    let c := intermediate β b x
-    have ind_neq_n (ind: Fin (n+1)) (h: ind ≠ Fin.last n): ↑ind ≠ n := by
-      show ↑ind ≠ (↑(Fin.last n: Fin (n+1)): ℕ)
-      have: ↑(Fin.last n: Fin (n+1)) = n := rfl
-      intro h'
-      exact h (Fin.ext_iff.mpr h')
-
-    have ind_lt_n (ind: Fin (n+1)) (h: ind ≠ Fin.last n): ↑ind < n := by
-      suffices ↑ind ≤ n ∧ ↑ind ≠ n from ?_
-      . have ⟨h₀, h₁⟩ := this
-        exact Nat.lt_of_le_of_ne h₀ h₁
-      constructor
-      . exact Nat.le_of_lt_succ ind.is_lt
-      . exact ind_neq_n ind h
-
-    have h_one_is_n (i j: Fin (n+1)) (hjn: i ≠ j): (i=Fin.last n) → β (c i) (c j) = 0 := by
-      intro h'
-      rw[h', hs]
-
-      let j': ℕ := ↑j
-      have hj': j'<(n+1) := j.is_lt
-      let i': ℕ := ↑i
-      have hi': i'<(n+1) := i.is_lt
-      have hi'n_eq: i'=n := by exact Fin.mk.inj_iff.mp h'
-
-      have hi'n_neq: i'≠ j' := Fin.val_ne_iff.mpr hjn
-
-      have hj_neq_n: j ≠ Fin.last n:= by
-        rw[<- h']
-        symm
-        exact Fin.val_ne_iff.mp hi'n_neq
-
-      have j_ineq: j'<n := ind_lt_n j hj_neq_n
-      let j_new: Fin n := ⟨j', j_ineq⟩
-
-      suffices (β (b j_new) (sub_perp_align β b x)=0) from ?_
-      . have hj_eq_j_neq: b j_new = c j := by exact Eq.symm (intermediate_val₂ β b j hj_neq_n x)
-        have: c (Fin.last n)=sub_perp_align β b x :=
-          (Ne.dite_eq_right_iff fun h a ↦ h rfl).mpr fun a ↦ a rfl
-        rw[<- hj_eq_j_neq, this]
-        assumption
-      apply orthog_sub_perp_align β hp hs b hb
-
-    have h_none_is_n (i j: Fin (n+1)) (h: i ≠ j): (i≠ Fin.last n) → (j ≠ Fin.last n) → β (c i) (c j) = 0 := by
+    have case1 (i j: Fin (n+1)) (h: i ≠ j): (h₁: i=Fin.last n) → (β (intermediate β b x i)) (intermediate β b x j) = 0 := by
+      intro h₁
+      rw[h₁]
+      have h₂: j ≠ Fin.last n :=
+        Ne.symm (Lean.Grind.ne_of_ne_of_eq_left (id (Eq.symm h₁)) h)
+      have h₃: (intermediate β b x) (Fin.last n) = sub_perp_align β b x := by simp
+      rw[h₃]
+      rw[hs]
+      have: intermediate β b x j = b (j.castPred h₂) := intermediate_val₂ β b j h₂ x
+      rw[this]
+      exact orthog_sub_perp_align β hp hs b hb x (j.castPred h₂)
+    have case2 (i j: Fin (n+1)) (h: i ≠ j): (i≠ Fin.last n) → (j ≠ Fin.last n) → (β (intermediate β b x i)) (intermediate β b x j) = 0 := by
       intro h₁ h₂
-      let j': ℕ := ↑j
-      have hj': j'<(n+1) := j.is_lt
-      let i': ℕ := ↑i
-      have hi': i'<(n+1) := i.is_lt
-
-      have hi'n_neq: i'≠ j' := by
-        intro h''
-        have: i=j := by
-          suffices ⟨i', hi'⟩ =(⟨j', hj'⟩ : Fin (n+1)) from ?_
-          . tauto
-          rw[Fin.mk.inj_iff]
-          exact h''
-        apply h this
-
-      have hi'_neq_n : i' ≠ n := ind_neq_n i h₁
-      have hj'_neq_n : j' ≠ n := ind_neq_n j h₂
-
-      have hi'_lt_n: i'<n := ind_lt_n i h₁
-      have hj'_lt_n: j'<n := ind_lt_n j h₂
-
-      let i_new: Fin n := ⟨i', hi'_lt_n⟩
-      let j_new: Fin n := ⟨j', hj'_lt_n⟩
-      suffices β (b i_new) (b j_new) =0 from ?_
-      . have hi_eq_i_neq: b i_new = c i := by exact Eq.symm (intermediate_val₂ β b i h₁ x)
-        have h_jeq_j_neq: b j_new = c j := by exact Eq.symm (intermediate_val₂ β b j h₂ x)
-        simp_all
+      have h1: intermediate β b x i = b (i.castPred h₁) := intermediate_val₂ β b i h₁ x
+      have h2: intermediate β b x j = b (j.castPred h₂) := intermediate_val₂ β b j h₂ x
+      rw[h1, h2]
       apply hb
-      intro hcontr
-      rw[Fin.mk.inj_iff] at hcontr
-      . exact hi'n_neq hcontr
-
+      intro h'
+      simp_all
     intro i j h
-    let h1:= (i ≠ Fin.last n ) ∧ (j ≠ Fin.last n)
-    let h2:= (i = Fin.last n )
-    let h3:= (j = Fin.last n)
-    have: h1 ∨ h2 ∨ h3 := by
-      rcases Classical.em (i=Fin.last n) with h₁ | h₁
-      . right; left; exact h₁
-      . rcases Classical.em (j=Fin.last n) with h₃ | h₄
-        . right; right; exact h₃
-        . left; exact ⟨ h₁, h₄⟩
-
-    rcases this with h1' | (h2' | h3')
-    . apply h_none_is_n i j h h1'.left h1'.right
-    . apply h_one_is_n i j h h2'
-    . rw[hs (c i) (c j)]
-      apply h_one_is_n j i h.symm h3'
+    rcases Classical.em (i=Fin.last n) with h₁ | h₁
+    . exact case1 i j h h₁
+    rcases Classical.em (j=Fin.last n) with h₂ | h₂
+    . rw[hs]
+      exact case1 j i h.symm h₂
+    . exact case2 i j h h₁ h₂
 
 
 @[simp]
