@@ -88,6 +88,7 @@ def fin_disjoint_fin_equiv_fin (n m: ℕ) : DisjointUnion (Fin n) (Fin m) ≃ Fi
 
 theorem lin_indep_by_transverse_subspaces
    (k V : Type) [Field k] [AddCommGroup V] [Module k V] (I₁ I₂ : Type)
+   [Fintype I₁] [Fintype I₂]
    (b₁ : I₁ → V) (b₂ : I₂ → V)
    (b1_indep : LinearIndependent k b₁)
    (b2_indep : LinearIndependent k b₂)
@@ -99,11 +100,36 @@ theorem lin_indep_by_transverse_subspaces
     unfold disjointUnion_funs
     rw[linearIndependent_iff]
     intro a h
-    have k₁ : b₁ a  = b₂ a := by
-      exact h
+    have k₁ : ∑ i, (a (left i)) • (b₁ i) = - ∑ j, (a  (right j)) • (b₂ j)  := by
       sorry
-      -- "a" is not working here, i think i need to put something into a
-    have k₂ : a ∈
+    have k₂ : ∑ i, (a (left i)) • (b₁ i) ∈ W₁ ⊓ W₂ := by
+      simp
+      have k₂₀ : ∑ i, (a (left i)) • (b₁ i) ∈ W₁ := by
+        exact Submodule.sum_smul_mem W₁ (fun i ↦ a (left i)) fun c a ↦ hbw1 c
+      have k₂₁ : ∑ i, (a (left i)) • (b₁ i) ∈ W₂ := by
+        rw[k₁]
+        apply Submodule.neg_mem
+        exact Submodule.sum_smul_mem W₂ (fun i ↦ a (right i)) fun c a ↦ hbw2 c
+      -- need to construct an and statement probably
+      constructor
+      · exact k₂₀
+      · exact k₂₁
+    have k₃ : - ∑ j, (a  (right j)) • (b₂ j) ∈ W₁ ⊓ W₂ := by
+      rw[k₁] at k₂
+      exact k₂
+      -- im not totally sure if this hypothesis is completely relevant but i created it anyways
+    rw[linearIndependent_iff] at b1_indep
+    rw[linearIndependent_iff] at b2_indep
+    --im not sure if any of this is doing anything good or relevant. im dying
+    rw[h_int] at k₂
+    rw[h_int] at k₃
+    simp at k₂
+    simp at k₃
+    ext x₀
+  -- linear independent _iff theorem
+
+
+
     -- a is coefficients, b1 (x) is the vectors, b2 (x) is the other vectors
     -- step zero: make a hypothesis that b1a1 = -b2a2 and then show =>
     -- step one: show its in the intersection

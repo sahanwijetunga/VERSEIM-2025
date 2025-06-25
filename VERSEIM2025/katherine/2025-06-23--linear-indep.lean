@@ -191,3 +191,14 @@ example (k V : Type) [Field k] [AddCommGroup V] [Module k V] : Basis ι k V wher
 -- basis vectors parametrized by `ι` in the usual, black-board math sense. Indeed, for a term
 
 -- `x:ι`
+
+
+----------------------------
+-- lists
+
+def reverse {α : Type}  : List α →  List α
+  | [] => []
+  | List.cons x xs => List.append (reverse xs) [x]
+
+
+#eval reverse [1, 2, 3, 4]
