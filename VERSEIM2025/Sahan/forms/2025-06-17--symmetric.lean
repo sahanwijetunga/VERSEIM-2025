@@ -209,8 +209,7 @@ theorem direct_sum_unique_repr (k V : Type) [Field k] [AddCommGroup V] [Module k
     intro h
     have h': x₁-y₁ = y₂-x₂ :=
       calc
-        x₁-y₁ = (x₁+0)-y₁ := by abel_nf
-        _ = (x₁+x₂-x₂)-y₁ := by abel_nf
+        x₁-y₁ = (x₁+x₂-x₂)-y₁ := by abel_nf
         _ = (y₁+y₂-x₂)-y₁ := by rw[h]
         _ = y₂-x₂ := by abel
     have hw1: (x₁-y₁) ∈ W₁ := by
@@ -234,8 +233,6 @@ theorem direct_sum_unique_repr (k V : Type) [Field k] [AddCommGroup V] [Module k
       exact this
     have hxy1: x₁=y₁ := by
       calc
-        _ = x₁+0 := by abel
-        _ = x₁+(y₁-y₁) := by abel
         _ = (x₁-y₁)+y₁ := by abel
         _ = 0+y₁ := by rw[hw0]
         _ = y₁ := by abel
