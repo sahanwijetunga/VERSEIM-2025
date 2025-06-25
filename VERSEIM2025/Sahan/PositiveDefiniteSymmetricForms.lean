@@ -8,8 +8,8 @@ VERSEIM-2025 REU VERSEIM-2025 REU @ Tufts University
 -/
 
 import Mathlib.Tactic
-import Sahan.BilinearForms
-import Sahan.Subspaces
+import VERSEIM2025.Sahan.BilinearForms
+import VERSEIM2025.Sahan.Subspaces
 
 -- In this file we consider a vector space over the real numbers ℝ
 -- equipped with a positive definite bilinear form
@@ -61,7 +61,7 @@ def orthog_by_gram_schmidt (β:V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (hs : Symm β) {
 
 
 theorem lin_indep_of_orthog_subspaces (V : Type) [AddCommGroup V] [Module ℝ V] (β:V →ₗ[ℝ] V →ₗ[ℝ] ℝ)
-  (hp:PosDef β) (W₁ W₂ : Submodule ℝ V) (ho:OrthogSubspaces ℝ V β W₁ W₂)
+  (hp:PosDef β) (W₁ W₂ : Submodule ℝ V) (ho: OrthogSubspaces β W₁ W₂)
   (ι₁ ι₂: Type) [Fintype ι₁] [Fintype ι₂]
   (f₁:ι₁ → V) (f₂:ι₂ → V)
   (hi₁:LinearIndependent ℝ f₁) (hi₂:LinearIndependent ℝ f₂) :
