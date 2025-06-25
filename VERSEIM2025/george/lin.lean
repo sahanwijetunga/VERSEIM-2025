@@ -116,7 +116,7 @@ example : Pi.single (0:Fin 3) 1 = ↑(Finsupp.single (0:Fin 3) 1) := by
 example (α:Type) (f g :Fin 5 → α) (h:(i:Fin 5) → f i = g i) : f = g := by
   ext i
   exact h i 
-
+DE
 example (α:Type) (f g :Fin 5 → α) (j:Fin 5) (h: f j ≠ g j) : f ≠ g := by
   intro k
   rw [k] at h
