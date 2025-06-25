@@ -131,3 +131,4 @@ example : List ( (Fin 5) × ℕ ) := List.map (fun (i:Fin 5) => (i,i.toNat.succ)
 #eval List.map (fun (i:Fin 5) => (i,i.toNat.succ)) (FinEnum.toList (Fin 5))
 
 #check funext
+
