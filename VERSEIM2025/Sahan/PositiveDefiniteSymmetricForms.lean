@@ -11,6 +11,7 @@ import Mathlib.Tactic
 import VERSEIM2025.Sahan.BilinearForms
 import VERSEIM2025.Sahan.Subspaces
 
+
 -- In this file we consider a vector space over the real numbers ℝ
 -- equipped with a positive definite bilinear form
 

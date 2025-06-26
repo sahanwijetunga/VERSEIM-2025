@@ -38,34 +38,27 @@ lemma fun1_right (m n: ℕ) (j: Fin m): fun1 m n (Sum.inr j) = Fin.natAdd n j :=
    . exact Nat.add_comm m n
    exact Nat.add_comm j n
 
-theorem comm_fin (m n : ℕ): Fin (n+m)=Fin (m+n) := by
-   rw[add_comm]
-
 def reverse_ineq {n m i: ℕ} (h: i<m+n) : i<n+m := by
    rw[add_comm]
    exact h
 
-def fun2 (m n: ℕ): Fin (n+m) → (Fin n) ⊕ (Fin m) := by
-   rintro ⟨i,hi⟩
+def fun2 (m n: ℕ): Fin (n+m) → (Fin n) ⊕ (Fin m) :=
+   fun ⟨i,hi⟩ =>
    if h : i < n then
-      have : NeZero n := NeZero.mk (by linarith)
-      exact Sum.inl (⟨↑i, h⟩: Fin n)
+      Sum.inl (⟨↑i, h⟩: Fin n)
    else
-      have : NeZero m := NeZero.mk (by linarith)
-      have: n ≤ i := Nat.le_of_not_lt h
-      exact Sum.inr (Fin.subNat n (⟨i,reverse_ineq hi⟩: Fin (m+n)) this)
+      Sum.inr (Fin.subNat n (⟨i,reverse_ineq hi⟩: Fin (m+n)) (Nat.le_of_not_lt h))
 
 
 @[simp]
 lemma fun2_less (m n: ℕ) (i: Fin (n+m)) (h: ↑i< n): fun2 m n i = Sum.inl (⟨↑i, h⟩: Fin n) := by
-   have : NeZero n := NeZero.mk (by linarith)
    simp_all[fun2]
 
 @[simp]
 lemma fun2_more (m n: ℕ) (i: Fin (n+m)) (h: ↑i≥ n): fun2 m n i =
    Sum.inr (Fin.subNat n (⟨(↑i: ℕ),reverse_ineq i.is_lt⟩: Fin (m+n)) h) := by
    have: ¬ ↑i< n := by exact Nat.not_lt.mpr h
-   simp[fun2, *]
+   simp[fun2,this]
 
 
 def fin_disjoint_fin_equiv_fin (n m: ℕ) : (Fin n) ⊕ (Fin m) ≃ Fin (n+m) where
@@ -79,7 +72,7 @@ def fin_disjoint_fin_equiv_fin (n m: ℕ) : (Fin n) ⊕ (Fin m) ≃ Fin (n+m) wh
 
   right_inv := by
       intro a
-      rcases Classical.em (a<n) with h | h
+      by_cases h:(a<n)
       .  simp_all
       .  simp_all
 

@@ -60,22 +60,12 @@ lemma div_2 {p} (hp: CharP k p) (hn2 : p ≠ 2) (v: V) (h: v+v=0) : v=0 := by
     _ = (2: k)⁻¹ • (2: k) • v := by exact mul_smul 2⁻¹ 2 v
     _ = 0 := by simp_all
 
-
 lemma alt_iff_skew  {p}(β:V →ₗ[k] V →ₗ[k] k)
-   (hp2: CharP k p) (hn2 : p ≠ 2)
+   [CharP k p] (hn2 : p ≠ 2)
    : Alt β ↔ Skew β := by
+  have hp2: CharP k p := by (expose_names; exact inst_3)
   constructor
-  . intro h
-    simp[Alt, Skew] at *
-    intro v w
-    suffices β v w + β w v = 0 from ?_
-    . exact Eq.symm (LinearMap.BilinForm.IsAlt.neg_eq h w v)
-
-    calc
-      (β v) w + (β w) v = β v w + β w v + β v v + β w w := by
-        simp_all
-      _ = β (v+w) (v+w) := by simp_all
-      _ = 0 := h (v+w)
+  . apply skew_of_alt
   . intro h
     simp[Alt, Skew] at *
     intro v
