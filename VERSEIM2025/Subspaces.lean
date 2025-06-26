@@ -11,6 +11,20 @@ VERSEIM-2025 REU VERSEIM-2025 REU @ Tufts University
 import Mathlib.Tactic
 import VERSEIM2025.BilinearForms
 
+-- the next lemma says that for a vector space over a field k of
+-- characteristic different from 2, for v in V the equation `2v=0`
+-- implies that `v=0`.
+
+
+lemma eq_zero_of_two_mul_eq_zero { k V : Type } [ Field k] [ AddCommGroup V] 
+  [Module k V] {p:ℕ} [CharP k p] (hn2 : p ≠ 2) 
+  (v:V) (h:2•v = 0) : v = 0 := by
+  have two_neq_zero : (↑2 : k) ≠ 0 := by simp
+  by_contra v_neq_zero
+  have l : 2 • v ≠ 0 := smul_ne_zero two_neq_zero v_neq_zero
+  exact l h
+
+
 --------------------------------------------------------------------------------
 
 inductive DisjointUnion (ι κ : Type) where

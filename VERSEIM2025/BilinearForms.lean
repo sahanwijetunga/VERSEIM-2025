@@ -27,6 +27,8 @@ lemma skew_of_alt (β:V →ₗ[k] V →ₗ[k] k) (ha : Alt β) :
   Skew β := by 
   sorry
 
+
+
 lemma alt_iff_skew (β:V →ₗ[k] V →ₗ[k] k) 
    [CharP k p] (hn2 : p ≠ 2)
    : Alt β ↔ Skew β := by
