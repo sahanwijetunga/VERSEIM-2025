@@ -1,0 +1,281 @@
+--------------------------------------------------------------------------------
+/-
+Copyright (c) 2025 George McNinch. All rights reserved.
+Released under the Apache 2.0 license as described in the file LICENSE.
+Author : George McNinch
+-/
+
+/- VERSEIM-2025 REU -/
+
+import Mathlib.Tactic
+
+-- follow-up on yesterday's discussion about functions and "currying"
+-- (though I'm not sure I used the word currying...)
+
+def F : ℤ → ℤ → ℤ := fun x y => x + y
+
+def F' : ℤ × ℤ → ℤ := fun (x,y) => x + y
+
+#eval F' (1,0)
+
+-- this next evaluation is only happy because Lean coerces `1:ℤ` into `(1,1):ℤ × ℤ`
+-- which you can tell because `F' 1` evaluates to 1+1 = 2.
+
+#check F' (1:ℤ)
+#eval F' 1
+
+-- but Lean for whatever reason does not coerce= a `String` into a `String × String`
+
+def Fs : String × String → String := fun (x,y) => String.append x y
+
+#eval Fs ("foo","bar")
+
+-- but this fails:
+-- #check Fs "foo"
+
+--------------------------------------------------------------------------------
+
+-- yesterday we saw a bit about the ∀ quanitifier.
+
+-- let's look at some other "logical operators" now
+
+-- an operator (∀, ∃, ∧ , ∨ , ⋯ ) produces a type. there are then two questions:
+
+-- how does one *use* a term of the indicated type?
+-- how does one *create* a term of the indicated type?
+
+-- we saw that ∀ was basically the same as (some form of) a function type
+
+-- now lets look at the existential quantifier ∃
+
+-- a basic example is divisibility of natural numbers
+
+-- let's prove that 2m ∣ 4m.
+
+example (m : ℕ) : ∃ x:ℕ, x * 2 * m = 4*m := by
+  use 2
+
+-- so to give the proof, we have to *provide* the required x via `use`
+
+example : ∃ x : ℝ, 0 < x ∧ x < 1 := by
+  use 1 / 2
+  norm_num
+
+-- rather than rely on the norm_num tactic, we can settle all the
+-- goals of the required ∧ assertion:
+
+example : ∃ x : ℝ, 0 < x ∧ x < 1 := by
+  have h : (0:ℝ) < 1/2 := by norm_num
+  have k : 1/2 < (1:ℝ) := by norm_num
+  use 1/2  -- the use tactic uses available assumptions.
+
+-- now let's see how to *use* a term of a type involving ∃ as a  hypothesis:
+
+def has_zero (f : ℝ → ℝ) : Prop := ∃ x, f x = 0
+
+example (f g: ℝ → ℝ) (h: has_zero f) : has_zero fun x => f x * g x := by
+  rcases h with ⟨x,hf⟩
+  use x
+  dsimp
+  rw [hf]
+  norm_num
+
+-- here if h has type `∃ x:α, p`
+-- then `rcases h with ⟨y,hy⟩` gives you a term `y:α` and a term `h:p`
+-- here you should think of `h` as a proof that `p holds for y`.
+
+-- the syntax ⟨ ... ⟩ is Lean's "anonymous constructor syntax"
+-- if you look at `math-in-lean` section 3.2 you'll see some more examples of
+-- how to use terms like this.
+
+
+-- another version of the "bounded" predicates  from yesterday
+
+--recall
+
+def FnUb (f:ℝ → ℝ) (a:ℝ) : Prop :=
+  ∀ x, f x ≤ a
+
+-- here is a version that doesn't require indicating the `a`
+
+def FnHasUb (f:ℝ → ℝ) : Prop :=
+  ∃ a, FnUb f a
+
+
+def FnLb (f : ℝ → ℝ) (a : ℝ) : Prop :=
+  ∀ x, a ≤ f x
+
+def FnHasLb (f : ℝ → ℝ) :=
+  ∃ a, FnLb f a
+
+-- we proved this yesterday, but are now *naming* it.
+-- note the "implicit arguments" `f g` and `a b`
+
+-- and here we give a `term proof` instead of a `tactic proof`
+
+theorem FnUb_add {f g : ℝ → ℝ} {a b : ℝ} (hfa : FnUb f a) (hgb : FnUb g b) :
+    FnUb (fun x ↦ f x + g x) (a + b) :=
+    fun x ↦ add_le_add (hfa x) (hgb x)
+
+
+example (ubf : FnHasUb f) (ubg : FnHasUb g) : FnHasUb fun x => f x + g x := by
+  rcases ubf with ⟨ a, ubfa ⟩
+  rcases ubg with ⟨ b, ubgb ⟩
+  let h := FnUb_add ubfa ubgb
+  use a + b
+
+
+-----
+
+
+variable (G : Type) [Group G]
+
+variable (A : Type) [AddCommGroup A]  -- to me, additive groups ought to always be commutative...but `mathlib` does have a typeclass `AddGroup`
+
+variable (H I J : Subgroup G)
+
+variable (B C D : AddSubgroup A)
+
+example : x ∈ B ↔ -x ∈ B := by
+  constructor
+  . intro hx
+    apply neg_mem hx
+  . intro hxneg
+    rw[<- neg_neg x]
+    exact neg_mem hxneg
+
+example: -x ∈ B → x ∈ B := by
+  intro h
+  have h': - - x ∈ B → x ∈ B := by
+    intro hq
+    rw[neg_neg x] at hq
+    exact hq
+  have h'': - - x ∈ B := by
+    exact neg_mem h
+  exact h' h''
+
+-- exercise
+
+def divis (n m : ℕ) : Prop := ∃ x:ℕ, x*n = m
+
+example {n: ℕ}: divis n n := ⟨1, one_mul n⟩
+
+example {n m p :ℕ} (h: divis n m) (k: divis m p) : divis n p := by
+  rcases h with ⟨a, rfl⟩
+  rcases k with ⟨b, rfl⟩
+  use b*a
+  rw[mul_assoc]
+
+
+-- exercise: give the proofs about even and odd functions:
+
+def FnEven (f : ℝ → ℝ) : Prop :=
+  ∀ x, f x = f (-x)
+
+def FnOdd (f : ℝ → ℝ) : Prop :=
+  ∀ x, f x = -f (-x)
+
+example (ef : FnEven f) (eg : FnEven g) : FnEven fun x ↦ f x + g x := by
+  intro x
+  calc
+    (fun x ↦ f x + g x) x = f x + g x := rfl
+    _ = f (-x) + g (-x) := by rw [ef, eg]
+
+
+example (of : FnOdd f) (og : FnOdd g) : FnEven fun x ↦ f x * g x := by
+  intro x
+  dsimp
+  rw[of, og]
+  rw[neg_mul_neg]
+
+example (ef : FnEven f) (og : FnOdd g) : FnOdd fun x ↦ f x * g x := by
+  intro x
+  dsimp
+  rw[og, ef]
+  rw[mul_neg]
+
+example (ef : FnEven f) (og : FnOdd g) : FnEven fun x ↦ f (g x) := by
+  intro x
+  dsimp
+  rw[og]
+  rw[ef]
+  congr
+  rw[neg_neg]
+
+
+--------------------------------------------------------------------------------
+
+--negation
+
+-- symbol ¬ typed via \not
+
+-- in Lean, there is a type `False` that has no terms (so you can't prove it).
+-- The negation `¬ P` of a proposition P is a term of type `P → False`,
+-- think of this as saying that `P` implies a contradiction.
+
+variable (a b :ℝ)
+
+-- let's prove that " a< b -> not b < a "
+
+-- we will use that " a < a is false "
+
+-- and we'll use the transitivity of the relation <, which is named `lt_trans`
+
+example (h : a < b) : ¬b < a := by
+  intro h'
+  have : a < a := lt_trans h h'
+  apply lt_irrefl a this
+
+
+
+variable (α: Type*)
+
+-- example (h: ∀ )
+
+-- note that as soon as we intro h', our goal is `False`
+
+-- lt_irrefl.{u_1} {α : Type u_1} [Preorder α] (a : α) : ¬a < a
+
+-- note that lt_irrefl a this returns a term of type ¬ a < a -- in other words
+-- a proof that `a < a → False`.
+
+
+example (h : ∀ a, ∃ x, f x > a) : ¬FnHasUb f := by
+  intro fnub
+  rcases fnub with ⟨a, fnuba⟩
+  rcases h a with ⟨x, hx⟩
+  have : f x ≤ a := fnuba x
+  linarith
+
+
+-- try this one:
+
+--
+
+variable (α: Type*) (P: α → Prop) (Q: Prop)
+
+example (h: ¬ ∃ x, P x) : ∀ x, ¬ P x := by
+  intro x h'
+  exact h ⟨x,h'⟩
+
+example (h: ∀ x, ¬ P x): ¬ ∃ x, P x := by
+  intro ⟨x, h'⟩
+  exact h x h'
+
+example (h: ∃ x, ¬ P x) : ¬ ∀ x, P x := by
+  intro h'
+  rcases h with ⟨x, hx⟩
+  exact hx (h' x)
+
+example (h: ¬ ∀ x, P x) : ∃ x, ¬ P x := by
+  contrapose! h
+  assumption
+
+
+
+example (h: ¬ ∀ x, P x) : ∃ x, ¬ P x := by
+  by_contra h'
+  apply h
+  intro x
+  by_contra h''
+  exact h' ⟨x, h''⟩
