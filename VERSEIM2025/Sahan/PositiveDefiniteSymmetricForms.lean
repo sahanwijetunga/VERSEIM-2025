@@ -19,7 +19,7 @@ variable { V : Type } [ AddCommGroup V ]  [Module ℝ V]
 variable (β:V →ₗ[ℝ] V →ₗ[ℝ] ℝ)
 
 def PosDef (β:V →ₗ[ℝ] V →ₗ[ℝ] ℝ) : Prop :=
-  ∀ x : V, β x x ≥ 0 ∧ x ≠ 0 → β x x > 0
+  ∀ x : V, (β x x ≥ 0 ∧( x ≠ 0 → β x x > 0))
 
 -- We are really only interested in the case in which `V` is finite
 -- dimensional but initially there is not need to impose that
@@ -64,5 +64,24 @@ theorem lin_indep_of_orthog_subspaces (V : Type) [AddCommGroup V] [Module ℝ V]
   (hp:PosDef β) (W₁ W₂ : Submodule ℝ V) (ho: OrthogSubspaces β W₁ W₂)
   (ι₁ ι₂: Type) [Fintype ι₁] [Fintype ι₂]
   (f₁:ι₁ → V) (f₂:ι₂ → V)
-  (hi₁:LinearIndependent ℝ f₁) (hi₂:LinearIndependent ℝ f₂) :
-  LinearIndependent ℝ (disjointUnion_funs f₁ f₂) := by sorry
+  (hi₁:LinearIndependent ℝ f₁) (hi₂:LinearIndependent ℝ f₂)
+  (hbw1 : ∀ i, f₁ i ∈ W₁)
+   (hbw2 : ∀ i, f₂ i ∈ W₂) :
+  LinearIndependent ℝ (disjointUnion_funs f₁ f₂) := by
+    apply lin_indep_by_transverse_subspaces
+    . exact hi₁
+    . exact hi₂
+    . show W₁ ⊓ W₂ = ⊥
+      suffices W₁ ⊓ W₂ ≤ ⊥ from ?_
+      . exact (Submodule.eq_bot_iff (W₁ ⊓ W₂)).mpr this
+      intro x ⟨h1, h2⟩
+      have: β x x = 0 := by
+        unfold OrthogSubspaces at ho
+        simp_all
+      contrapose! this
+      have: x ≠ 0 := by exact this
+      have:= (hp x).right this
+      exact Ne.symm (ne_of_lt this)
+    . intro i
+      exact hbw1 i
+    . exact fun i ↦ hbw2 i
