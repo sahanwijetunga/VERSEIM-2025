@@ -107,14 +107,20 @@ theorem lin_indep_by_transverse_subspaces
    [DecidableEq I₁] [DecidableEq I₂]
    : LinearIndependent k (disjointUnion_funs b₁ b₂) := by
     rw[linearIndependent_iff'']
-    intro s a g h₁ h₂
+    intro s a g h₁ t
     have k₀ : ∑ i ∈ s, a i • disjointUnion_funs b₁ b₂ i = ∑ i : (I₁ ⊕ I₂), a i • disjointUnion_funs b₁ b₂ i := by
       rw[h₁]
       have k₀₀ : Disjoint s sᶜ := by
         unfold Disjoint
-        intro x₀
+        intro r
         simp
-        sorry
+        intro y₀ y₁
+        ext x
+        simp
+        intro hx
+        have xnotins : x ∈ Finset.univ \ s := y₁ hx
+        simp at xnotins
+        exact xnotins (y₀ hx)
       have k₀₁ : s ∪ sᶜ = (⊤ : Finset (I₁ ⊕ I₂)) := by
         simp
       have k₀₂ : (⊤: Finset (I₁ ⊕ I₂)) = Finset.univ := by
@@ -123,8 +129,18 @@ theorem lin_indep_by_transverse_subspaces
       rw[ ← k₀₁]
       rw[Finset.sum_union k₀₀]
       rw[h₁]
-      -- rw[← Set.mem_compl] -> this is exactly what i want to do, but its inside of sum
-      sorry
+      have k₀₃ : ∀ i ∈ sᶜ, a i = 0 := by
+        intro i h
+        rw[g]
+        intro p
+        rw[Finset.mem_compl] at h
+        exact h p
+      simp
+      rw[Finset.sum_eq_zero]
+      intro x₀ h
+      rw[k₀₃]
+      simp
+      exact h
     have eq_h : ∑ a₁, a (Sum.inl a₁) • disjointUnion_funs b₁ b₂ (Sum.inl a₁) +
     ∑ a₂, a (Sum.inr a₂) • disjointUnion_funs b₁ b₂ (Sum.inr a₂) =
     ∑ i, (a (Sum.inl i)) • (b₁ i) + ∑ j, (a (Sum.inr j)) • (b₂ j) := by
@@ -134,7 +150,9 @@ theorem lin_indep_by_transverse_subspaces
       rw[k₀] at h₁
       simp at h₁
       rw[eq_h] at h₁
-      sorry
+      rw[add_eq_zero_iff_eq_neg'] at h₁
+      rw[h₁]
+      simp
     have k₂ : ∑ i, (a (Sum.inl i)) • (b₁ i) ∈ W₁ ⊓ W₂ := by
       simp
       have k₂₀ : ∑ i, (a (Sum.inl i)) • (b₁ i) ∈ W₁ := by
@@ -149,13 +167,22 @@ theorem lin_indep_by_transverse_subspaces
     have k₃ : - ∑ j, (a  (Sum.inr j)) • (b₂ j) ∈ W₁ ⊓ W₂ := by
       rw[k₁] at k₂
       exact k₂
-    rw[linearIndependent_iff] at b1_indep
-    rw[linearIndependent_iff] at b2_indep
+    rw[linearIndependent_iff''] at b1_indep
+    rw[linearIndependent_iff''] at b2_indep
     rw[h_int] at k₂
     rw[h_int] at k₃
     simp at k₂
     simp at k₃
-    sorry
+    apply b1_indep at k₂
+    apply b2_indep at k₃
+    match t with
+      | Sum.inl x =>
+        rw[k₂]
+      | Sum.inr x =>
+        rw[k₃]
+    · simp
+    · simp
+
     -- a is coefficients, b1 (x) is the vectors, b2 (x) is the other vectors
     -- step zero: make a hypothesis that b1a1 = -b2a2 and then show =>
     -- step one: show its in the intersection
