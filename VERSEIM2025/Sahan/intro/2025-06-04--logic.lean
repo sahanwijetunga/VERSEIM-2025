@@ -34,11 +34,17 @@ example : ∀ x : ℝ, 0 ≤ x → |x| = x := by
 
 -- let's define some *predicates* on real-valued functions of a real variable
 
-def FnUb (f : ℝ → ℝ) (a : ℝ) : Prop :=
+def FnUb (f : ℝ → ℝ) (a : ℝ) :=
   ∀ x, f x ≤ a
 
 def FnLb (f : ℝ → ℝ) (a : ℝ) : Prop :=
   ∀ x, a ≤ f x
+
+def FnBdFn (f g: ℝ → ℝ) : Prop :=
+  ∀ x, f x ≤ g x
+
+def FnBdFn' (f : ℝ → ℝ)(g : ℝ → ℝ ) : Prop :=
+  ∀ x, f x ≤ g x
 
 -- read: `FnUB f a` means that the values of function `f` are bounded
 -- above by `a`
@@ -48,9 +54,9 @@ section anon_functions
 -- the keyword `fun` constructs a function. The `fun` construction is often
 -- called a `lambda` in some programming languages ("anonomous function")
 
--- for example 
+-- for example
 
-def f : ℝ → ℝ → ℝ := fun x y => x + y
+-- def f : ℝ → ℝ → ℝ := fun x y => x + y
 
 -- same as
 
@@ -66,7 +72,7 @@ end anon_functions
 
 -- in the following example, note how `apply`ing `add_le_add` results in two new goals.
 
-variable { f g : ℝ → ℝ }
+-- variable (g : ℝ → ℝ )
 
 example (hfa : FnUb f a) (hgb : FnUb g b) : FnUb (fun x ↦ f x + g x) (a + b) := by
   intro x
@@ -79,15 +85,37 @@ example (hfa : FnUb f a) (hgb : FnUb g b) : FnUb (fun x ↦ f x + g x) (a + b) :
 
 -- try these!
 
-example (hfa : FnLb f a) (hgb : FnLb g b) : FnLb (fun x ↦ f x + g x) (a + b) :=
-  sorry
+example (hfa : FnLb f a) (hgb : FnLb g b) : FnLb (fun x ↦ f x + g x) (a + b) := by
+  intro x
+  dsimp
+  apply add_le_add
+  . tauto
+  . tauto
 
-example (nnf : FnLb f 0) (nng : FnLb g 0) : FnLb (fun x ↦ f x * g x) 0 :=
-  sorry
+example (nnf : FnLb f 0) (nng : FnLb g 0) : FnLb (fun x ↦ f x * g x) 0 := by
+  intro x
+  dsimp
+  apply mul_nonneg
+  . tauto
+  . tauto
 
 example (hfa : FnUb f a) (hgb : FnUb g b) (nng : FnLb g 0) (nna : 0 ≤ a) :
-    FnUb (fun x ↦ f x * g x) (a * b) :=
-  sorry
-
+    FnUb (fun x ↦ f x * g x) (a * b) := by
+  intro x
+  dsimp
+  apply mul_le_mul
+  . tauto
+  . tauto
+  . tauto
+  . tauto
 
 --------------------------------------------------------------------------------
+
+example (P Q : Prop) : P ∧ Q → Q := by
+  intro ⟨ hp, hq⟩
+  assumption
+
+example (P Q : Prop) : P ∨ Q → True := by
+  rintro (hp | hq)
+  . trivial
+  . trivial

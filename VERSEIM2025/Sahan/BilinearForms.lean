@@ -4,7 +4,7 @@ Copyright (c) 2025 Clea Bergsman, Katherine Buesing, George McNinch, Sahan Wijet
 
 Released under the Apache 2.0 license as described in the file LICENSE.
 
-VERSEIM-2025 REU @ Tufts University 
+VERSEIM-2025 REU @ Tufts University
 -/
 
 import Mathlib.Tactic
@@ -18,37 +18,25 @@ def Alt (β:V →ₗ[k] V →ₗ[k] k) : Prop :=
   ∀ v : V, β v v = 0
 
 def Skew (β:V →ₗ[k] V →ₗ[k] k) : Prop :=
-  ∀ v w : V, β v w = β w v
+  ∀ v w : V, β v w = - β w v
 
 def Symm (β:V →ₗ[k] V →ₗ[k] k) : Prop :=
   ∀ v w : V, β v w = β w v
 
 lemma skew_of_alt (β:V →ₗ[k] V →ₗ[k] k) (ha : Alt β) :
-  Skew β := by 
-  sorry
+  Skew β := by
+  intro v w
+  suffices β v w + β w v = 0 from ?_
+  . exact Eq.symm (LinearMap.BilinForm.IsAlt.neg_eq ha w v)
+  calc
+    β v w + β w v = β w v + β v w + β v v + β w w := by
+      rw[ha v, ha w]
+      abel
+    _ = β (v+w) (v+w) := by sorry
+    _ = 0 := ha _
 
--- the next lemma says that for a vector space over a field k of
--- characteristic different from 2, for v in V the equation `2v=0`
--- implies that `v=0`.
 
-lemma eq_zero_of_two_mul_eq_zero { k V : Type } [ Field k] [ AddCommGroup V] 
-  [Module k V] {p:ℕ} [CharP k p] (hn2 : p ≠ 2) 
-  (v:V) (h:2•v = 0) : v = 0 := by
-    have two_smul_eq_zero : (2:k) • v = 0 := by 
-      rw [ ofNat_smul_eq_nsmul k 2 v ]
-      assumption
-    have ring_char_n2 : ringChar k ≠ 2 := by 
-       rw [ ringChar.eq k p ] 
-       assumption
-    have two_neq_zero : (2:k) ≠ 0 := by
-       apply Ring.two_ne_zero ring_char_n2
-    by_contra v_neq_zero
-    have two_smul_ne_zero : (↑2:k) • v ≠ 0 := 
-       smul_ne_zero two_neq_zero v_neq_zero
-    exact two_smul_ne_zero two_smul_eq_zero 
-   
-
-lemma alt_iff_skew (β:V →ₗ[k] V →ₗ[k] k) 
+lemma alt_iff_skew (β:V →ₗ[k] V →ₗ[k] k)
    [CharP k p] (hn2 : p ≠ 2)
    : Alt β ↔ Skew β := by
    sorry
