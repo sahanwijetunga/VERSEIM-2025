@@ -85,3 +85,11 @@ def fe_equi (n m : ℕ) : (Fin n) ⊕ (Fin m) ≃ Fin (n+m)  := by
 #eval (fe_equi 5 7).toFun (Sum.inl 0) -- (0:Fin 12)
 #eval (fe_equi 5 7).toFun (Sum.inr 0) -- (5:Fin 12)
 #eval (fe_equi 5 7).toFun (Sum.inr 6) -- (11:Fin 12)
+
+
+-- on the other hand, it isn't currently clear to how to prove the following:
+
+example (n m : ℕ) [NeZero n] [NeZero m] : 
+  (fe_equi n m).toFun (Sum.inr (Fin.ofNat m 0)) = Fin.ofNat (n+m) n := by 
+   sorry -- ???
+  
