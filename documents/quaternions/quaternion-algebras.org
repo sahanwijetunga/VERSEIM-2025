@@ -1,0 +1,104 @@
+#+title: Quaternion algebras
+#+author: George McNinch  
+#+date: {{{current}}}  
+
+#+OPTIONS: toc:nil ':t 
+
+#+keywords: quaternions, number-theory
+
+#+INCLUDE: "../assets/macros.org" 
+
+* Some references
+
+- [[https://kconrad.math.uconn.edu/blurbs/ringtheory/quaternionalg.pdf][Some notes of Keith Conrad (UConn)]]
+
+- first chapter of [[https://www.cambridge.org/core/books/central-simple-algebras-and-galois-cohomology/B4A8F430A0D6C5A59722BD48AEF94C05][Gille-Szamuely - "Central Simple Algebras and Galois Cohomology"]] 
+
+* Quaternion algebras, defined
+
+If \(k\) is a field, an /algebra/ \(A\) over \(k\) is a \(k\)-vector
+space \(A\) together with operations \(+:A \times A \to A\) and
+\(\cdot:A \times A \to A\) which satisfy the axioms of a /ring/.
+
+Here, we are going to insist that the algebra \(A\) be finite
+dimensional as a \(k\)-vector space, and that there is a
+multiplicative identity element \(1 \in A\).
+
+Given a field \(\ell\) containing \(k\) (a "field extension of \(k\)")
+we can form an \(\ell\)-algebra \(A_\ell\) by /extension of
+scalars/. (Really, this is the tensor product: \(A_\ell = A \otimes_k
+\ell\)).
+
+The algebra \(A\) is said to be /central simple/ over \(k\) if for
+some field extension \(\ell\) of \(k\) and for some \(n \in \Nat\), the
+\(\ell\)-algebra \(A_\ell\) is isomorphic as \(\ell\)-algebras to
+\(\Mat_n(\ell)\), the algebra of \(n \times n\) matrices
+over \(\ell\).
+
+Now, a /quaternion algebra/ is a central simple algebra \(Q\) over
+\(k\) with \(\dim Q = 4\). Thus for some field extension \(\ell\) of
+\(k\), the \(\ell\)-algebra \(Q_\ell\) is isomorphic to
+\(\Mat_{2}(k)\)
+
+  
+* A description of quaternion algebras
+
+A quaternion algebra \(Q\) over \(k\) can be described in a explicit
+manner. The case where \(k\) has characteristic 2 is slightly
+different and I'll omit it here, so suppose that \(k\) has
+characteristic \(\ne 2\).
+
+Given \(a,b \in k\) non-zero elements, we define the \(k\)-algebra
+\((a,b)_k\) to be the \(k\)-vector space with basis \(1,i,j,ij\) where
+the multiplication satisfies \[i^2 = a, j^2 = b, ij = -ji\]
+
+#+name: theorem:quaternion-described
+#+begin_theorem
+Suppose that \(k\) does not have characteristic 2.  If \(Q\) is a
+quaternion algebra over \(k\), there are non-zero elements \(a,b \in
+k\) for which \(Q \simeq (a,b)_k\).
+#+end_theorem
+
+If \(\alpha = s + ti + uj + vij \in (a,b)_k\) for \(s,t,u,v \in k\),
+the conjugate \(\overline{\alpha}\) is defined to be
+\begin{equation*}
+\overline{\alpha} = s - ti - uj - vij
+\end{equation*}
+
+#+name: proposition:norm
+#+begin_proposition
+The assignment \(N:(a,b)_k \to k\) given by \(N(\alpha) = \alpha \cdot
+\overline{\alpha} = s^2 - at^2 - bu^2 + abv\) defines a non-degenerate
+quadratic form on the vector space \((a,b)_k\).
+#+end_proposition
+We call this quadratic form \(N\) the /norm/ -- or the /norm form/ --
+of the quaternion algebra \((a,b)_k\).
+
+#+name: theorem:division-algebra-condition
+#+begin_theorem
+The quaternion algebra \((a,b)_k\) is a division algebra if and only
+if the norm \(N\) does not vanish at any nonzero element of \((a,b)_k\);
+i.e. \(N(\alpha) = 0 \implies \alpha = 0\).
+#+end_theorem
+
+* Associated conics
+
+Associated with the quaternion algebra \((a,b)_k\) is the conic
+\(C=C(a,b)\) which is the set of solutions to the equation \(ax^2 +
+by^2 = z^2\) in the projective plane \(\PP^2\).  In turn, we can
+consider the field of rational functions \(k(C)\) on this conic; it is
+the field of fractions of the algebra \(k[x,y]/\langle ax^2 + by^2 -
+1\rangle.\) One sometimes calls \(k(C)\) the "function field of \(C\)".
+
+We may now state an important theorem due to Witt:
+#+name: theorem:witt
+#+begin_theorem
+Let \(Q_1 = (a_1,b_1)_k\) and \(Q_2 = (a_2,b_2)_k\) be quaternion
+algebras over \(k\), and let \(C_1\) and \(C_2\) be the associated
+conics. The algebra \(Q_1\) and \(Q_2\) are isomorphic if and only if
+the the function fields \(k(C_1)\) and \(k(C_2)\) are isomorphic.
+#+end_theorem
+
+In particular, Witt's theorem shows that two quaternion algebras are
+isomorphic if and only if the associated conics are isomorphic as
+algebraic curves.

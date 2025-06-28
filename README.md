@@ -3,14 +3,18 @@
 This is the repository for the *formalization project* of the [2025
 VERSEIM-REU](https://sites.tufts.edu/verseimreu/).
 
-It contains some [documents](/documents/) with notes, including:
+- [assignment for weekend of 2025-06-07 - 2025-06-08](/documents/2025-06-07--assignment-for-weekend.md)
 
-- The slides for the ["kick-off talk"](/documents/2025-06-01--formalization-kickoff-talk-slides.pdf)
+- [cheat-sheet for using github](/documents/git-cheat-sheet.md) (at least for our purposes)
 
-- A document storing [resources for
-  formalization](/documents/resources.md).
+- this repository contains some [documents](/documents/) with notes,
+  including:
 
-- [week 01 information](/documents/week-01.md).
+  - The slides for the ["kick-off talk"](/documents/2025-06-01--formalization-kickoff-talk-slides.pdf)
 
-Eventually we will put code in the [project
-directory](VERSEIM2025) for the formalization we carry out.
+  - [resources for formalization](/documents/resources.md).
+
+
+- this repository also contains [`Lean` code](/VERSEIM2025/)
+
+- potential [topics for formalization](documents/domain-topics.md)

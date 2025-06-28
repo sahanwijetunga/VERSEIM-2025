@@ -1,0 +1,262 @@
+% Created 2025-06-09 Mon 19:27
+% Intended LaTeX compiler: pdflatex
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+
+%%--------------------------------------------------------------------------------
+
+\usepackage[svgnames]{xcolor}
+\usepackage{mathrsfs}
+\usepackage{tikz-cd}
+\usepackage{svg}
+\usepackage[top=25mm,bottom=25mm,left=25mm,right=30mm]{geometry}
+
+
+\usepackage{amsthm}
+\usepackage{thmtools}
+\usepackage{cleveref}
+\usepackage{stmaryrd}
+
+%%\usepackage[outputdir=build]{minted}
+\usepackage{minted}
+\usemintedstyle{tango}
+\usepackage[svgnames]{xcolor}
+\setminted[bash]{bgcolor=NavajoWhite}
+\setminted[python]{bgcolor=Lavender}
+\setminted[sage]{bgcolor=Lavender}
+
+\usepackage{titlesec}
+%%\newcommand{\sectionbreak}{\clearpage}
+
+
+\renewcommand{\descriptionlabel}[1]{\hspace{\labelsep}#1}
+
+
+\usepackage[cal=boondox]{mathalfa}
+
+
+\newenvironment{referee}{\color{red}}{\color{black}}
+
+\numberwithin{equation}{section}
+
+\declaretheorem[numberwithin=subsection,Refname={Theorem,Theorems}]{theorem}
+\declaretheorem[sibling=theorem,name=Proposition,Refname={Proposition,Propositions}]{proposition}
+\declaretheorem[sibling=theorem,name=Corollary,Refname={Corollary,Corollaries}]{corollary}
+\declaretheorem[sibling=theorem,name=Lemma,Refname={Lemma,Lemmas}]{lemma}
+\declaretheorem[sibling=theorem,name=Remark,style=remark,Refname={Remark,Remarks}]{remark}
+\declaretheorem[sibling=theorem,name=Problem,style=remark,Refname={Problem,Problems}]{problem}
+\declaretheorem[sibling=theorem,name=Example,style=remark,Refname={Example,Examples}]{ex}
+\declaretheorem[sibling=theorem,name=Definition,style=remark,Refname={Definition,Definitions}]{definition}
+
+\crefname{equation}{}{}
+
+%%--------------------------------------------------------------------------------
+
+\newenvironment{solution}
+{\par \color{red}\hrulefill \newline \noindent \textbf{Solution:} \vspace{2mm}}
+{\vspace{2mm} \color{black}}
+
+
+\newcommand{\totdeg}{\operatorname{totdeg}}
+\newcommand{\content}{\operatorname{content}}
+
+\newcommand{\Mat}{\operatorname{Mat}}
+\newcommand{\Hom}{\operatorname{Hom}}
+
+\newcommand{\Aut}{\operatorname{Aut}}
+\newcommand{\Gal}{\operatorname{Gal}}
+
+\newcommand{\A}{\mathscr{A}}
+\newcommand{\B}{\mathscr{B}}
+\newcommand{\FF}{\mathscr{F}}
+\newcommand{\LF}{\mathcal{LF}}
+
+\newcommand{\HH}{\mathcal{H}}
+\newcommand{\X}{\mathscr{X}}
+
+\newcommand{\ff}{\mathfrak{f}}
+\newcommand{\pp}{\mathfrak{p}}
+
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Nat}{\mathbb{N}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+
+\newcommand{\PP}{\mathbb{P}}
+
+\newcommand{\Poly}{\mathcal{P}}
+%%--------------------------------------------------------------------------------
+
+%%--------------------------------------------------------------------------------
+
+\usepackage[svgnames]{xcolor}
+\usepackage{mathrsfs}
+\usepackage{tikz-cd}
+\usepackage{svg}
+\usepackage[top=25mm,bottom=25mm,left=25mm,right=30mm]{geometry}
+
+
+\usepackage{amsthm}
+\usepackage{thmtools}
+\usepackage{cleveref}
+\usepackage{stmaryrd}
+
+%%\usepackage[outputdir=build]{minted}
+\usepackage{minted}
+\usemintedstyle{tango}
+\usepackage[svgnames]{xcolor}
+\setminted[bash]{bgcolor=NavajoWhite}
+\setminted[python]{bgcolor=Lavender}
+\setminted[sage]{bgcolor=Lavender}
+
+\usepackage{titlesec}
+%%\newcommand{\sectionbreak}{\clearpage}
+
+
+\renewcommand{\descriptionlabel}[1]{\hspace{\labelsep}#1}
+
+
+\usepackage[cal=boondox]{mathalfa}
+
+
+\newenvironment{referee}{\color{red}}{\color{black}}
+
+\numberwithin{equation}{section}
+
+\declaretheorem[numberwithin=subsection,Refname={Theorem,Theorems}]{theorem}
+\declaretheorem[sibling=theorem,name=Proposition,Refname={Proposition,Propositions}]{proposition}
+\declaretheorem[sibling=theorem,name=Corollary,Refname={Corollary,Corollaries}]{corollary}
+\declaretheorem[sibling=theorem,name=Lemma,Refname={Lemma,Lemmas}]{lemma}
+\declaretheorem[sibling=theorem,name=Remark,style=remark,Refname={Remark,Remarks}]{remark}
+\declaretheorem[sibling=theorem,name=Problem,style=remark,Refname={Problem,Problems}]{problem}
+\declaretheorem[sibling=theorem,name=Example,style=remark,Refname={Example,Examples}]{ex}
+\declaretheorem[sibling=theorem,name=Definition,style=remark,Refname={Definition,Definitions}]{definition}
+
+\crefname{equation}{}{}
+
+%%--------------------------------------------------------------------------------
+
+\newenvironment{solution}
+{\par \color{red}\hrulefill \newline \noindent \textbf{Solution:} \vspace{2mm}}
+{\vspace{2mm} \color{black}}
+
+
+\newcommand{\totdeg}{\operatorname{totdeg}}
+\newcommand{\content}{\operatorname{content}}
+
+\newcommand{\Mat}{\operatorname{Mat}}
+\newcommand{\Hom}{\operatorname{Hom}}
+
+\newcommand{\Aut}{\operatorname{Aut}}
+\newcommand{\Gal}{\operatorname{Gal}}
+
+\newcommand{\A}{\mathscr{A}}
+\newcommand{\B}{\mathscr{B}}
+\newcommand{\FF}{\mathscr{F}}
+\newcommand{\LF}{\mathcal{LF}}
+
+\newcommand{\HH}{\mathcal{H}}
+\newcommand{\X}{\mathscr{X}}
+
+\newcommand{\ff}{\mathfrak{f}}
+\newcommand{\pp}{\mathfrak{p}}
+
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Nat}{\mathbb{N}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+
+\newcommand{\PP}{\mathbb{P}}
+
+\newcommand{\Poly}{\mathcal{P}}
+%%--------------------------------------------------------------------------------
+\author{George McNinch}
+\date{2025-06-09 19:27:11 EDT (george@valhalla)}
+\title{Graph theory}
+\hypersetup{
+ pdfauthor={George McNinch},
+ pdftitle={Graph theory},
+ pdfkeywords={graph-theory},
+ pdfsubject={},
+ pdfcreator={Emacs 30.0.92 (Org mode 9.7.11)}, 
+ pdflang={English}}
+\usepackage{calc}
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelsep}
+\setlength{\csllabelsep}{0.6em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{0.45em * 0}
+\newenvironment{cslbibliography}[2] % 1st arg. is hanging-indent, 2nd entry spacing.
+ {% By default, paragraphs are not indented.
+  \setlength{\parindent}{0pt}
+  % Hanging indent is turned on when first argument is 1.
+  \ifodd #1
+  \let\oldpar\par
+  \def\par{\hangindent=\cslhangindent\oldpar}
+  \fi
+  % Set entry spacing based on the second argument.
+  \setlength{\parskip}{\parskip +  #2\baselineskip}
+ }%
+ {}
+\newcommand{\cslblock}[1]{#1\hfill\break}
+\newcommand{\cslleftmargin}[1]{\parbox[t]{\csllabelsep + \csllabelwidth}{#1}}
+\newcommand{\cslrightinline}[1]
+  {\parbox[t]{\linewidth - \csllabelsep - \csllabelwidth}{#1}\break}
+\newcommand{\cslindent}[1]{\hspace{\cslhangindent}#1}
+\newcommand{\cslbibitem}[2]
+  {\leavevmode\vadjust pre{\hypertarget{citeproc_bib_item_#1}{}}#2}
+\makeatletter
+\newcommand{\cslcitation}[2]
+ {\protect\hyper@linkstart{cite}{citeproc_bib_item_#1}#2\hyper@linkend}
+\makeatother\begin{document}
+
+\maketitle
+\section{Some references}
+\label{sec:org6b05c5f}
+
+\begin{itemize}
+\item \emph{Linear algebra and matrices : topics for a second course}
+Shapiro, Helene, 1954-
+Providence, Rhode Island : American Mathematical Society, 2015
+\end{itemize}
+\section{statements}
+\label{sec:statements}
+\begin{itemize}
+\item \href{https://leanprover-community.github.io/mathlib4\_docs/Mathlib/Combinatorics/Hall/Finite.html}{Hall's Marriage Theorem} (the link is to the mathlib proof of this)
+
+\item formalize [Shapiro 2015] Theorem 15.6
+entries in m-th power of adjacency matrix count ``walks of length m''
+
+\item graphs and eigenvalues of adjacency matrix formalize [Shapiro 2015]
+Theorem 15.10 - for a graph of diameter d, adjacency matrix has at
+least d+1 distinct eigenvalues
+
+\item Handshaking Lemma:
+
+In any undirected graph, the sum of the degrees of all vertices is
+equal to twice the number of edges.
+
+\item Euler's Theorem:
+
+A connected graph can be traversed in a single path (an Eulerian
+path) that visits every edge exactly once if and only if it has
+exactly zero or two vertices of odd degree. If all vertices have
+even degree, the path can start and end at the same vertex (an
+Eulerian circuit).
+\end{itemize}
+\end{document}

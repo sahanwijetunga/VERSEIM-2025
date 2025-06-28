@@ -1,0 +1,3 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kd}{variable} \PYG{o}{\PYGZob{}}\PYG{n}{ι} \PYG{o}{:} \PYG{k+kt}{Type}\PYG{n+nb+bp}{*}\PYG{o}{\PYGZcb{}} \PYG{o}{(}\PYG{n}{B} \PYG{o}{:} \PYG{n}{Basis} \PYG{n}{ι} \PYG{n}{k} \PYG{n}{V}\PYG{o}{)}
+\end{Verbatim}

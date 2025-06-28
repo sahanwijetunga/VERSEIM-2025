@@ -1,0 +1,4 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kd}{variable} \PYG{o}{(}\PYG{n}{k}\PYG{o}{:}\PYG{k+kt}{Type}\PYG{n+nb+bp}{*}\PYG{o}{)} \PYG{o}{[} \PYG{n}{Field} \PYG{n}{k} \PYG{o}{]}
+\PYG{k+kd}{variable} \PYG{o}{(}\PYG{n}{V}\PYG{o}{:}\PYG{k+kt}{Type}\PYG{n+nb+bp}{*}\PYG{o}{)} \PYG{o}{[} \PYG{n}{AddCommGroup} \PYG{n}{V}\PYG{o}{]} \PYG{o}{[}\PYG{n}{Module} \PYG{n}{k} \PYG{n}{V}\PYG{o}{]}
+\end{Verbatim}

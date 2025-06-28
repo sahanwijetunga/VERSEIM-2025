@@ -1,0 +1,59 @@
+\documentclass{article}
+
+%%--------------------------------------------------------------------------------
+\usepackage{fontspec}
+\setmonofont{FreeMono}
+
+\usepackage{minted}
+\usepackage[svgnames]{xcolor}
+
+%% I'll use `Lavender` below, which is defined by the `svgnames` spec
+%% of xcolor (google for svgnames xcolor latex package for a full list
+%% of colornames provided by `svgnames`
+
+%% or define your own color name like this:
+
+%% \definecolor{lavender-web}{rgb}{0.9, 0.9, 0.98}
+
+%% You can find more example color specs here: https://latexcolor.com/
+
+\newmintinline[lean]{lean4}{bgcolor=Lavender}
+\newminted[leancode]{lean4}{fontsize=\footnotesize}
+\usemintedstyle{tango}  % a nice, colorful theme
+
+\setminted[lean]{bgcolor=Lavender}
+
+%%--------------------------------------------------------------------------------
+
+\title{example-minted}
+\author{gmcninch }
+\date{June 2025}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+ \begin{itemize}
+\item example: defn of convergence of a sequence
+
+\begin{minted}[]{lean}
+-- definition of "u tends to ℓ" 
+def seq_limit (u : ℕ → ℝ) (ℓ : ℝ) :=
+  ∀ ε > 0, ∃ N, ∀ n ≥ N, |u n - ℓ| ≤ ε
+\end{minted}
+
+\item statement of the ``squeeze theorem''  
+\begin{minted}[]{lean}
+-- squeeze theorem
+theorem (hu : seq_limit u ℓ)
+        (hw : seq_limit w ℓ)
+        (h : ∀ n, u n ≤ v n)
+        (h' : ∀ n, v n ≤ w n) :
+        seq_limit v ℓ := by
+   sorry
+\end{minted}
+\end{itemize}
+
+\end{document}
