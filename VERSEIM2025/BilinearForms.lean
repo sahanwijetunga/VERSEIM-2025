@@ -12,6 +12,11 @@ import Mathlib.Tactic
 
 variable { k V : Type } [Field k] [ AddCommGroup V ]  [Module k V]
 
+
+variable { ι : Type } [Fintype ι] [DecidableEq ι]
+
+variable { b : Basis ι k V }
+
 variable (β:V →ₗ[k] V →ₗ[k] k)
 
 def Alt (β:V →ₗ[k] V →ₗ[k] k) : Prop :=
@@ -103,3 +108,98 @@ def OrthogSets  (β:V →ₗ[k] V →ₗ[k] k) (s₁ s₂ : Set V) : Prop :=
 
 lemma orthog_sets_iff_orthog_subspaces (β:V →ₗ[k] V →ₗ[k] k) (s₁ s₂ : Set V) :
   OrthogSets β s₁ s₂ ↔ OrthogSubspaces β (Submodule.span k s₁) (Submodule.span k s₂) := by sorry
+
+--------------------------------------------------------------------------------
+-- non-degenerate forms
+-- ====================
+
+open LinearMap 
+open LinearMap (BilinForm)
+
+
+def Nondeg (β : BilinForm k V) : Prop := 
+  ∀ v:V, ∀ w:V, β v w = 0 → v = 0
+
+def NondegOn
+  (β : BilinForm k V) (W : Subspace k V) : Prop := 
+  Nondeg (BilinForm.restrict β W)
+
+
+
+theorem nondeg_conditions  (β : BilinForm k V) 
+  : List.TFAE [ Nondeg β                                                 -- left-nondegenate
+               , ∀ w:V, ∀ v:V, β v w = 0 → w = 0                          -- right-nondegenerate
+               , ∃ (b:Basis ι k V), (BilinForm.toMatrix b β).det ≠ 0
+               ] := by sorry
+
+
+--------------------------------------------------------------------------------
+-- direct sums and orthogonal complements
+-- ======================================
+
+structure internal_direct_sum (W₁ W₂ : Submodule k V) where
+  span : ⊤ = W₁ ⊔ W₂
+  zero : ⊥ = W₁ ⊓ W₂
+
+structure orthog_direct_sum (β:BilinForm k V) (W : Submodule k V) where
+  compl : Submodule k V
+  ds : internal_direct_sum W compl
+  orthog : ∀ v₁ ∈ W, ∀ v₂ ∈ compl, β v₁ v₂ = 0  
+
+def OrthogCompl {k V:Type} [AddCommGroup V] [Field k] [Module k V] (S : Set V) 
+    (β:BilinForm k V)
+    : Subspace k V where
+  carrier := { v | ∀ (x:S), β v x = 0 }
+  add_mem' := by sorry
+  zero_mem' := by sorry
+  smul_mem' := by sorry
+
+def orthog_decomp (β:BilinForm k V) (W:Submodule k V) (wnd : NondegOn β W):
+  orthog_direct_sum β W where
+   compl := OrthogCompl W β
+   ds := 
+     { span := by sorry
+     , zero := by sorry
+     }
+   orthog := by sorry
+
+--------------------------------------------------------------------------------
+-- hyperbolic subspaces
+-- ====================
+
+def hyp_pair (β:BilinForm k V) (e f : V) : Prop :=
+        β e e = 0  ∧  β f f = 0  ∧  β e f = 1
+
+def hypsubspace (β:BilinForm k V) {e f : V} (h:hyp_pair β e f) : Subspace k V := 
+  Submodule.span k {e,f}
+
+theorem hyp2_nondeg_symm (β:BilinForm k V) 
+  (bsymm : Symm β) {e f : V} (h2: hyp_pair β e f) :
+  NondegOn β (hypsubspace β h2)  := by sorry
+
+theorem hyp2_nondeg_alt (β:BilinForm k V) 
+  (balt : Alt β) {e f : V} (h2: hyp_pair β e f) :
+  NondegOn β (hypsubspace β h2)  := by sorry
+
+
+-- using `orthog_decomp` above, we get
+
+def hyp2_decomp_symm (β:BilinForm k V) (bsymm : Symm β) (e f : V) (h2:hyp_pair β e f) 
+  : orthog_direct_sum β (hypsubspace β h2) :=
+  orthog_decomp β (hypsubspace β h2) (hyp2_nondeg_symm  β bsymm h2)
+
+def hyp2_decomp_alt (β:BilinForm k V) (balt : Alt β) (e f : V) (h2:hyp_pair β e f) 
+  : orthog_direct_sum β (hypsubspace β h2) :=
+  orthog_decomp β (hypsubspace β h2) (hyp2_nondeg_alt  β balt h2)
+
+
+-- finally, we need
+
+theorem hyp_pair_exists_symm (β:BilinForm k V) (bsymm : Symm β) (e:V) (enz : e ≠ 0) (eiso : β e e  = 0) 
+  (hnl : ⊤ ≠ Submodule.span k {e}):
+   ∃ f, hyp_pair β e f := by sorry
+  
+theorem hyp_pair_exists_alt (β:BilinForm k V) (bsymm : Symm β) (e:V) (enz : e ≠ 0) 
+  (hnl : ⊤ ≠ Submodule.span k {e}):
+   ∃ f, hyp_pair β e f := by sorry
+  
