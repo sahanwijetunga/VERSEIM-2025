@@ -58,12 +58,12 @@ noncomputable def proj {V : Type} [AddCommGroup V] [ Module ℝ V ] (β:V →ₗ
   (β v u / β u u) • u
 
 lemma proj_contained {V : Type} [AddCommGroup V] [ Module ℝ V ] (β:V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (u v: V)
- : proj β u v ∈ Submodule.span ℝ {u} := by
+: proj β u v ∈ Submodule.span ℝ {u} := by
     refine Submodule.mem_span_singleton.mpr ?_
     exact exists_apply_eq_apply (fun a ↦ a • u) ((β v) u / (β u) u)
 
 lemma proj_contained' {V : Type} [AddCommGroup V] [ Module ℝ V ] (β:V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (u v: V) (W: Submodule ℝ V) (h: u ∈ W)
- : proj β u v ∈ W := by
+: proj β u v ∈ W := by
     have: proj β u v ∈ Submodule.span ℝ {u} := proj_contained β u v
     have cont: Submodule.span ℝ {u} ≤ W := by exact
       (Submodule.span_singleton_le_iff_mem u W).mpr h
@@ -217,9 +217,9 @@ theorem orthog_intermediate {V:Type} [AddCommGroup V] [Module ℝ V]
       intro h'
       simp_all
     intro i j h
-    rcases Classical.em (i=Fin.last n) with h₁ | h₁
+    by_cases h₁:(i=Fin.last n)
     . exact case1 i j h h₁
-    rcases Classical.em (j=Fin.last n) with h₂ | h₂
+    by_cases h₂:(j=Fin.last n)
     . rw[hs]
       exact case1 j i h.symm h₂
     . exact case2 i j h h₁ h₂
@@ -230,8 +230,8 @@ noncomputable def gram_schmidt {V:Type} [AddCommGroup V] [Module ℝ V]
   (β:V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (hp : Def β) (hs : Symm β)
   {n:ℕ} (b:Fin n → V)
   : Fin n → V := match n with
-   | Nat.zero =>  (fun _ ↦ 0)
-   | Nat.succ n =>
+  | Nat.zero =>  (fun _ ↦ 0)
+  | Nat.succ n =>
     let b' := restrict b
     let c' := gram_schmidt β hp hs b'
     intermediate β c' (b (Fin.last n))
@@ -272,10 +272,8 @@ theorem orthog_span_gram_schmidt {V:Type} [AddCommGroup V] [Module ℝ V]
 
     have h: c = intermediate β c' x := rfl
 
-    have orthog: OrthogPred β c := by
-      show OrthogPred β (intermediate β c' x)
-      exact orthog_intermediate β hp hs c' (orthog_span_gram_schmidt β hp hs (restrict b)) x
-    exact orthog
+    exact orthog_intermediate β hp hs c'
+      (orthog_span_gram_schmidt β hp hs (restrict b)) x
 
 @[simp]
 lemma span_stuff_restrict_contained {V:Type} [AddCommGroup V] [Module ℝ V] (b: Fin (n+1) → V): span_stuff (restrict b) ≤ span_stuff b := by
@@ -306,7 +304,7 @@ theorem span_eq_gram_schmidt {V:Type} [AddCommGroup V] [Module ℝ V]
         suffices sub_perp_align β (gram_schmidt β hp hs (restrict b)) (b (Fin.last n)) ∈ ↑(Submodule.span ℝ (Set.range b))
           from ?_
         . have: intermediate β (gram_schmidt β hp hs (restrict b)) (b (Fin.last n)) (Fin.last n)
-             = sub_perp_align β (gram_schmidt β hp hs (restrict b)) (b (Fin.last n)) := by
+            = sub_perp_align β (gram_schmidt β hp hs (restrict b)) (b (Fin.last n)) := by
               simp [intermediate]
           (expose_names; exact Set.mem_of_eq_of_mem this this_1)
         simp only [sub_perp_align]
@@ -339,7 +337,7 @@ theorem span_eq_gram_schmidt {V:Type} [AddCommGroup V] [Module ℝ V]
             intermediate_val₂ β (gram_schmidt β hp hs (restrict b)) y h (b (Fin.last n))
         rw[this]
         suffices gram_schmidt β hp hs (restrict b) (y.castPred h) ∈
-           Set.range (gram_schmidt β hp hs (restrict b)) from ?_
+          Set.range (gram_schmidt β hp hs (restrict b)) from ?_
         . exact Submodule.mem_span.mpr fun p a ↦ a this
         exact Set.mem_range_self (y.castPred h)
 
@@ -361,7 +359,7 @@ theorem span_eq_gram_schmidt {V:Type} [AddCommGroup V] [Module ℝ V]
         exact containment this
 
 lemma linear_independence_equiv_condition_fin {V:Type} [AddCommGroup V] [Module ℝ V] {n: ℕ} (b: Fin n → V)
- (h: ∀(l: Fin n → ℝ), ∑ i, (l i) • (b i)=0 → l=0): LinearIndependent ℝ b := by
+(h: ∀(l: Fin n → ℝ), ∑ i, (l i) • (b i)=0 → l=0): LinearIndependent ℝ b := by
     exact Fintype.linearIndependent_iff.mpr fun g a ↦ congrFun (h g a)
 
 
@@ -383,10 +381,6 @@ theorem linear_independence_orthog_nonzero {V:Type} [AddCommGroup V] [Module ℝ
       assumption
     simp[h, nonzerostuff] at this
     assumption
-
-example {V: Type} [AddCommGroup V] (n: ℕ) (v: Fin n → V) [Module ℝ V] (W: Submodule ℝ V) (h: ∀i, v i ∈ W) : ∑ i, v i ∈ W := by
-  exact Submodule.sum_mem W fun c a ↦ h c
-
 
 lemma linear_independence_mem {V:Type} [AddCommGroup V] [Module ℝ V] (b: Fin (n+1) → V) (hb: LinearIndependent ℝ b) :
   ¬ (b (Fin.last n))∈ Submodule.span ℝ (Set.range (restrict b)) := by
@@ -444,9 +438,10 @@ theorem gram_schmidt_linear_independence {V:Type} [AddCommGroup V] [Module ℝ V
     . refine non_zero_gram_schmidt β hp hs ⇑b ?_
       exact Basis.linearIndependent b
 
-structure OrthogBasis' {V:Type} [AddCommGroup V] [Module ℝ V] (β:V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (hp: Def β) (hs: Symm β) (n:ℕ) where
-   basis : Basis (Fin n) ℝ V
-   is_orthog : OrthogPred β basis
+structure OrthogBasis' {V:Type} [AddCommGroup V] [Module ℝ V]
+  (β:V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (hp: Def β) (hs: Symm β) (n:ℕ) where
+  basis : Basis (Fin n) ℝ V
+  is_orthog : OrthogPred β basis
 
 noncomputable def orthog_basis {V:Type} [AddCommGroup V] [Module ℝ V]
   (β:V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (hp : Def β) (hs : Symm β)
