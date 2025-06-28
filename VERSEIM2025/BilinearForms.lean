@@ -4,7 +4,7 @@ Copyright (c) 2025 Clea Bergsman, Katherine Buesing, George McNinch, Sahan Wijet
 
 Released under the Apache 2.0 license as described in the file LICENSE.
 
-VERSEIM-2025 REU @ Tufts University 
+VERSEIM-2025 REU @ Tufts University
 -/
 
 import Mathlib.Tactic
@@ -24,7 +24,7 @@ def Symm (β:V →ₗ[k] V →ₗ[k] k) : Prop :=
   ∀ v w : V, β v w = β w v
 
 lemma skew_of_alt (β:V →ₗ[k] V →ₗ[k] k) (ha : Alt β) :
-  Skew β := by 
+  Skew β := by
   sorry
 
 -- the next lemma says that for a vector space over a field k of
@@ -32,50 +32,50 @@ lemma skew_of_alt (β:V →ₗ[k] V →ₗ[k] k) (ha : Alt β) :
 -- implies that `v=0`.
 
 
-lemma eq_zero_of_two_mul_eq_zero  { k : Type } [ Field k] 
+lemma eq_zero_of_two_mul_eq_zero  { k : Type } [ Field k]
   [CharZero k] (x:k) (h:2*x = 0) : x = 0 := by
   --have nz2_inst : NeZero ↑2 := inferInstance
-  have nz2 : (2:k) ≠ 0 := NeZero.ne ↑2 
+  have nz2 : (2:k) ≠ 0 := NeZero.ne ↑2
   by_contra x_neq_zero
   have two_mul_ne_zero : ↑2*x ≠ 0 :=
     mul_ne_zero nz2 x_neq_zero
   exact two_mul_ne_zero h
 
-lemma eq_zero_of_two_mul_eq_zero' { k : Type } [ Field k] 
+lemma eq_zero_of_two_mul_eq_zero' { k : Type } [ Field k]
   {p:ℕ} [CharP k p] [ hn2:Fact (p≠2)]
   (x:k) (h:2*x = 0) : x = 0 := by
-    have ring_char_n2 : ringChar k ≠ 2 := by 
-       rw [ ringChar.eq k p ] 
+    have ring_char_n2 : ringChar k ≠ 2 := by
+       rw [ ringChar.eq k p ]
        exact Fact.elim hn2
     have two_neq_zero : (2:k) ≠ 0 := by
        apply Ring.two_ne_zero ring_char_n2
     by_contra x_neq_zero
-    have two_mul_ne_zero : (↑2:k) * x ≠ 0 := 
+    have two_mul_ne_zero : (↑2:k) * x ≠ 0 :=
        mul_ne_zero two_neq_zero x_neq_zero
     exact two_mul_ne_zero h
 
 
 example (x:ℝ) (h:2*x = 0) : x=0 := eq_zero_of_two_mul_eq_zero x h
 
-lemma eq_zero_of_two_mul_eq_zero_vector { k V : Type } 
-  [ Field k] [ AddCommGroup V] 
-  [Module k V] {p:ℕ} [CharP k p] (hn2 : p ≠ 2) 
+lemma eq_zero_of_two_mul_eq_zero_vector { k V : Type }
+  [ Field k] [ AddCommGroup V]
+  [Module k V] {p:ℕ} [CharP k p] (hn2 : p ≠ 2)
   (v:V) (h:2•v = 0) : v = 0 := by
-    have two_smul_eq_zero : (2:k) • v = 0 := by 
+    have two_smul_eq_zero : (2:k) • v = 0 := by
       rw [ ofNat_smul_eq_nsmul k 2 v ]
       assumption
-    have ring_char_n2 : ringChar k ≠ 2 := by 
-       rw [ ringChar.eq k p ] 
+    have ring_char_n2 : ringChar k ≠ 2 := by
+       rw [ ringChar.eq k p ]
        assumption
     have two_neq_zero : (2:k) ≠ 0 := by
        apply Ring.two_ne_zero ring_char_n2
     by_contra v_neq_zero
-    have two_smul_ne_zero : (↑2:k) • v ≠ 0 := 
+    have two_smul_ne_zero : (↑2:k) • v ≠ 0 :=
        smul_ne_zero two_neq_zero v_neq_zero
-    exact two_smul_ne_zero two_smul_eq_zero 
-   
+    exact two_smul_ne_zero two_smul_eq_zero
 
-lemma alt_iff_skew (β:V →ₗ[k] V →ₗ[k] k) 
+
+lemma alt_iff_skew (β:V →ₗ[k] V →ₗ[k] k)
    [CharP k p] (hn2 : p ≠ 2)
    : Alt β ↔ Skew β := by
    sorry
