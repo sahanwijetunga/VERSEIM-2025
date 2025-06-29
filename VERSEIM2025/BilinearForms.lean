@@ -167,7 +167,7 @@ open LinearMap (BilinForm)
 
 
 def Nondeg (β : BilinForm k V) : Prop :=
-  ∀ v:V, ∀ w:V, β v w = 0 → v = 0
+  ∀ v:V, (∀ w:V, β v w = 0) → v = 0
 
 def NondegOn
   (β : BilinForm k V) (W : Subspace k V) : Prop :=
@@ -175,12 +175,26 @@ def NondegOn
 
 
 
-theorem nondeg_conditions  (β : BilinForm k V)
-  : List.TFAE [ Nondeg β                                                 -- left-nondegenate
-               , ∀ w:V, ∀ v:V, β v w = 0 → w = 0                          -- right-nondegenerate
+theorem nondeg_conditions  (β : BilinForm k V) : List.TFAE [ Nondeg β                                -- left-nondegenate
+               , ∀ w:V, (∀ v:V, β v w = 0) → w = 0                          -- right-nondegenerate
                , ∃ (b:Basis ι k V), (BilinForm.toMatrix b β).det ≠ 0
                ] := by sorry
 
+/- Sahan: Using nondeg_conditions was painful so I separate this result out
+Note: To prove this we would need to add (at least) a hypothesis that
+V is finite dimensional, and also add it to future things relying on this
+(for those that don't include ι in the statement of the theorem)
+-/
+
+theorem nondeg_conditions' (β : BilinForm k V) :
+  (Nondeg β) ↔ (∀ w:V, (∀ v:V, β v w = 0) → w = 0) := by sorry
+
+
+example
+  (β: BilinForm k V) (W: Submodule k V): List.TFAE [ Nondeg (β.restrict W)
+               , ∀ w:W, (∀ v:W, β v w = 0) → w = 0
+               , ∃ (b:Basis ι k W), (BilinForm.toMatrix b (β.restrict W)).det ≠ 0
+               ]  := nondeg_conditions (β.restrict W)
 
 --------------------------------------------------------------------------------
 -- direct sums and orthogonal complements
@@ -232,18 +246,26 @@ def orthog_decomp (β:BilinForm k V) (W:Submodule k V) (wnd : NondegOn β W):
    ds :=
      { span := by sorry
      , zero := by
+        have wnd' : ∀ w:W, (∀ v:W, (β.restrict W) v w = 0) → w = 0 := by
+          have:= nondeg_conditions' (β.restrict W)
+          tauto
         symm
         suffices W ⊓ OrthogCompl (↑W) β ≤ ⊥ from ?_
         . exact (Submodule.eq_bot_iff (W ⊓ OrthogCompl (↑W) β)).mpr this
         intro a ha
         obtain ⟨ha1, ha2⟩ := ha
-        have: ∀ b ∈ W, β a a = 0 := by
-          simp_all[OrthogCompl]
+        -- Sahan: This have statement is very slow to compile,
+        --  maybe prove more explicitly without simp
+        have: ∀ b ∈ W, β b a = 0 := by
+          simp_all only [BilinForm.restrict_apply, domRestrict_apply, Subtype.forall,
+            Submodule.mk_eq_zero, SetLike.mem_coe, OrthogCompl, SetLike.coe_sort_coe,
+            SetLike.coe_mem, Submodule.coe_set_mk, AddSubmonoid.coe_set_mk,
+            AddSubsemigroup.coe_set_mk, Set.mem_setOf_eq, implies_true, Submodule.zero_mem,
+            map_zero, zero_apply]
         show a=0
-        simp only [NondegOn, Nondeg, BilinForm.restrict_apply, domRestrict_apply, Subtype.forall,
-          Submodule.mk_eq_zero] at wnd
-        exact wnd a ha1 a ha1 (this a ha1)
-     }
+        simp_all only [BilinForm.restrict_apply, domRestrict_apply, Subtype.forall,
+          Submodule.mk_eq_zero, SetLike.mem_coe, implies_true, Submodule.zero_mem, map_zero]
+    }
    orthog := by
     intro a ha b hb
     simp_all[OrthogCompl]
@@ -253,19 +275,113 @@ def orthog_decomp (β:BilinForm k V) (W:Submodule k V) (wnd : NondegOn β W):
 -- hyperbolic subspaces
 -- ====================
 
+
 def hyp_pair (β:BilinForm k V) (e f : V) : Prop :=
         β e e = 0  ∧  β f f = 0  ∧  β e f = 1
 
-def hypsubspace (β:BilinForm k V) {e f : V} (h:hyp_pair β e f) : Subspace k V :=
+def hypsubspace (β:BilinForm k V) {e f : V} (_:hyp_pair β e f) : Subspace k V :=
   Submodule.span k {e,f}
+
+-- Sahan: Simplify name?
+lemma in_span_fin_n_iff_linear_combination (n: ℕ) (v: V) (vect: Fin n → V) (hv : v ∈ Submodule.span k (Set.range vect)) :
+  ∃(f: Fin n → k), v = ∑ i, f i • (vect i) := by
+    rw[Submodule.mem_span_range_iff_exists_fun] at hv
+    have ⟨c, hc⟩ := hv
+    use c
+    symm
+    exact hc
+
+-- Sahan: Simplify name?
+lemma in_span_fin_2_iff_linear_combination (v: V) (vect: Fin 2 → V) (hv : v ∈ Submodule.span k (Set.range vect)) :
+  ∃(f: Fin 2 → k), v = ∑ i, f i • (vect i) := by
+    exact in_span_fin_n_iff_linear_combination (2: ℕ) (v: V) (vect: Fin 2 → V) hv
+
+-- Sahan: Better name?
+def foo_fun (e f : V) : Fin 2 → V
+| ⟨0, _⟩ => e
+| ⟨1, _⟩ => f
+
+-- Sahan: Using `in_span_fin_2_iff_linear_combination` with `foo_fun` should hopefully work.
+--  Hopefully there is an easier way to do this but I can't make anything work
+-- Sahan: Better name?
+lemma foo (v1 v2 v : V)(hv : v ∈ Submodule.span k {v1, v2}) :
+  ∃(a b: k), v = a • v1 + b • v2 := by
+    sorry
+
+theorem hyp2_nondeg_refl (β:BilinForm k V)
+  (brefl : IsRefl β) {e f : V} (h2: hyp_pair β e f) :
+  NondegOn β (hypsubspace β h2) := by
+    rintro ⟨v, hv⟩  h
+    have: ∃(a b: k), v = a • e + b • f := by
+      unfold hypsubspace at hv
+      exact foo e f v hv
+    have ⟨a,b,hab⟩ := this
+    have hve: β v e = 0 := by
+      have he: e ∈ hypsubspace β h2 := by
+        simp[hypsubspace]
+        suffices e ∈ ({e,f} : Set V)from ?_
+        . exact Submodule.mem_span_of_mem this
+        exact Set.mem_insert e {f}
+      apply h ⟨e, he⟩
+
+    have hvf: β v f = 0 := by
+      have hf: f ∈ hypsubspace β h2 := by
+        simp[hypsubspace]
+        suffices f ∈ ({e,f} : Set V)from ?_
+        . exact Submodule.mem_span_of_mem this
+        exact Set.mem_insert_of_mem e rfl
+      apply h ⟨f, hf⟩
+
+    have hveb: β e v = b := by
+      calc
+        β e v = β e (a• e + b • f) := by rw[hab]
+        _ = a * β e e + b * β e f := by simp
+        _ = a * 0 + b * 1 := by
+          unfold hyp_pair at h2
+          have: β e e = 0 := by
+            exact h2.left
+          have: β e f= 1 := by
+            exact h2.right.right
+          simp[*]
+        _ =  b := by simp
+    have hvfa: β v f = a:= by
+        calc
+        β v f = β (a• e + b • f) f := by rw[hab]
+        _ = a * β e f + b * β f f := by simp
+        _ = a * 1 + b * 0 := by
+          unfold hyp_pair at h2
+          have: β e f = 1 := by
+            exact h2.right.right
+          have: β f f = 0 := by
+            exact h2.right.left
+          simp[*]
+        _ = a := by simp
+    have hva: a=0 :=
+      calc
+        a= β v f := hvfa.symm
+        _ = 0 := hvf
+    have hvb: b=0 := by
+      have hve': β e v = 0 := by
+        apply brefl
+        exact hve
+      calc
+        b = β e v:= hveb.symm
+        _ = 0 := hve'
+
+    simp[hab,hva,hvb]
+
 
 theorem hyp2_nondeg_symm (β:BilinForm k V)
   (bsymm : Symm β) {e f : V} (h2: hyp_pair β e f) :
-  NondegOn β (hypsubspace β h2)  := by sorry
+  NondegOn β (hypsubspace β h2)  := by
+  have brefl: IsRefl β := IsSymm.isRefl bsymm
+  exact hyp2_nondeg_refl β brefl h2
 
 theorem hyp2_nondeg_alt (β:BilinForm k V)
   (balt : Alt β) {e f : V} (h2: hyp_pair β e f) :
-  NondegOn β (hypsubspace β h2)  := by sorry
+  NondegOn β (hypsubspace β h2)  := by
+  have brefl: IsRefl β := IsAlt.isRefl balt
+  exact hyp2_nondeg_refl β brefl h2
 
 
 -- using `orthog_decomp` above, we get
