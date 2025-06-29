@@ -53,6 +53,8 @@ def orthog_by_gram_schmidt (β:V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (hs : Symm β) {
   (b : Fin n → V) (hb : LinearIndependent ℝ b) :
   orthog_fun β n := by sorry
 
+example[AddCommGroup A] (n: ℕ) (f g : Fin n → A) (h: f = g): ∑ i, f i = ∑ i, g i := by
+  rw[h]
 
 
 --------------------------------------------------------------------------------

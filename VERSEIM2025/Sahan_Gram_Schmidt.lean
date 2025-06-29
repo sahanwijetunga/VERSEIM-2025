@@ -49,9 +49,13 @@ theorem restrict_set_eq {X: Type} {m: ℕ} (f: Fin (m+1) → X) :
       use y.castPred this
       simp
     . rintro ⟨y, rfl⟩
-      simp
-      use y
-      simp
+      show f y.castSucc ∈ f '' {i | ↑i < m}
+      use y.castSucc
+      constructor
+      . simp_all
+      . simp_all
+
+
 
 
 noncomputable def proj {V : Type} [AddCommGroup V] [ Module ℝ V ] (β:V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (u v: V) : V :=
@@ -139,7 +143,7 @@ lemma intermediate_span_contained {V:Type} [AddCommGroup V] [Module ℝ V]
       ↑(Submodule.span ℝ (Set.range (intermediate β b x))) := by
         exact Submodule.subset_span
       exact h' this
-    use y
+    use y.castSucc
     simp
 
 @[simp]
@@ -165,7 +169,7 @@ lemma intermediate_contained {V:Type} [AddCommGroup V] [Module ℝ V]
       . exact proj_contained' β (b i) x (Submodule.span ℝ (Set.range (intermediate β b x))) this
       suffices b i ∈ Set.range (intermediate β b x) from ?_
       . exact Submodule.mem_span.mpr fun p a ↦ a this
-      use i
+      use i.castSucc
       simp
 
 
