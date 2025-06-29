@@ -1,0 +1,135 @@
+% Created 2025-06-29 Sun 14:50
+% Intended LaTeX compiler: pdflatex
+\documentclass[svgnames]{beamer}
+%%\documentclass[svgnames,handout]{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\mode<beamer>{\usetheme{Darmstadt}}
+
+%%--------------------------------------------------------------------------------
+%%\usepackage[svgnames]{xcolor}
+\usepackage{mathrsfs}
+\usepackage{tikz-cd}
+
+\usepackage{fontspec}
+\setmonofont{FreeMono}
+\setmainfont{FreeSerif}
+
+\usepackage{unicode-math}
+
+\usepackage{amsthm}
+\usepackage{thmtools}
+\usepackage{cleveref}
+
+%\usepackage[cachedir=mintedcache]{minted}
+\usepackage{minted}
+\usemintedstyle{tango}
+\setminted[bash]{bgcolor=NavajoWhite}
+\setminted[output]{bgcolor=NavajoWhite}
+\setminted[python]{bgcolor=Lavender}
+
+\newmintinline[lean]{lean4}{bgcolor=lavender}
+\newminted[leancode]{lean4}{fontsize=\footnotesize,bgcolor=Lavender}
+\setminted[lean]{bgcolor=LightBlue}
+
+\usepackage{newunicodechar}
+\newfontfamily{\freeserif}{DejaVu Sans}
+\newunicodechar{✝}{\freeserif{✝}}
+\newunicodechar{∀}{\ensuremath{\forall}}
+\newunicodechar{→}{\ensuremath{\to}}
+\newunicodechar{≤}{\ensuremath{\le}}
+\newunicodechar{⧸}{/}
+
+
+\newcommand{\Z}{\mathbf{Z}}
+\newcommand{\Q}{\mathbf{Q}}
+\newcommand{\R}{\mathbf{R}}
+\newcommand{\C}{\mathbf{C}}
+\newcommand{\F}{\mathbf{F}}
+\newcommand{\N}{\mathbf{N}}
+
+\newcommand{\LL}{\mathscr{L}}
+\newcommand{\pp}{\mathbf{p}}
+\newcommand{\xx}{\mathbf{x}}
+\newcommand{\yy}{\mathbf{y}}
+\newcommand{\vv}{\mathbf{v}}
+\newcommand{\ww}{\mathbf{w}}
+%%--------------------------------------------------------------------------------
+\author{George McNinch}
+\date{2025-06-29 14:50:51 EDT (george@valhalla)}
+\title{Demo slides}
+\hypersetup{
+ pdfauthor={George McNinch},
+ pdftitle={Demo slides},
+ pdfkeywords={modelling},
+ pdfsubject={},
+ pdfcreator={Emacs 31.0.50 (Org mode 9.7.11)}, 
+ pdflang={English}}
+\usepackage{biblatex}
+
+\begin{document}
+
+\maketitle
+\begin{frame}{Outline}
+\tableofcontents
+\end{frame}
+
+\section{Section one}
+\label{sec:one}
+\begin{frame}[label={sec:examples},fragile]{Lean examples}
+ \begin{itemize}[<+->]
+\item example: defn of convergence of a sequence
+
+\begin{minted}[]{lean}
+-- definition of "u tends to ℓ" 
+def seq_limit (u : ℕ → ℝ) (ℓ : ℝ) :=
+  ∀ ε > 0, ∃ N, ∀ n ≥ N, |u n - ℓ| ≤ ε
+\end{minted}
+\end{itemize}
+\end{frame}
+\begin{frame}[label={sec:appending-lists},fragile]{appending lists}
+ \begin{itemize}[<+->]
+\item Here is some \texttt{Lean} code that \emph{appends two lists}.
+\begin{minted}[]{lean}
+def append {α:Type} (xs ys : List α)
+  : List a :=
+  match xs with
+  | [] => ys
+  | z :: zs => z :: append zs ys
+\end{minted}
+
+\item e.g.
+\begin{minted}[]{lean}
+append ["a", "b", "c"] ["d", "e"]
+\end{minted}
+evaluates to
+\begin{minted}[]{lean}
+["a", "b", "c", "d", "e"] : List String
+\end{minted}
+\end{itemize}
+\end{frame}
+\section{Algebra}
+\label{sec:"finite-algebra"}
+\begin{frame}[label={sec:vector-spaces}]{vector spaces}
+\begin{itemize}[<+->]
+\item Let \(k\) be a \alert{field}.
+
+\item and let \(V\) be a finite dimensional vector space over \(k\).
+
+\item Let \(\beta:V \times V \to k\) be a \alert{bilinear form}
+
+\item and suppose that \(\beta\) is \alert{nondegenerate} and \alert{symmetric}
+
+\item (also suppose for convenience that \(p\neq 2\) where \(p\) is the characteristic of \(k\))
+\end{itemize}
+\end{frame}
+\end{document}
