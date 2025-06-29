@@ -89,7 +89,6 @@ lemma eq_zero_of_two_mul_eq_zero_vector (k: Type) { V : Type }
 lemma alt_iff_skew (β:V →ₗ[k] V →ₗ[k] k)
    [CharP k p] (hn2 : p ≠ 2)
    : Alt β ↔ Skew β := by
-  have hp2: CharP k p := by (expose_names; exact inst_3)
   constructor
   . apply skew_of_alt
   . intro h
