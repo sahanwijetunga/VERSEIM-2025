@@ -26,24 +26,35 @@ lemma card_fin_sum_fin (n m : ℕ) : Fintype.card ((Fin n) ⊕ (Fin m)) = n + m 
 
 noncomputable def ft_equiv (n m : ℕ) : (Fin n) ⊕ (Fin m) ≃ Fin (n+m)  := by
   apply Fintype.equivOfCardEq 
-  rw [Fintype.card_sum]
-  rw [Fintype.card_fin n]
-  rw [Fintype.card_fin m]
-  rw [Fintype.card_fin (n+m)]
+  rw [ card_fin_sum_fin ]
+  rw [ Fintype.card_fin (n+m) ]
 
 
--- the main tools are `Fintype.card_sum` which states
+-- note that the result that permits the proof of the lemma
+-- `card_fin_sum_fin` is this:
 
 -- theorem Fintype.card_sum {α : Type u_1} {β : Type u_2} [Fintype α] [Fintype β] :
 --   card (α ⊕ β) = card α + card β
 
--- and
+
+
+-- in addition to the lemma, the main tool is `Fintype.equivOfCardEq` which states
+
 
 -- noncomputable def Fintype.equivOfCardEq {α : Type u_1} {β : Type u_2} [Fintype α] [Fintype β] 
 --   (h : card α = card β) :
 --   α ≃ β
 
--- but we can't compute with the def `ft_equiv`:  these evals throw errors...
+
+#check Fintype.equivOfCardEq
+
+-- we've also used `Fintype.card_fin` which is the statement
+
+-- Fintype.card_fin (n : ℕ) : Fintype.card (Fin n) = n
+
+#check Fintype.card_fin
+
+-- but we can't compute with the term `ft_equiv`:  these evals throw errors...
 
 -- #eval (ft_equiv 10 10).toFun (Sum.inl 0) 
 -- #eval (ft_equiv 10 10).toFun (Sum.inr 0) 
@@ -79,15 +90,16 @@ def fe_equi (n m : ℕ) : (Fin n) ⊕ (Fin m) ≃ Fin (n+m)  := by
    rw [← FinEnum.card_eq_fintypeCard ]
    exact FinEnum.equiv
     
--- now we can see what choices Lean made in defining this equivalence!
--- for example:
+-- For numerical examples, we can now see what choices Lean made in
+-- defining this equivalence!  for example:
 
 #eval (fe_equi 5 7).toFun (Sum.inl 0) -- (0:Fin 12)
 #eval (fe_equi 5 7).toFun (Sum.inr 0) -- (5:Fin 12)
 #eval (fe_equi 5 7).toFun (Sum.inr 6) -- (11:Fin 12)
 
 
--- on the other hand, it isn't currently clear to how to prove the following:
+-- on the other hand, it isn't currently clear to me how one would
+-- prove the following (which I assume must be true?)
 
 example (n m : ℕ) [NeZero n] [NeZero m] : 
   (fe_equi n m).toFun (Sum.inr (Fin.ofNat m 0)) = Fin.ofNat (n+m) n := by 
