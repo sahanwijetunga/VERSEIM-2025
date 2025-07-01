@@ -46,6 +46,7 @@ noncomputable def ft_equiv (n m : ℕ) : (Fin n) ⊕ (Fin m) ≃ Fin (n+m)  := b
 -- but we can't compute with the def `ft_equiv`:  these evals throw errors...
 
 -- #eval (ft_equiv 10 10).toFun (Sum.inl 0) 
+
 -- #eval (ft_equiv 10 10).toFun (Sum.inr 0) 
 
 
@@ -54,7 +55,7 @@ noncomputable def ft_equiv (n m : ℕ) : (Fin n) ⊕ (Fin m) ≃ Fin (n+m)  := b
 
 -- `FinEnum` "keeps track" of equivalences. More precisely, if
 
--- `(X : Type) [Finset X]` and if the cardinality of X is n, then the
+-- `(X : Type) [FinEnum X]` and if the cardinality of X is n, then the
 -- typeclass instance gives a specified(!) equivalence of types `X ≃
 -- Fin n`.
 

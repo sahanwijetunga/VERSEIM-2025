@@ -26,7 +26,7 @@ example : (LinearMap.BilinForm k V) = (V →ₗ[k] V →ₗ[k] k) := rfl
 
 -- An n × m matrix has the following type
 
-variable (n m:ℕ) 
+variable (n m:ℕ) in
 #check Matrix (Fin n) (Fin m) k 
 
 
@@ -34,8 +34,9 @@ variable (n m:ℕ)
 -- are indexed by just any type (in our case, we'll typically insist
 -- that those indexing types be finite!)
 
-variable (rows cols : Type) [Fintype rows] [Fintype cols] 
+variable (rows cols : Type) [Fintype rows] [Fintype cols] in
 #check Matrix rows cols k
+
 
 -- the type of matrices has a vector space structure
 
@@ -68,7 +69,7 @@ example (rows cols : Type) : Module k (Matrix rows cols k) := inferInstance
 
 -- and finally you can take determinants:
 
-example (a b:ℚ) : !![a , 1 ; 0 , b ].det = a*b := by simp
+example (a b : ℚ) : !![ a , 1 ; 0 , b ].det = a*b := by simp
 
 
 -- on the black board, we have described how to get a matrix from a bilinear form β:
@@ -85,7 +86,7 @@ variable (b : Basis (Fin n) k V)
 
 noncomputable example : Matrix (Fin n) (Fin n) k := BilinForm.toMatrix b β
 
--- more precisely, in thenotation of the previous example,
+-- more precisely, in the notation of the previous example,
 -- `BilinForm.toMatrix b` is a linear equivalence:
 
 #check LinearMap.BilinForm k V ≃ₗ[k] Matrix (Fin n) (Fin n) k
@@ -97,14 +98,15 @@ noncomputable example : Matrix (Fin n) (Fin n) k := BilinForm.toMatrix b β
 example (i j : Fin n) : (BilinForm.toMatrix b) β i j  = β (b i) (b j) := 
   BilinForm.toMatrix_apply b β i j
 
--- there is no need to only work with bases and rows/cols indexed by `Fin`s
--- (Note that the index type needs to have a `DecidableEq` instance!)
+-- there is no need to only work with bases and rows/cols indexed by
+-- `Fin`s (Note that the index type does need to have a `DecidableEq`
+-- instance!)
 
 variable (ι : Type) [Fintype ι] [DecidableEq ι]
 
 variable (c : Basis ι k V)
 
--- using our basis `c` we'll construct an `ι` × `ι` matrix corresponding to `β`.
+-- using our basis `c` we'll construct an `ι × ι` matrix corresponding to `β`.
 
 #check BilinForm.toMatrix c β
 
