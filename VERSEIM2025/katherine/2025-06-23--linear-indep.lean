@@ -149,6 +149,9 @@ theorem sbv_span (n:ℕ) : Submodule.span ℚ (Set.image (sbv n) ⊤) = (⊤:Sub
   unfold sbv
   simp
   intro h₁ h₂
+  simp at h₂
+
+
   sorry
 
 --------------------------------------------------------------------------------
