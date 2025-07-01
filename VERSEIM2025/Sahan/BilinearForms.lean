@@ -8,23 +8,38 @@ VERSEIM-2025 REU @ Tufts University
 -/
 
 import Mathlib.Tactic
+import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
 
 
-variable { k V : Type } [Field k] [ AddCommGroup V ]  [Module k V]
-
+variable { k V : Type* } [Field k] [ AddCommGroup V ]  [Module k V]
 
 variable { ι : Type } [Fintype ι] [DecidableEq ι]
 
-def Alt (β:V →ₗ[k] V →ₗ[k] k) : Prop :=
+variable { B : Basis ι k V }
+
+-- let's use the MathLib notions for Bilinear forms
+
+open LinearMap (BilinForm)
+open LinearMap
+
+-- then we have
+
+example : (V →ₗ[k] V →ₗ[k] k) = (BilinForm k V) := rfl
+
+def Alt (β:BilinForm k V) : Prop :=
   ∀ v : V, β v v = 0
 
-def Skew (β:V →ₗ[k] V →ₗ[k] k) : Prop :=
+def Skew (β:BilinForm k V) : Prop :=
   ∀ v w : V, β v w = - β w v
 
-def Symm (β:V →ₗ[k] V →ₗ[k] k) : Prop :=
+def Symm (β:BilinForm k V) : Prop :=
   ∀ v w : V, β v w = β w v
 
-lemma skew_of_alt (β:V →ₗ[k] V →ₗ[k] k) (ha : Alt β) :
+-- a bilinear form is said to be reflexive if `∀ x y, β x y = 0 → β y
+-- x = 0`.
+
+
+lemma skew_of_alt (β:BilinForm k V) (ha : Alt β) :
   Skew β := by
   intro v w
   suffices β v w + β w v = 0 from ?_
@@ -38,12 +53,13 @@ lemma skew_of_alt (β:V →ₗ[k] V →ₗ[k] k) (ha : Alt β) :
       abel
     _ = 0 := ha _
 
+
 -- the next lemma says that for a vector space over a field k of
 -- characteristic different from 2, for v in V the equation `2v=0`
 -- implies that `v=0`.
 
 
-lemma eq_zero_of_two_mul_eq_zero  { k : Type } [ Field k]
+lemma eq_zero_of_two_mul_eq_zero  { k : Type* } [ Field k]
   [CharZero k] (x:k) (h:2*x = 0) : x = 0 := by
   --have nz2_inst : NeZero ↑2 := inferInstance
   have nz2 : (2:k) ≠ 0 := NeZero.ne ↑2
@@ -52,7 +68,7 @@ lemma eq_zero_of_two_mul_eq_zero  { k : Type } [ Field k]
     mul_ne_zero nz2 x_neq_zero
   exact two_mul_ne_zero h
 
-lemma eq_zero_of_two_mul_eq_zero' { k : Type } [ Field k]
+lemma eq_zero_of_two_mul_eq_zero' { k : Type* } [ Field k]
   {p:ℕ} [CharP k p] [ hn2:Fact (p≠2)]
   (x:k) (h:2*x = 0) : x = 0 := by
     have ring_char_n2 : ringChar k ≠ 2 := by
@@ -68,7 +84,7 @@ lemma eq_zero_of_two_mul_eq_zero' { k : Type } [ Field k]
 
 example (x:ℝ) (h:2*x = 0) : x=0 := eq_zero_of_two_mul_eq_zero x h
 
-lemma eq_zero_of_two_mul_eq_zero_vector (k: Type) { V : Type }
+lemma eq_zero_of_two_mul_eq_zero_vector (k: Type*) { V : Type* }
   [ Field k] [ AddCommGroup V]
   [Module k V] {p:ℕ} [CharP k p] (hn2 : p ≠ 2)
   (v:V) (h:2•v = 0) : v = 0 := by
@@ -92,7 +108,7 @@ lemma alt_iff_skew (β:V →ₗ[k] V →ₗ[k] k)
   constructor
   . apply skew_of_alt
   . intro h
-    simp[Alt, Skew] at *
+    simp only [Alt, Skew] at *
     intro v
     have: β v v + β v v = 0 := eq_neg_iff_add_eq_zero.mp (h v v)
     have: 2 • β v v = 0 := by rw[(two_nsmul ((β v) v)), this]
@@ -104,36 +120,80 @@ lemma alt_iff_skew (β:V →ₗ[k] V →ₗ[k] k)
 -- which is neither alternating nor symmetric) should have a more
 -- complicated definition.
 
+-- ===============
+-- Reflexive forms
+-- ===============
 
-def OrthogSubspaces (β:V →ₗ[k] V →ₗ[k] k) (W₁ W₂ : Submodule k V) : Prop :=
+-- Mathlib has a predicate for reflexive forms -- namely
+-- `LinearMap.IsRefl`. So it might be useful if we record that our
+-- alternating and symmetric forms are reflexive.
+
+lemma skew_is_reflexive (β:BilinForm k V) (h:Skew β) : IsRefl β := by
+  intro v w l
+  rw [h]
+  simp
+  assumption
+
+lemma alt_is_reflexive (β:BilinForm k V) (h:Alt β) : IsRefl β := by
+  intro a b hab
+  rw[ skew_of_alt β h]
+  simp[hab]
+
+
+lemma symm_is_reflexive (β:BilinForm k V) (h:Symm β) : IsRefl β := by
+  intro a b hab
+  rw[h]
+  exact hab
+
+def OrthogSubspaces (β:BilinForm k V) (W₁ W₂ : Submodule k V) : Prop :=
   ∀ (x:W₁), ∀ (y:W₂), β x y = 0
 
-def fun_is_orthog (β:V →ₗ[k] V →ₗ[k] k) {n:ℕ} (vect : Fin n → V) : Prop :=
-  ∀ i j : Fin n, i ≠ j → β (vect i) (vect j) = 0
+
+theorem orthog_complement (β: BilinForm k V) (W: Submodule k V) :
+    OrthogSubspaces β W (β.orthogonal W) := by
+    unfold OrthogSubspaces
+    rintro ⟨a, ha⟩ ⟨b, hb⟩
+    simp at hb
+    show β a b =0
+    apply hb
+    exact ha
 
 
+-- The mathlib predicate `LinearMap.IsOrthoᵢ` is used to indicate that
+-- a collection of vectors is orthogonal with respect to some bilinear
+-- form. e.g.
 
-lemma linear_independence_equiv_condition_fin {V:Type} [AddCommGroup V] [Module ℝ V] {n: ℕ} (b: Fin n → V)
-(h: ∀(l: Fin n → ℝ), ∑ i, (l i) • (b i)=0 → l=0): LinearIndependent ℝ b := by
-    exact Fintype.linearIndependent_iff.mpr fun g a ↦ congrFun (h g a)
+example (β : BilinForm k V) (vect:Fin n → V) : Prop := IsOrthoᵢ β vect
 
-/- Sahan:
+-- the preceding means that `∀ i j : Fin n, i ≠ j → β (vect i) (vect j) = 0`
 
-  LinearMap.BilinForm.linearIndependent_of_iIsOrtho
-  would prove the below theorem if we have the hypothesis
-     B (f i) (f i) ≠ 0 for all i: Fin n
 
--/
-theorem lin_indep_of_orthog (β:V →ₗ[k] V →ₗ[k] k) (f : Fin n → V)
-   (ho: fun_is_orthog β f):  LinearIndependent k f := by
-  sorry
+-- thanks to Sahan for pointing out that the following is avaiable in `mathlib`
+
+-- if we have a function `vect:Fin n → V` that satisfies the predicate
+-- `IsOrthoᵢ` and if we know  `∀ i: Fin n, β (vect i) (vect i) ≠ 0` then
+-- we can conclude the linear independence of `vect` by using
+
+-- `LinearMap.BilinForm.linearIndependent_of_IsOrthoᵢ`
+
+-- indeed:
+
+
+example (β : BilinForm k V) (vect:Fin n → V)
+  (h₁: IsOrthoᵢ β vect)
+  (h₂: ∀ i: Fin n, β (vect i) (vect i) ≠ 0)
+  : LinearIndependent k vect := by
+  apply linearIndependent_of_isOrthoᵢ h₁
+  intro i l
+  exact h₂ i l
+
 
 -- predicate for orthogonality of sets
-def OrthogSets  (β:V →ₗ[k] V →ₗ[k] k) (s₁ s₂ : Set V) : Prop :=
+def OrthogSets  (β:BilinForm k V) (s₁ s₂ : Set V) : Prop :=
   ∀ x₁ ∈ s₁, ∀ x₂ ∈ s₂, β x₁ x₂ = 0
 
 
-lemma orthog_sets_iff_orthog_subspaces (β:V →ₗ[k] V →ₗ[k] k) (s₁ s₂ : Set V) :
+lemma orthog_sets_iff_orthog_subspaces (β:BilinForm k V) (s₁ s₂ : Set V) :
   OrthogSets β s₁ s₂ ↔ OrthogSubspaces β (Submodule.span k s₁) (Submodule.span k s₂) := by
   constructor
   . intro h
@@ -150,8 +210,8 @@ lemma orthog_sets_iff_orthog_subspaces (β:V →ₗ[k] V →ₗ[k] k) (s₁ s₂
     simp_all[-hx, -hy]
   . intro h
     intro x hx y hy
-    have hx: x ∈ Submodule.span k s₁ := Submodule.mem_span.mpr fun p a ↦ a hx
-    have hy: y ∈ Submodule.span k s₂ := Submodule.mem_span.mpr fun p a ↦ a hy
+    have hx: x ∈ Submodule.span k s₁ := by exact Submodule.mem_span.mpr fun p a ↦ a hx
+    have hy: y ∈ Submodule.span k s₂ := by exact Submodule.mem_span.mpr fun p a ↦ a hy
     simp_all[OrthogSubspaces]
 
 
@@ -167,105 +227,156 @@ def Nondeg (β : BilinForm k V) : Prop :=
   ∀ v:V, (∀ w:V, β v w = 0) → v = 0
 
 def NondegOn
-  (β : BilinForm k V) (W : Subspace k V) : Prop :=
+  (β : BilinForm k V) (W : Submodule k V) : Prop :=
   Nondeg (BilinForm.restrict β W)
 
 
-
-theorem nondeg_conditions  (β : BilinForm k V) : List.TFAE [ Nondeg β                                -- left-nondegenate
-               , ∀ w:V, (∀ v:V, β v w = 0) → w = 0                          -- right-nondegenerate
-               , ∃ (b:Basis ι k V), (BilinForm.toMatrix b β).det ≠ 0
-               ] := by sorry
-
-/- Sahan: Using nondeg_conditions was painful so I separate this result out
-Note: To prove this we would need to add (at least) a hypothesis that
-V is finite dimensional, and also add it to future things relying on this
-(for those that don't include ι in the statement of the theorem)
--/
-
-theorem nondeg_conditions' (β : BilinForm k V) :
-  (Nondeg β) ↔ (∀ w:V, (∀ v:V, β v w = 0) → w = 0) := by sorry
+theorem nondeg_conditions (β : BilinForm k V) [FiniteDimensional k V] :
+    (Nondeg β)
+  ↔ (∀ w:V, (∀ v:V, β v w = 0) → w = 0) := by sorry
 
 
-example
-  (β: BilinForm k V) (W: Submodule k V): List.TFAE [ Nondeg (β.restrict W)
-               , ∀ w:W, (∀ v:W, β v w = 0) → w = 0
-               , ∃ (b:Basis ι k W), (BilinForm.toMatrix b (β.restrict W)).det ≠ 0
-               ]  := nondeg_conditions (β.restrict W)
+theorem nondeg_via_basis (β: BilinForm k V) [FiniteDimensional k V] :
+    (Nondeg β)
+  ↔ (∃ (b:Basis ι k V), (BilinForm.toMatrix b β).det ≠ 0) := by sorry
+
 
 --------------------------------------------------------------------------------
 -- direct sums and orthogonal complements
 -- ======================================
 
 
-/- Sahan:
+structure internal_direct_sum (W₁ W₂ : Submodule k V)  where
+  zero : W₁ ⊓ W₂ = ⊥
+  span : W₁ ⊔ W₂ = ⊤
 
 
-IsCompl in Mathlib formalizes similar thing to internal_direct_sum
+-- Sahan pointed out that this is the same predicate as `IsCompl`
+-- which is defined for bounded a bounded lattice `α`.
 
-`LinearMap.BilinForm.orthogonal` formalizes the (left) orthogonal complement
+-- So we should prove that the notions are the same, so we'll be able
+--  use results about `IsCompl`.
 
-The only relevant theorem I could find is
-  `BilinForm.restrict_nondegenerate_iff_isCompl_orthogonal`
-  which requires the form to be reflexive (and v.s. finite dimensional)
-
--/
-
-structure internal_direct_sum (W₁ W₂ : Submodule k V) where
-  span : ⊤ = W₁ ⊔ W₂
-  zero : ⊥ = W₁ ⊓ W₂
+lemma direct_sum_iff_iscompl (W₁ W₂ : Submodule k V) :
+    internal_direct_sum W₁ W₂
+  ↔ IsCompl W₁ W₂ := by
+  constructor
+  . intro h
+    rw[isCompl_iff]
+    constructor
+    . rw[disjoint_iff_inf_le]
+      rw[h.zero]
+    . rw[codisjoint_iff_le_sup]
+      rw[h.span]
+  . intro h
+    have zero: W₁ ⊓ W₂=⊥ := by
+      rw[isCompl_iff] at h
+      exact disjoint_iff.mp h.left
+    have span: W₁ ⊔ W₂=⊤ := by
+      rw[isCompl_iff] at h
+      exact codisjoint_iff.mp h.right
+    exact {zero, span}
 
 structure orthog_direct_sum (β:BilinForm k V) (W : Submodule k V) where
   compl : Submodule k V
   ds : internal_direct_sum W compl
-  orthog : ∀ v₁ ∈ W, ∀ v₂ ∈ compl, β v₁ v₂ = 0
+  orthog : ∀ w ∈ W, ∀ v ∈ compl, β w v= 0
 
-def OrthogCompl {k V:Type} [AddCommGroup V] [Field k] [Module k V] (S : Set V)
-    (β:BilinForm k V)
-    : Subspace k V where
-  carrier := { v | ∀ (x:S), β x v = 0 }
-  add_mem' := by
-    intro a b ha hb
-    intro s
-    simp_all only [Subtype.forall, Set.mem_setOf_eq, map_add, add_apply, Subtype.coe_prop, add_zero]
-  zero_mem' := by
-    intro s
-    simp
-  smul_mem' := by
-    intro c a ha
-    simp_all only [Subtype.forall, Set.mem_setOf_eq, map_smul, smul_apply, smul_eq_mul, mul_zero,
-      implies_true]
+theorem orthog_inter (β: BilinForm k V) [FiniteDimensional k V] (W: Submodule k V) (wnd: NondegOn β W) :
+  W ⊓ (β.orthogonal W) = ⊥ := by
+  have wnd : ∀ w:W, (∀ v:W, (β.restrict W) v w = 0) → w = 0 := by
+    have := nondeg_conditions (β.restrict W)
+    tauto
+  suffices W ⊓ β.orthogonal W ≤ ⊥ from ?_
+  . exact (Submodule.eq_bot_iff (W ⊓ β.orthogonal W)).mpr this
+  intro a ha
+  obtain ⟨ha1, ha2⟩ := ha
+  have: ∀ b ∈ W, β b a= 0 := by
+    intro b hb
+    exact ha2 b hb
+  show a=0
+  simp_all only [BilinForm.restrict_apply, domRestrict_apply, Subtype.forall, Submodule.mk_eq_zero,
+    SetLike.mem_coe, implies_true, Submodule.zero_mem, map_zero]
 
--- Sahan: Do we need some finite dimensional requirement?
-def orthog_decomp (β:BilinForm k V) (W:Submodule k V) (wnd : NondegOn β W):
+
+namespace Hidden
+/- Sahan:
+This namespace is purely to prove isCompl_orthogonal_of_restrict_nondegenerate.
+I wanted to avoid access to `finrank_add_finrank_orthogonal`, `toLin_restrict_ker_eq_inf_orthogonal`,
+which are proven in Mathlib using the condtion
+    `LinearMap.IsRefl`
+instead of a nondegeneracy condition.
+- Note: (Hidden) finrank_add_finrank_orthogonal could be useful elsewhere as well.
+
+The proof of isCompl_orthogonal_of_restrict_nondegenerate was essentially taken from Mathlib,
+with minor modifications to accomodate different conditions
+-/
+
+open Module Submodule
+
+protected lemma toLin_restrict_ker_eq_inf_orthogonal'  {V : Type*} {K : Type*} [Field K]
+   [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+  (B : BilinForm K V) (W : Submodule K V) (wnd: NondegOn B W) :
+    (LinearMap.ker (B.domRestrict W)).map W.subtype = (W ⊓ B.orthogonal ⊤ : Submodule K V) := by
+  ext x; constructor
+  . rintro ⟨⟨a, ha⟩, h1,h2⟩
+    simp at h1
+    have h3: (B.restrict W) ⟨a, ha⟩  = 0 := by
+      ext y
+      simp_all
+    have: (⟨a, ha⟩: W) = 0 := by
+      apply wnd
+      rw[h3]
+      simp
+    rw[<- h2, this]
+    exact (Quotient.mk_eq_zero (W ⊓ B.orthogonal ⊤)).mp rfl
+  . rintro ⟨h1, h2⟩
+    have h3: x ∈ B.orthogonal W := by
+      intro y hy
+      show B y x = 0
+      exact h2 y trivial
+    have h4: x ∈ W ⊓ B.orthogonal W := mem_inf.mpr ⟨h1, h3⟩
+    have h5: x=0 := by
+      rw[orthog_inter B W wnd] at h4
+      exact h4
+    rw[h5]
+    exact Submodule.zero_mem (map W.subtype (ker (domRestrict B W)))
+
+
+protected lemma finrank_add_finrank_orthogonal'  {V : Type*} {K : Type*} [Field K]
+ [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+ (B: BilinForm K V) (W : Submodule K V) (wnd : NondegOn B W):
+    finrank K W + finrank K (B.orthogonal W) =
+      finrank K V + finrank K (W ⊓ B.orthogonal ⊤ : Submodule K V) := by
+  rw [← Hidden.toLin_restrict_ker_eq_inf_orthogonal' B W wnd]
+  rw[ ←LinearMap.BilinForm.toLin_restrict_range_dualCoannihilator_eq_orthogonal _ _, finrank_map_subtype_eq]
+  conv_rhs =>
+    rw [← @Subspace.finrank_add_finrank_dualCoannihilator_eq K V _ _ _ _
+        (LinearMap.range (B.domRestrict W)),
+      add_comm, ← add_assoc, add_comm (finrank K (LinearMap.ker (B.domRestrict W))),
+      LinearMap.finrank_range_add_finrank_ker]
+
+theorem isCompl_orthogonal_of_restrict_nondegenerate  {V : Type*} {K : Type*} [Field K]
+  [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+  (B: BilinForm K V) (W: Submodule K V)
+    (wnd:NondegOn B W )  : IsCompl W (B.orthogonal W) := by
+  have : W ⊓ B.orthogonal W = ⊥ := orthog_inter B W wnd
+
+  refine IsCompl.of_eq this (eq_top_of_finrank_eq <| (finrank_le _).antisymm ?_)
+  conv_rhs => rw [← add_zero (finrank K _)]
+  rw [← finrank_bot K V]
+  rw[← this]
+  rw[finrank_sup_add_finrank_inf_eq]
+  rw[Hidden.finrank_add_finrank_orthogonal' B W wnd]
+  exact le_self_add
+
+end Hidden
+
+def orthog_decomp (β:BilinForm k V)[FiniteDimensional k V] (W:Submodule k V) (wnd : NondegOn β W):
   orthog_direct_sum β W where
-   compl := OrthogCompl W β
-   ds :=
-     { span := by sorry
-     , zero := by
-        have wnd' : ∀ w:W, (∀ v:W, (β.restrict W) v w = 0) → w = 0 := by
-          have:= nondeg_conditions' (β.restrict W)
-          tauto
-        symm
-        suffices W ⊓ OrthogCompl (↑W) β ≤ ⊥ from ?_
-        . exact (Submodule.eq_bot_iff (W ⊓ OrthogCompl (↑W) β)).mpr this
-        intro a ha
-        obtain ⟨ha1, ha2⟩ := ha
-        -- Sahan: This have statement is very slow to compile,
-        --  maybe prove more explicitly without simp
-        have: ∀ b ∈ W, β b a = 0 := by
-          simp_all only [BilinForm.restrict_apply, domRestrict_apply, Subtype.forall,
-            Submodule.mk_eq_zero, SetLike.mem_coe, OrthogCompl, SetLike.coe_sort_coe,
-            SetLike.coe_mem, Submodule.coe_set_mk, AddSubmonoid.coe_set_mk,
-            AddSubsemigroup.coe_set_mk, Set.mem_setOf_eq, implies_true, Submodule.zero_mem,
-            map_zero, zero_apply]
-        show a=0
-        simp_all only [BilinForm.restrict_apply, domRestrict_apply, Subtype.forall,
-          Submodule.mk_eq_zero, SetLike.mem_coe, implies_true, Submodule.zero_mem, map_zero]
-    }
-   orthog := by
-    intro a ha b hb
-    simp_all[OrthogCompl]
+   compl := β.orthogonal W
+   ds := (direct_sum_iff_iscompl _ _).mpr (Hidden.isCompl_orthogonal_of_restrict_nondegenerate β W wnd)
+   orthog := fun w a _ a_1 ↦ a_1 w a
 
 
 --------------------------------------------------------------------------------
@@ -276,7 +387,7 @@ def orthog_decomp (β:BilinForm k V) (W:Submodule k V) (wnd : NondegOn β W):
 def hyp_pair (β:BilinForm k V) (e f : V) : Prop :=
         β e e = 0  ∧  β f f = 0  ∧  β e f = 1
 
-def hypsubspace (β:BilinForm k V) {e f : V} (_:hyp_pair β e f) : Subspace k V :=
+def hypsubspace (β:BilinForm k V) {e f : V} (_:hyp_pair β e f) : Submodule k V :=
   Submodule.span k {e,f}
 
 -- Sahan: Simplify name?
@@ -303,9 +414,25 @@ def foo_fun (e f : V) : Fin 2 → V
 -- Sahan: Better name?
 lemma foo (v1 v2 v : V)(hv : v ∈ Submodule.span k {v1, v2}) :
   ∃(a b: k), v = a • v1 + b • v2 := by
-    sorry
+    have: {v1, v2} = Set.range (foo_fun v1 v2):= by
+      ext x
+      constructor
+      . rintro (h | h)
+        . use 0; simp only [foo_fun]; tauto
+        . use 1; simp only [foo_fun]
+          symm; exact h
+      . rintro ⟨y, rfl⟩
+        match y with
+        | ⟨0, _⟩ => simp[foo_fun]
+        | ⟨1, _⟩ => simp[foo_fun]
+    rw[this] at hv
+    have ⟨f, hv⟩ := in_span_fin_2_iff_linear_combination v (foo_fun v1 v2) hv
+    use f 0, f 1
+    rw[hv]
+    exact Fin.sum_univ_two fun i ↦ f i • foo_fun v1 v2 i
 
--- Sahan: proof has some apparent redundancies but I don't see how to simplify
+
+
 theorem hyp2_nondeg_refl (β:BilinForm k V)
   (brefl : IsRefl β) {e f : V} (h2: hyp_pair β e f) :
   NondegOn β (hypsubspace β h2) := by
@@ -366,7 +493,6 @@ theorem hyp2_nondeg_refl (β:BilinForm k V)
 
     simp[hab,hva,hvb]
 
-
 theorem hyp2_nondeg_symm (β:BilinForm k V)
   (bsymm : Symm β) {e f : V} (h2: hyp_pair β e f) :
   NondegOn β (hypsubspace β h2)  := by
@@ -382,11 +508,11 @@ theorem hyp2_nondeg_alt (β:BilinForm k V)
 
 -- using `orthog_decomp` above, we get
 
-def hyp2_decomp_symm (β:BilinForm k V) (bsymm : Symm β) (e f : V) (h2:hyp_pair β e f)
+def hyp2_decomp_symm (β:BilinForm k V) [FiniteDimensional k V] (bsymm : Symm β) (e f : V) (h2:hyp_pair β e f)
   : orthog_direct_sum β (hypsubspace β h2) :=
   orthog_decomp β (hypsubspace β h2) (hyp2_nondeg_symm  β bsymm h2)
 
-def hyp2_decomp_alt (β:BilinForm k V) (balt : Alt β) (e f : V) (h2:hyp_pair β e f)
+def hyp2_decomp_alt (β:BilinForm k V) [FiniteDimensional k V] (balt : Alt β) (e f : V) (h2:hyp_pair β e f)
   : orthog_direct_sum β (hypsubspace β h2) :=
   orthog_decomp β (hypsubspace β h2) (hyp2_nondeg_alt  β balt h2)
 
