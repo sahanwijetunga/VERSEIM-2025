@@ -15,16 +15,6 @@ import VERSEIM2025.BilinearForms
 -- characteristic different from 2, for v in V the equation `2v=0`
 -- implies that `v=0`.
 
-
-lemma eq_zero_of_two_mul_eq_zero { k V : Type } [ Field k] [ AddCommGroup V] 
-  [Module k V] {p:ℕ} [CharP k p] (hn2 : p ≠ 2) 
-  (v:V) (h:2•v = 0) : v = 0 := by
-  have two_neq_zero : (↑2 : k) ≠ 0 := by simp
-  by_contra v_neq_zero
-  have l : 2 • v ≠ 0 := smul_ne_zero two_neq_zero v_neq_zero
-  exact l h
-
-
 --------------------------------------------------------------------------------
 
 inductive DisjointUnion (ι κ : Type) where
@@ -73,6 +63,22 @@ theorem lin_indep_by_transverse_subspaces
 
 
 --------------------------------------------------------------------------------
+
+
+
+def f {n m:ℕ} {W₁ W₂ : Submodule k V} (s₁:Fin n →  W₁) (s₂: Fin m → W₂) :
+  (Fin n) ⊕ (Fin m) → V := by
+    intro i
+    match i with
+     | Sum.inl x => exact ↑(s₁ x)
+     | Sum.inr y => exact ↑(s₂ y)
+
+lemma union_span (n m:ℕ) (W₁ W₂ : Submodule k V) (s₁:Fin n →  W₁) (s₂: Fin m → W₂) 
+      (h₁:(⊤:Submodule k W₁) = Submodule.span k (s₁ '' ⊤))
+      (h₂:(⊤:Submodule k W₂) = Submodule.span k (s₂ '' ⊤))
+      (h₃:⊤ = W₁ ⊔ W₂)
+    : (⊤:Submodule k V) = Submodule.span k ((f s₁ s₂) '' ⊤)  := by sorry
+
 
 
 
