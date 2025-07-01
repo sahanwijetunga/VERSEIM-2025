@@ -93,7 +93,7 @@ theorem posdef_has_orthog_basis (V : Type) [AddCommGroup V] [ Module ℝ V ]
 section lemmas
 
 --------------------------------------------------------------------------------
-
+-- clea
 -- 1. the orthogonal complement of a `S:Set V` is a subspace of V
 
 -- in blackboard math, the orthogonal complement of S is often written S^⟂ 
@@ -104,14 +104,26 @@ section lemmas
 def OrthogComplement {k V:Type} [AddCommGroup V] [Field k] [Module k V] (S : Set V) 
     {β:V →ₗ[k] V →ₗ[k] k} : Subspace k V where
   carrier := { v | ∀ (x:S), β v x = 0 }
-  add_mem' := by sorry
-  zero_mem' := by sorry
-  smul_mem' := by sorry
+  add_mem' := by
+    simp
+    intro h1 h2 h3 h4
+    exact fun a b ↦ Linarith.eq_of_eq_of_eq (h3 a b) (h4 a b)
+  zero_mem' := by
+    simp
+  smul_mem' := by
+    simp
+    intro h1 h2 h3 h4 h5
+    right
+    apply h3
+    exact h5
+    
+
+    
 
 -- you should read in [math-in-lean] §10.2 about `add_mem'` vs `add_mem` etc.
 
 --------------------------------------------------------------------------------
-
+-- katherine
 -- 2. Suppoe that W₁ and W₂ are subspaces of a vector space V, and
 -- suppose that W₁ and W₂ are orthogonal  to one another.
 
@@ -152,7 +164,7 @@ theorem lin_indep_of_orthog (V : Type) [AddCommGroup V] [Module ℝ V] (β:V →
 
 
 --------------------------------------------------------------------------------
-
+-- sahan
 -- 3.  direct sum
 
 -- If W₁ and W₁ are subspaces of a vector space, we want to give

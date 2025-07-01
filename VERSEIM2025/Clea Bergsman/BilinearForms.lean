@@ -60,6 +60,7 @@ lemma skew_of_alt (β:V →ₗ[k] V →ₗ[k] k) (ha : Alt β) :
 #check LinearMap.BilinForm.add_left
 #check LinearMap.BilinForm.add_right
 #check add_right_cancel_iff
+#check sub_eq_add_neg
 
 
 example (β : V →ₗ[k] V →ₗ[k] k)  (v w x : V) : β (v + w) x = β v x + β w x := by
@@ -83,6 +84,14 @@ lemma eq_zero_of_two_mul_eq_zero { k V : Type } [ Field k] [ AddCommGroup V]
        smul_ne_zero two_neq_zero v_neq_zero
     exact two_smul_ne_zero two_smul_eq_zero
 
+lemma zero_of_two_mul_eq_zero  { k : Type } [ Field k]
+  [CharZero k] (x:k) (h:2*x = 0) : x = 0 := by
+  --have nz2_inst : NeZero ↑2 := inferInstance
+  have nz2 : (2:k) ≠ 0 := NeZero.ne ↑2
+  by_contra x_neq_zero
+  have two_mul_ne_zero : ↑2*x ≠ 0 :=
+    mul_ne_zero nz2 x_neq_zero
+  exact two_mul_ne_zero h
 
 lemma alt_iff_skew (β:V →ₗ[k] V →ₗ[k] k)
    [CharP k p] (hn2 : p ≠ 2)
@@ -96,8 +105,12 @@ lemma alt_iff_skew (β:V →ₗ[k] V →ₗ[k] k)
    have h1 : β v v = -β v v := by apply hs
    have h2 : β v v + β v v = β v v + -β v v := by
      apply (@add_left_cancel_iff _ _ _ (β v v) (β v v) (-β v v)).mpr  h1
-   rw [sub_self, ← two_mul] at h2
-   --apply eq_zero_of_two_mul_eq_zero ((β v) v) at h2
+   rw [← sub_eq_add_neg, sub_self ((β v) v)] at h2
+   rw [← two_mul] at h2
+   apply zero_of_two_mul_eq_zero at h2
+   exact h2
+
+#check CharZero k
 
 
 -- REMARK: we are really only interested in the case of forms which

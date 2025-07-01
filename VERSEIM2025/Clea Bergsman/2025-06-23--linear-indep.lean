@@ -12,8 +12,8 @@ import Mathlib.Tactic
 
 variable (n :ℕ) [NeZero n]
 
--- we can use an arbitrary field, but to do computations, 
--- let's use ℚ 
+-- we can use an arbitrary field, but to do computations,
+-- let's use ℚ
 
 
 -- for any field k, a standard model of a vector space is `Fin n → k`
@@ -40,7 +40,7 @@ example : (Pi.single (0:Fin 3) (1:ℚ) : Fin 3 → ℚ) = ![1,0,0] := by trivial
 
 -- let's try to work out what proof term the `trivial` tactic used:
 
-example : (Pi.single (0:Fin 3) (1:ℚ) : Fin 3 → ℚ) = ![1,0,0] := by 
+example : (Pi.single (0:Fin 3) (1:ℚ) : Fin 3 → ℚ) = ![1,0,0] := by
   exact List.ofFn_inj.mp rfl
 
 -- what this tells us is that there is a function List.ofFn
@@ -63,19 +63,19 @@ def sbv (n:ℕ) : Fin n → Fin n → ℚ := by
 
 
 -- term form seems to need parens...
-def sbv' (n:ℕ)  [NeZero n] : Fin n → (Fin n → ℚ) := (fun i => 
+def sbv' (n:ℕ)  [NeZero n] : Fin n → (Fin n → ℚ) := (fun i =>
   Pi.single i (1:ℚ) )
 
 
 -- so `sbv n 0`, `sbv n 1`, ... `sbv n (n-1)` are the standard basis vectors of
 -- `Fin n → ℚ`
 
-#eval sbv 8 
+#eval sbv 8
 
 -- lets try to use the theorem `linearIndependent_iff` to get linear independence
 
 
---#check linearIndependent_iff 
+--#check linearIndependent_iff
 
 -- LinearIndependent k v ↔ ∀ (l : ι →₀ R), (Finsupp.linearCombination R v) l = 0 → l = 0
 
@@ -91,39 +91,39 @@ example (l:Fin n →ℚ) :  Fintype.linearCombination ℚ (sbv n) l = ∑ i:Fin 
   rw [ ←Fintype.linearCombination_apply ℚ (sbv n) ]
 
 
-lemma single_smul (n : ℕ) (l : Fin n → ℚ) : (i:Fin n) → 
+lemma single_smul (n : ℕ) (l : Fin n → ℚ) : (i:Fin n) →
   Pi.single (M:=fun _ => ℚ) i (l i • (1:ℚ)) = l i • Pi.single (M:=fun _ => ℚ) i (1:ℚ)  := by
   intro i
-  apply (Pi.single_smul' i (l i) (1:ℚ))  
+  apply (Pi.single_smul' i (l i) (1:ℚ))
 
-lemma sbv_lin_comb' (n:ℕ) (l:Fin n → ℚ) : 
+lemma sbv_lin_comb' (n:ℕ) (l:Fin n → ℚ) :
    ∑ i, l i • sbv n i  = l  := by
    ext j
    unfold sbv
-   rw [  ← Fintype.sum_congr _ _ (single_smul n l) ] 
+   rw [  ← Fintype.sum_congr _ _ (single_smul n l) ]
    simp
 
 -- the final `simp` in the previous proof (surely) uses `Fintype.sum_pi_single` or
 -- `Fintype.sum_pi_single'`
 
-#check Fintype.sum_pi_single' 
+#check Fintype.sum_pi_single'
 
 -- for our purposes, this says:
 
--- Fintype.sum_pi_single' (n:ℕ) {V : Type} [AddCommGroup V] (i : Fin n) 
+-- Fintype.sum_pi_single' (n:ℕ) {V : Type} [AddCommGroup V] (i : Fin n)
 -- (a : V) : ∑ j, Pi.single i a j = a
 
 -- so `single'` is somehow playing the role of the "Kronecker delta " δ_{i,j}.
 
-theorem sbv_lin_indep (n:ℕ) : LinearIndependent ℚ (sbv n) := by 
-  apply Fintype.linearIndependent_iff.mpr  
-  intro l  h 
+theorem sbv_lin_indep (n:ℕ) : LinearIndependent ℚ (sbv n) := by
+  apply Fintype.linearIndependent_iff.mpr
+  intro l  h
   rw [ sbv_lin_comb' n ] at h
   intro i
   exact congrFun h i
 
 
--- to talk about spanning, we must transform the function 
+-- to talk about spanning, we must transform the function
 -- `sbv n : Fin n → (Fin n → ℚ)` into a *subset*.
 
 -- in general, if `f : X → Y` and `s: Set X`, the image of s via f is written
@@ -138,15 +138,15 @@ example : Set (Fin n → ℚ) := (sbv n) '' ⊤
 
 example : Set (Fin n → ℚ) := Set.image (sbv n) ⊤
 
-theorem sbv_span (n:ℕ) : Submodule.span ℚ (Set.image (sbv n) ⊤) = (⊤:Submodule ℚ (Fin n → ℚ)) := by 
+theorem sbv_span (n:ℕ) : Submodule.span ℚ (Set.image (sbv n) ⊤) = (⊤:Submodule ℚ (Fin n → ℚ)) := by
   ext v
-  have : v = ∑ j, v j • sbv n j := by 
+  have : v = ∑ j, v j • sbv n j := by
     ext k
     unfold sbv
     rw [ ← Fintype.sum_congr _ _ (single_smul n v) ]
     simp
   sorry
-  
+
 --------------------------------------------------------------------------------
 
 -- note that the linear independence of the standard basis is actually
@@ -154,18 +154,18 @@ theorem sbv_span (n:ℕ) : Submodule.span ℚ (Set.image (sbv n) ⊤) = (⊤:Sub
 
 -- dimension of a finite dimensional space is known as `Module.finrank`
 
-example : Module.finrank ℚ (Fin 5 → ℚ) = 5 := by simp  
+example : Module.finrank ℚ (Fin 5 → ℚ) = 5 := by simp
 
-example : Module.finrank ℝ ℂ = 2 := by 
-  exact Complex.finrank_real_complex 
+example : Module.finrank ℝ ℂ = 2 := by
+  exact Complex.finrank_real_complex
 
 -- I'm not actually sure at the moment how to do this one...
-example : Module.finrank ℝ (Fin 5 → ℂ) = 10 := by 
+example : Module.finrank ℝ (Fin 5 → ℂ) = 10 := by
   sorry
 
 example : Module ℚ (Matrix (Fin 4) (Fin 5) ℚ) := inferInstance
 
-example : Module.finrank ℚ  (Matrix (Fin 4) (Fin 4) ℚ) = 16 := by 
+example : Module.finrank ℚ  (Matrix (Fin 4) (Fin 4) ℚ) = 16 := by
   sorry
 
 
@@ -183,12 +183,32 @@ example : Module.finrank ℚ  (Matrix (Fin 4) (Fin 4) ℚ) = 16 := by
 example (k V : Type) [Field k] [AddCommGroup V] [Module k V] : Basis ι k V where
   repr := sorry -- the type of `repr` should be `V ≃ₗ[k] ι →₀ k`
 
--- The idea is that such a linear equivalence indeed determines 
+-- The idea is that such a linear equivalence indeed determines
 -- basis vectors parametrized by `ι` in the usual, black-board math sense. Indeed, for a term
 
 -- `x:ι`
 
 
 
-  
-  
+ -- lists
+
+ #check [1, 2, 3]
+
+ #check ([] : List ℕ )
+
+ -- defn of list is more or less as follows
+ -- def List (α:Type) where
+ -- | nil : List α
+ -- | cons : α → List α → List α
+
+example : [1,2] = List.cons 1 (List.cons 2 []) := rfl
+
+def f : ℕ → ℕ
+  | Nat.zero => 0
+  | _+1 => 1
+
+--lets write code to reverse a list
+
+def reverse { α : Type} (xs: List α) : List α → List α
+  | [ ] => [ ]
+  | List.cons x xs => (reverse xs) ++ [ x ]
