@@ -12,40 +12,6 @@ semester: 2024 Spring
 
 import Mathlib.Tactic
 
-<<<<<<< HEAD
---------------------------------------------------------------------------------
--- 07 --Algebra (Linear algebra)
---------------------------------------------------------------------------------
-
--- We've seen a bit about using `structures` and `classes`to create
--- objects representing common mathematical abstractions in `Lean`.
--- Here I want to explore some of these ideas in the context of *linear algebra*.
-
--- but let me start by developing some of the API for *groups* and their subgroups
-
--- For the same reason that a subset is not a type, a subgroup is not a group.
--- If `G` is a group -- i.e.
-
-variable (G : Type) [Group G]
-
-
--- then the type of all subgroups of `G` is written `Subgroup G`. Thus
--- to specify a subgroup `H` of `G` one says:
-
-variable (H : Subgroup G)
-
--- Now, the group `G` is written multiplicatively, otherwise, you'd
--- specify `AdditiveGroup` like this (I'm including a `CommGroup`
--- instance because to me additive groups should be commutative...).
-
-variable (A : Type) [AddGroup A] [CommGroup A]
-
-variable (B : Subgroup A)
-
--- now the multiplicative group `G` has a *multiplicative 
-
-
-=======
 import Mathlib.Algebra.BigOperators.Ring
 
 --------------------------------------------------------------------------------
@@ -55,7 +21,7 @@ import Mathlib.Algebra.BigOperators.Ring
 --------------------------------------------------------------------------------
 section MyGroups
 
--- Recall that we endow a group structure on a type via the notion of "typeclass". 
+-- Recall that we endow a group structure on a type via the notion of "typeclass".
 
 -- We've seen that a subset is not a type. For the same reason, as subgroup is not a "group"
 
@@ -85,28 +51,28 @@ example (hx : x ∈ B) (hy : y ∈ B) : x + y ∈ B := add_mem hx hy
 
 -- in addtive group, can rewrite `subtraction` via negation
 
-example (x y : A) : x - y = x + -y :=  sub_eq_add_neg _ _ 
+example (x y : A) : x - y = x + -y :=  sub_eq_add_neg _ _
 
 
 
-example (ha : a ∈ H) (hb : b ∈ H) : a*b⁻¹ ∈ H := by 
+example (ha : a ∈ H) (hb : b ∈ H) : a*b⁻¹ ∈ H := by
   apply inv_mem at hb
-  apply mul_mem 
+  apply mul_mem
   repeat assumption
 
 -- I'm putting the next one in the *exercises*
 
 example (hx : x ∈ B) (hy : y ∈ B) : a - b ∈ B := by sorry
-  
+
 
 -- the following is actually a result in the `mathlib` called `Subgroup.inv_mem_iff`
 -- but we can just prove it directly
 
 example : a⁻¹ ∈ H ↔ a ∈ H := by
   constructor
-  · intro hi 
+  · intro hi
     apply inv_mem at hi
-    rw [inv_inv] at hi 
+    rw [inv_inv] at hi
     assumption
   · intro ha
     apply inv_mem _
@@ -116,8 +82,16 @@ example : a⁻¹ ∈ H ↔ a ∈ H := by
 
 -- this one is similar and I've put it in the exericse
 
-example : x ∈ B ↔ -x ∈ B := by 
-  sorry
+example : x ∈ B ↔ -x ∈ B := by
+  constructor
+  . intro hx
+    apply neg_mem hx
+  . intro hxneg
+    have h: x = -(-x) := by
+      rw[neg_neg x]
+    rw[h]
+    exact neg_mem hxneg
+
 
 -- I'm putting the next one in the *exercise*
 -- it is also already a theorem in `mathlib` named `Subgroup.mul_mem_cancel_left`
@@ -156,7 +130,7 @@ example (x : A) : x ∈ (⊤ : AddSubgroup A) := AddSubgroup.mem_top _
 -- `{ a : g ∣ ∃ b, b ∈ H ∧ a = x * a * x⁻¹ }`
 -- so we need to show that this set satisfies the axioms for a subgroup.
 
-variable { G H } 
+variable { G H }
 
 variable {x y z : G}
 
@@ -171,7 +145,7 @@ theorem conj.inv_mem (hy : y ∈ {a : G | ∃ h, h ∈ H ∧ a = x * h * x⁻¹}
   rcases hy with ⟨h,he,rfl⟩  -- putting `rfl` here simplifies things a bit...
   use h⁻¹, inv_mem he
   group
-    
+
 
 theorem conj.mul_mem (hy : y ∈ {a : G | ∃ h, h ∈ H ∧ a = x * h * x⁻¹})
   (hz : z ∈ {a : G | ∃ h, h ∈ H ∧ a = x * h * x⁻¹}) :
@@ -183,16 +157,16 @@ theorem conj.mul_mem (hy : y ∈ {a : G | ∃ h, h ∈ H ∧ a = x * h * x⁻¹}
 
 -- now we can define a *conjugate operation*
 
-open Subgroup 
+open Subgroup
 
-def conjugate (H : Subgroup G) (x: G) : Subgroup G 
+def conjugate (H : Subgroup G) (x: G) : Subgroup G
   where
   carrier := { a : G | ∃ h, h ∈ H ∧ a = x * h * x⁻¹ }
   one_mem' := conj.one_mem
   inv_mem' := conj.inv_mem
   mul_mem' := conj.mul_mem
-  
-  
+
+
 
 end MyGroups
 --------------------------------------------------------------------------------
@@ -262,7 +236,7 @@ variable (W: Type) [AddCommGroup W] [Module K W]
 -- these terms are additive group homomorphisms `φ:V → W` for which
 -- φ(a • v) = (id a) • (φ v)
 
-variable ( φ ψ : V →ₗ[K] W ) 
+variable ( φ ψ : V →ₗ[K] W )
 variable ( x : V)
 
 example (x : V) : W := φ x
@@ -272,19 +246,19 @@ example (X : Subspace K V) : Subspace K W :=
   --or:
   -- X.map φ
 
-example (X : Subspace K V) (Y : Subspace K W) (hx: x ∈ X) (hY : Submodule.map φ X ≤ Y) : (φ x) ∈ Y := by 
+example (X : Subspace K V) (Y : Subspace K W) (hx: x ∈ X) (hY : Submodule.map φ X ≤ Y) : (φ x) ∈ Y := by
   apply hY
   apply Submodule.mem_map.mpr
   use x
 
-open Submodule 
+open Submodule
 -- let's try this:
 example (X : Subspace K V) (Y : Subspace K W) : map φ X ≤ Y ↔ X ≤ comap φ Y := by
   constructor
   · intro h x hx
-    apply mem_comap.mpr 
+    apply mem_comap.mpr
     apply h
-    apply mem_map.mpr 
+    apply mem_map.mpr
     use x
   · intro h y hm
     rw [mem_map] at hm
@@ -304,7 +278,7 @@ variable (V : Type) [AddCommGroup V] [Module K V] [FiniteDimensional K V]
 -- rather, `A ⊓ B` - cannot be the zero vector space.
 
 -- `FiniteDimensional.finrank V` is the dimension of `V`
-open FiniteDimensional -- now we can just write `finrank`. 
+open FiniteDimensional -- now we can just write `finrank`.
 
 -- note that since a subspace `X : Subspace V` isn't a type, you can't *really* speak of `finrank K X`.
 -- But you can *coerce* X into a type `↥X : Type [Vectorspace K X]`.
@@ -320,7 +294,7 @@ example (A B : Subspace K V) (hV : finrank K V = 5) (hA : finrank K A = 3) (hB :
     rw [hA,hB,h,finrank_bot K V] at h1
     norm_num at h1
     have h2 :=Submodule.finrank_le (A ⊔ B)
-    rw [h1, hV] at h2              
+    rw [h1, hV] at h2
     linarith
 
 -- let's define the span of some vectors in V
@@ -338,7 +312,7 @@ open Finset
 example : V := ∑ i, (α i) • (f i)
 
 lemma mul_sum'  {f : I → V} {a : K} :
-    a • (∑ i, f i) = ∑ i, a • (f i) := 
+    a • (∑ i, f i) = ∑ i, a • (f i) :=
   map_sum (AddMonoidHom.smulLeft a) _ _
 
 
@@ -347,29 +321,29 @@ example (α β : I → K) : ∑ i, α i + ∑ i, β i = ∑ i, ((α i) + (β i))
 
 
 def span' {I: Type} [Fintype I ] { K : Type } [Field K]  {V : Type} [AddCommGroup V] [ Module K V ]
-   (f : I → V) : Subspace K V 
+   (f : I → V) : Subspace K V
   where
     carrier := { v : V | ∃ (α:I → K), v = ∑ i, (α i) • (f i) }
-    add_mem' := by  
+    add_mem' := by
       intro a b ha hb
       rcases ha with ⟨α,haeq⟩
       rcases hb with ⟨β,hbeq⟩
       use α + β
       rw [haeq,hbeq]
       rw [ sum_add_distrib.symm ]
-      simp [ map_sum ] 
-      apply sum_congr 
+      simp [ map_sum ]
+      apply sum_congr
       · triv
       · intro x _
-        rw [ add_smul ]      
-    zero_mem' := by 
+        rw [ add_smul ]
+    zero_mem' := by
       use (λ _ => 0)
       field_simp
-    smul_mem' := by 
+    smul_mem' := by
       intro c x hx
       simp at hx
       simp
-      rcases hx with ⟨β,heq⟩ 
+      rcases hx with ⟨β,heq⟩
       use (λ i => c * β i)
       rw [ heq]
       rw [ mul_sum' ]
@@ -384,15 +358,15 @@ noncomputable section
 
 example : Module ℚ (Fin 3 → ℚ) := by
    infer_instance
-  
+
 def kron : Fin 3  →  Fin 3 → ℚ
   | 0, 0 => 1
-  | 1, 1 => 1 
+  | 1, 1 => 1
   | 2, 2 => 1
   | _, _ => 0
 
 def e (i : Fin 3) : Fin 3 → ℚ := kron i
-  
+
 #check e 0 + e 1
 
 def F : Fin 2 → (Fin 3 → ℚ)
@@ -402,10 +376,8 @@ def F : Fin 2 → (Fin 3 → ℚ)
 
 #check span' F
 
-def M : Subspace ℚ (Fin 3 → ℚ) := span' F 
+def M : Subspace ℚ (Fin 3 → ℚ) := span' F
 
-end 
+end
 
 end MyLinAlg
-
->>>>>>> 4029744e76473f77f549b88f571e6f0170cee352

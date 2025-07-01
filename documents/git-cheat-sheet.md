@@ -9,19 +9,57 @@
 
   ```
   # commit your personal changes
-  git branch george   ## just to make sure we are on the right branch. replace "george" with your name
+  git switch george   ## just to make sure we are on the right switch. replace "george" with your name
   git add .           ## stage all your work
   git commit -m "some explanatory note for the commit"   ## commit your changes
   git push            ## push the changes to the remote server -- i.e. to github
   
-  # pull the changes from the server on the main branch
+  # pull the changes from the server on the main switch
   
-  git branch main
+  git switch main
   git pull
-  git branch george   ## again, replace george by your name...
+  git switch george   ## again, replace george by your name...
   git merge main
   ```
   
+## making a pull request
+
+  When you have some work you'd like to add to the main branch of the
+  repository, proceed as follows:
+  
+  - update your local copy of the main repository by following the instructions above
+  
+  - edit the relevant files in `VERSEIM-2025/VERSEIM2025` 
+  
+  - push the edits to your branch as follows
+  
+    ```
+	git switch george  # to make sure...
+	git add .
+    git commit -m "changes for pull-request"
+	git push
+	```
+	
+  - now in a browser, navigate to the github repository, at
+    `https://github.com/gmcninch-tufts/VERSEIM-2025/`
+	
+  - at the top of the page, there is a row-menu with options `Code, Issues, Pull Requests, Actions, ...`
+  
+    choose `Pull Requests`
+	
+  - Now, on the right-hand side there should be a green button "New
+    Pull Request". Push this to start making a pull-request.
+	
+  - You should be on a page labeled "Compare changes".
+  
+    There are two chooser-widgets.
+	
+	`base` should be `main`
+	`compare` should be `<your branch>` (`george` in my case)
+	
+  - now push the green "create pull request" button
+  
+  That will generate an email to me to merge your branch to main.
 
 # initial set-up
 
