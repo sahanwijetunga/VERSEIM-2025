@@ -13,10 +13,6 @@ import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
 
 variable { k V : Type* } [Field k] [ AddCommGroup V ]  [Module k V]
 
-variable { ι : Type } [Fintype ι] [DecidableEq ι]
-
-variable { B : Basis ι k V }
-
 -- let's use the MathLib notions for Bilinear forms
 
 open LinearMap (BilinForm)
@@ -149,7 +145,7 @@ def OrthogSubspaces (β:BilinForm k V) (W₁ W₂ : Submodule k V) : Prop :=
   ∀ (x:W₁), ∀ (y:W₂), β x y = 0
 
 
-theorem orthog_complement (β: BilinForm k V) (W: Submodule k V) :
+theorem OrthogSubspaces_of_orthogonal (β: BilinForm k V) (W: Submodule k V) :
     OrthogSubspaces β W (β.orthogonal W) := by
     unfold OrthogSubspaces
     rintro ⟨a, ha⟩ ⟨b, hb⟩
@@ -226,20 +222,32 @@ open LinearMap (BilinForm)
 def Nondeg (β : BilinForm k V) : Prop :=
   ∀ v:V, (∀ w:V, β v w = 0) → v = 0
 
+def co_Nondeg (β : BilinForm k V) : Prop :=
+  ∀ v:V, (∀ w:V, β w v = 0) → v = 0
+
 def NondegOn
   (β : BilinForm k V) (W : Submodule k V) : Prop :=
   Nondeg (BilinForm.restrict β W)
 
+lemma Nondeg_iff_Nondegenerate (β: BilinForm k V):
+  Nondeg β ↔ β.Nondegenerate := by rfl
 
-theorem nondeg_conditions (β : BilinForm k V) [FiniteDimensional k V] :
+lemma co_Nondeg_iff_flip_Nondegenerate (β: BilinForm k V):
+  co_Nondeg β ↔ β.flip.Nondegenerate := by
+  simp[co_Nondeg, LinearMap.BilinForm.flip, LinearMap.BilinForm.Nondegenerate]
+
+theorem nondeg_conditions (B : BilinForm k V) [FiniteDimensional k V]:
+    (Nondeg B) ↔ (co_Nondeg B) := by
+    rw[Nondeg_iff_Nondegenerate]
+    rw[co_Nondeg_iff_flip_Nondegenerate]
+    exact LinearMap.BilinForm.nonDegenerateFlip_iff.symm
+
+theorem nondeg_via_basis (β: BilinForm k V)
+ {ι: Type*} [Fintype ι] [DecidableEq ι] (b: Basis ι k V):
     (Nondeg β)
-  ↔ (∀ w:V, (∀ v:V, β v w = 0) → w = 0) := by sorry
-
-
-theorem nondeg_via_basis (β: BilinForm k V) [FiniteDimensional k V] :
-    (Nondeg β)
-  ↔ (∃ (b:Basis ι k V), (BilinForm.toMatrix b β).det ≠ 0) := by sorry
-
+  ↔ (BilinForm.toMatrix b β).det ≠ 0 := by
+  rw[Nondeg_iff_Nondegenerate]
+  exact BilinForm.nondegenerate_iff_det_ne_zero b
 
 --------------------------------------------------------------------------------
 -- direct sums and orthogonal complements
@@ -302,15 +310,22 @@ theorem orthog_inter (β: BilinForm k V) [FiniteDimensional k V] (W: Submodule k
 namespace Hidden
 /- Sahan:
 This namespace is purely to prove isCompl_orthogonal_of_restrict_nondegenerate.
-I wanted to avoid access to `finrank_add_finrank_orthogonal`, `toLin_restrict_ker_eq_inf_orthogonal`,
+I wanted to avoid access to
+    `finrank_add_finrank_orthogonal`, `toLin_restrict_ker_eq_inf_orthogonal`,
 which are proven in Mathlib using the condtion
     `LinearMap.IsRefl`
 instead of a nondegeneracy condition.
 - Note: (Hidden) finrank_add_finrank_orthogonal could be useful elsewhere as well.
 
-The proof of isCompl_orthogonal_of_restrict_nondegenerate was essentially taken from Mathlib,
-with minor modifications to accomodate different conditions
+The proof of `finrank_add_finrank_orthogonal` and `isCompl_orthogonal_of_restrict_nondegenerate`
+are essentially taken from Mathlib, with minor modifications to accomodate
+different conditions
+
+`toLin_restrict_ker_eq_inf_orthogonal` is somewhat degenerate assuming
+    `NondegOn B W`
+as both sides are just `0` then.
 -/
+
 
 open Module Submodule
 
@@ -419,8 +434,7 @@ lemma foo (v1 v2 v : V)(hv : v ∈ Submodule.span k {v1, v2}) :
       constructor
       . rintro (h | h)
         . use 0; simp only [foo_fun]; tauto
-        . use 1; simp only [foo_fun]
-          symm; exact h
+        . use 1; simp only [foo_fun]; symm; exact h
       . rintro ⟨y, rfl⟩
         match y with
         | ⟨0, _⟩ => simp[foo_fun]
@@ -519,10 +533,49 @@ def hyp2_decomp_alt (β:BilinForm k V) [FiniteDimensional k V] (balt : Alt β) (
 
 -- finally, we need
 
-theorem hyp_pair_exists_symm (β:BilinForm k V) (bsymm : Symm β) (e:V) (enz : e ≠ 0) (eiso : β e e  = 0)
-  (hnl : ⊤ ≠ Submodule.span k {e}):
-   ∃ f, hyp_pair β e f := by sorry
+-- Sahan: Better name?
+lemma exists_nice_f {B: BilinForm k V} (enz: e ≠ 0)
+  (hn: Nondeg B): ∃f, B e f =1 := by
+    have: ∃ f, B e f ≠ 0 := by
+      contrapose! enz
+      exact hn e enz
+    have ⟨f, hf⟩ := this
+    let a := B e f
+    use a⁻¹ • f
+    calc
+      (B e) (a⁻¹ • f) = a⁻¹ * (B e f) := by simp only [map_smul, smul_eq_mul]
+      _ = a⁻¹ * a := rfl
+      _ = 1 := inv_mul_cancel₀ hf
 
-theorem hyp_pair_exists_alt (β:BilinForm k V) (bsymm : Symm β) (e:V) (enz : e ≠ 0)
-  (hnl : ⊤ ≠ Submodule.span k {e}):
-   ∃ f, hyp_pair β e f := by sorry
+theorem hyp_pair_exists_symm {β:BilinForm k V} (bsymm : Symm β) (hn: Nondeg β) (enz : e ≠ 0)
+   (eiso : β e e  = 0) [CharP k p] (hn2 : p ≠ 2):
+   ∃ f, hyp_pair β e f := by
+    have ⟨v, hv⟩ := exists_nice_f enz hn
+    let c := - 2⁻¹ * β v v
+    let v' := v+c • e
+    use v'
+    constructor
+    . exact eiso
+    constructor
+    . unfold v' c
+      have : β v e = 1 := by
+        rw[bsymm]
+        exact hv
+      have: (2: k) ≠ 0 := by
+        apply Ring.two_ne_zero
+        rw [ ringChar.eq k p ]
+        exact hn2
+      field_simp[*]
+      ring
+    . unfold v' c
+      simp_all
+
+
+theorem hyp_pair_exists_alt {β:BilinForm k V} (balt : Alt β) (hn: Nondeg β) (enz : e ≠ 0) :
+   ∃ f, hyp_pair β e f := by
+  have ⟨v, hv⟩ := exists_nice_f enz hn
+  use v
+  constructor; . exact balt e
+  constructor
+  . exact balt v
+  . exact hv
