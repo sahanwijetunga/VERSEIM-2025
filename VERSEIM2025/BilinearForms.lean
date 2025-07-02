@@ -249,69 +249,48 @@ theorem orthog_inter (β: BilinForm k V) [FiniteDimensional k V] (W: Submodule k
   W ⊓ (β.orthogonal W) = ⊥ := by
   sorry
 
-
-namespace Hidden
-/- Sahan:
-This namespace is purely to prove isCompl_orthogonal_of_restrict_nondegenerate.
-I wanted to avoid access to
-    `finrank_add_finrank_orthogonal`, `toLin_restrict_ker_eq_inf_orthogonal`,
-which are proven in Mathlib using the condtion
-    `LinearMap.IsRefl`
-instead of a nondegeneracy condition.
-- Note: (Hidden) finrank_add_finrank_orthogonal could be useful elsewhere as well.
-
-The proof of `finrank_add_finrank_orthogonal` and `isCompl_orthogonal_of_restrict_nondegenerate`
-are essentially taken from Mathlib, with minor modifications to accomodate
-different conditions
-
-`toLin_restrict_ker_eq_inf_orthogonal` is somewhat degenerate assuming
-    `NondegOn B W`
-as both sides are just `0` then.
--/
-
-
-open Module Submodule
-
-protected lemma toLin_restrict_ker_eq_inf_orthogonal'  {V : Type*} {K : Type*} [Field K]
+-- Sahan: Better name?
+lemma foo_ker_bilin_domRestrict_0 {V : Type*} {K : Type*} [Field K]
    [AddCommGroup V] [Module K V] [FiniteDimensional K V]
   (B : BilinForm K V) (W : Submodule K V) (wnd: NondegOn B W) :
-    (LinearMap.ker (B.domRestrict W)).map W.subtype = (W ⊓ B.orthogonal ⊤ : Submodule K V) := by
-  ext x; constructor
-  . rintro ⟨⟨a, ha⟩, h1,h2⟩
-    simp at h1
-    have h3: (B.restrict W) ⟨a, ha⟩  = 0 := by
-      ext y
-      simp_all
-    have: (⟨a, ha⟩: W) = 0 := by
-      apply wnd
-      rw[h3]
-      simp
-    rw[<- h2, this]
-    exact (Quotient.mk_eq_zero (W ⊓ B.orthogonal ⊤)).mp rfl
-  . rintro ⟨h1, h2⟩
-    have h3: x ∈ B.orthogonal W := by
-      intro y hy
-      show B y x = 0
-      exact h2 y trivial
-    have h4: x ∈ W ⊓ B.orthogonal W := mem_inf.mpr ⟨h1, h3⟩
-    have h5: x=0 := by
-      rw[orthog_inter B W wnd] at h4
-      exact h4
-    rw[h5]
-    exact Submodule.zero_mem (map W.subtype (ker (domRestrict B W)))
+    (LinearMap.ker (B.domRestrict W)).map W.subtype = (⊥: Submodule K V) := by
+  sorry
 
+-- Sahan: Better name?
+lemma foo_rank_ker_bilin_domRestrict_0 {V : Type*} {K : Type*} [Field K]
+   [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+  (B : BilinForm K V) (W : Submodule K V) (wnd: NondegOn B W) :
+    Module.finrank K ((LinearMap.ker (B.domRestrict W)).map W.subtype) = 0 := by
+    sorry
 
-protected lemma finrank_add_finrank_orthogonal'  {V : Type*} {K : Type*} [Field K]
+-- Sahan: Better name?
+lemma foo_inf_orthogonal_top_0{V : Type*} {K : Type*} [Field K]
+ [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+ (B: BilinForm K V) (W : Submodule K V) (wnd : NondegOn B W) :
+ (W ⊓ B.orthogonal ⊤ : Submodule K V)=⊥ := by
+  sorry
+
+-- Sahan: Better name?
+lemma foo_finrank_0{V : Type*} {K : Type*} [Field K]
+ [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+ (B: BilinForm K V) (W : Submodule K V) (wnd : NondegOn B W) :
+ Module.finrank K (W ⊓ B.orthogonal ⊤ : Submodule K V)=(0: ℕ) := by
+    sorry
+
+theorem finrank_orthogonal_add_total  {V : Type*} {K : Type*} [Field K]
  [AddCommGroup V] [Module K V] [FiniteDimensional K V]
  (B: BilinForm K V) (W : Submodule K V) (wnd : NondegOn B W):
-    finrank K W + finrank K (B.orthogonal W) =
-      finrank K V + finrank K (W ⊓ B.orthogonal ⊤ : Submodule K V) := by
-  rw [← Hidden.toLin_restrict_ker_eq_inf_orthogonal' B W wnd]
-  rw[ ←LinearMap.BilinForm.toLin_restrict_range_dualCoannihilator_eq_orthogonal _ _, finrank_map_subtype_eq]
+    Module.finrank K W + Module.finrank K (B.orthogonal W) =
+      Module.finrank K V := by
+
+  rw[<- add_zero (Module.finrank K V)]
+  rw [← foo_rank_ker_bilin_domRestrict_0 B W wnd]
+
+  rw[ ←LinearMap.BilinForm.toLin_restrict_range_dualCoannihilator_eq_orthogonal _ _, Submodule.finrank_map_subtype_eq]
   conv_rhs =>
     rw [← @Subspace.finrank_add_finrank_dualCoannihilator_eq K V _ _ _ _
         (LinearMap.range (B.domRestrict W)),
-      add_comm, ← add_assoc, add_comm (finrank K (LinearMap.ker (B.domRestrict W))),
+      add_comm, ← add_assoc, add_comm (Module.finrank K (LinearMap.ker (B.domRestrict W))),
       LinearMap.finrank_range_add_finrank_ker]
 
 theorem isCompl_orthogonal_of_restrict_nondegenerate  {V : Type*} {K : Type*} [Field K]
@@ -320,22 +299,19 @@ theorem isCompl_orthogonal_of_restrict_nondegenerate  {V : Type*} {K : Type*} [F
     (wnd:NondegOn B W )  : IsCompl W (B.orthogonal W) := by
   have : W ⊓ B.orthogonal W = ⊥ := orthog_inter B W wnd
 
-  refine IsCompl.of_eq this (eq_top_of_finrank_eq <| (finrank_le _).antisymm ?_)
-  conv_rhs => rw [← add_zero (finrank K _)]
-  rw [← finrank_bot K V]
-  rw[← this]
-  rw[finrank_sup_add_finrank_inf_eq]
-  rw[Hidden.finrank_add_finrank_orthogonal' B W wnd]
-  exact le_self_add
-
-end Hidden
+  refine IsCompl.of_eq this (Submodule.eq_top_of_finrank_eq <| (Submodule.finrank_le _).antisymm ?_)
+  conv_rhs =>
+    rw [← add_zero (Module.finrank K _)]
+    rw [← finrank_bot K V]
+    rw[← this]
+    rw[Submodule.finrank_sup_add_finrank_inf_eq]
+    rw[finrank_orthogonal_add_total B W wnd]
 
 def orthog_decomp (β:BilinForm k V)[FiniteDimensional k V] (W:Submodule k V) (wnd : NondegOn β W):
   orthog_direct_sum β W where
-    compl := β.orthogonal W
-    ds := (direct_sum_iff_iscompl _ _).mpr (Hidden.isCompl_orthogonal_of_restrict_nondegenerate β W wnd)
-    orthog := by
-      sorry
+   compl := β.orthogonal W
+   ds := (direct_sum_iff_iscompl _ _).mpr (isCompl_orthogonal_of_restrict_nondegenerate β W wnd)
+   orthog := sorry
 
 
 --------------------------------------------------------------------------------
