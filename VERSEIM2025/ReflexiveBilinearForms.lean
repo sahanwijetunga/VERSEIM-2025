@@ -101,17 +101,55 @@ theorem form_on_radForm'_eq_zero (B: BilinForm k V):
     ext _ ⟨y, hy⟩
     apply hy
 
-def quot_form (B: BilinForm k V) : BilinForm k (V ⧸ (radForm B)) := sorry
+def quot_form {B: BilinForm k V} (hb: B.IsRefl): BilinForm k (V ⧸ (radForm B)) := sorry
 
-theorem reflexive_quotient_radForm_nondegenerate (B: BilinForm k V) (hr: B.IsRefl)
-  [FiniteDimensional k V]: (quot_form B).Nondegenerate := sorry
+theorem reflexive_quotient_radForm_nondegenerate (B: BilinForm k V) (hr: B.IsRefl):
+   (quot_form hr).Nondegenerate := sorry
+
+-- Sahan: Leaving this here so I remember how to do induction :D
+example (B: BilinForm k V) (hr: B.IsRefl)
+  [FiniteDimensional k V] (n: ℕ) (hdim: Module.finrank k V=n) :
+  ∃ (W: Submodule k V), (IsOrthogDirectSum B (radForm B) W ∧ (B.restrict W).Nondegenerate) := by
+    induction' n with n h generalizing V
+    . sorry
+    sorry
 
 -- Sahan: Ideally one would separate out the submodule into a definition,
 -- however the choice is not canonical so it may be more difficult to construct.
-theorem reflexive_sum_radForm_nondegenerate (B: BilinForm k V) (hr: B.IsRefl)
-  [FiniteDimensional k V]:
+-- (Note: any such definition will have to be noncomputable)
+theorem reflexive_sum_radForm_nondegenerate (B: BilinForm k V) (hr: B.IsRefl):
   ∃ (W: Submodule k V), (IsOrthogDirectSum B (radForm B) W ∧ (B.restrict W).Nondegenerate) := by
-    sorry
-
-open FiniteDimensional
-variable {K: Type*} [Field K]
+    have ⟨W, h⟩ := Submodule.exists_isCompl (radForm B)
+    use W
+    constructor
+    . constructor; . exact h
+      intro ⟨a, ha⟩ ⟨b, hb⟩
+      dsimp
+      exact hr b a (hr a b (hr b a (hr a b (ha b))))
+    intro ⟨a, ha⟩ h'
+    suffices a=0 from (Submodule.mk_eq_zero W ha).mpr this
+    dsimp at h'
+    have: W ⊓ radForm B = ⊥ := IsCompl.inf_eq_bot (_root_.id (IsCompl.symm h))
+    show a ∈ (⊥: Submodule k V)
+    rw[<- this]
+    constructor; . exact ha
+    show ∀ b, B a b = 0
+    intro b
+    rw[hr]
+    have: ∃ y ∈ W, ∃ z ∈ (radForm B), y + z = b := by
+      have: W ⊔ (radForm B)= ⊤ := IsCompl.sup_eq_top (_root_.id (IsCompl.symm h))
+      rw[<- Submodule.mem_sup]
+      rw[this]
+      trivial
+    have ⟨y,hy,z,hz,hyz⟩ := this
+    rw[<- hyz]
+    calc
+      (B (y + z)) a = B y a + B z a := by
+        exact BilinForm.add_left y z a
+      _ = 0 + 0 := by
+        have: B z a = 0 := by exact hr a z (hr z a (hr a z (hr z a (hz a))))
+        rw[this]
+        have: B a y = 0 := by
+          rw[h' ⟨y, hy⟩]
+        exact congrFun (congrArg HAdd.hAdd (hr a y this)) 0
+      _ = 0 := by rw[add_zero]
