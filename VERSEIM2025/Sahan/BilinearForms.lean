@@ -44,7 +44,9 @@ lemma skew_of_alt (β:BilinForm k V) (ha : Alt β) :
     β v w + β w v = β w v + β v w + β v v + β w w := by
       rw[ha v, ha w]
       abel
-    _ = β (v+w) (v+w) := by sorry
+    _ = β (v+w) (v+w) := by
+      simp
+      abel
     _ = 0 := ha _
 
 

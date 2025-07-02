@@ -263,20 +263,6 @@ lemma foo_rank_ker_bilin_domRestrict_0 {V : Type*} {K : Type*} [Field K]
     Module.finrank K ((LinearMap.ker (B.domRestrict W)).map W.subtype) = 0 := by
     sorry
 
--- Sahan: Better name?
-lemma foo_inf_orthogonal_top_0{V : Type*} {K : Type*} [Field K]
- [AddCommGroup V] [Module K V] [FiniteDimensional K V]
- (B: BilinForm K V) (W : Submodule K V) (wnd : NondegOn B W) :
- (W ⊓ B.orthogonal ⊤ : Submodule K V)=⊥ := by
-  sorry
-
--- Sahan: Better name?
-lemma foo_finrank_0{V : Type*} {K : Type*} [Field K]
- [AddCommGroup V] [Module K V] [FiniteDimensional K V]
- (B: BilinForm K V) (W : Submodule K V) (wnd : NondegOn B W) :
- Module.finrank K (W ⊓ B.orthogonal ⊤ : Submodule K V)=(0: ℕ) := by
-    sorry
-
 theorem finrank_orthogonal_add_total  {V : Type*} {K : Type*} [Field K]
  [AddCommGroup V] [Module K V] [FiniteDimensional K V]
  (B: BilinForm K V) (W : Submodule K V) (wnd : NondegOn B W):
