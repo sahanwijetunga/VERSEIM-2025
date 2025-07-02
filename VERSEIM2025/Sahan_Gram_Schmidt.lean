@@ -50,7 +50,7 @@ theorem restrict_set_eq {X: Type} {m: ℕ} (f: Fin (m+1) → X) :
       simp
     . rintro ⟨y, rfl⟩
       simp
-      use y
+      use y.castSucc
       simp
 
 
@@ -139,7 +139,7 @@ lemma intermediate_span_contained {V:Type} [AddCommGroup V] [Module ℝ V]
       ↑(Submodule.span ℝ (Set.range (intermediate β b x))) := by
         exact Submodule.subset_span
       exact h' this
-    use y
+    use y.castSucc
     simp
 
 @[simp]
@@ -165,7 +165,7 @@ lemma intermediate_contained {V:Type} [AddCommGroup V] [Module ℝ V]
       . exact proj_contained' β (b i) x (Submodule.span ℝ (Set.range (intermediate β b x))) this
       suffices b i ∈ Set.range (intermediate β b x) from ?_
       . exact Submodule.mem_span.mpr fun p a ↦ a this
-      use i
+      use i.castSucc
       simp
 
 
