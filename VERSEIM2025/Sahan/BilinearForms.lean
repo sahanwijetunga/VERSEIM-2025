@@ -41,12 +41,10 @@ lemma skew_of_alt (β:BilinForm k V) (ha : Alt β) :
   suffices β v w + β w v = 0 from ?_
   . exact Eq.symm (LinearMap.BilinForm.IsAlt.neg_eq ha w v)
   calc
-    β v w + β w v = β v w+ β w v + β v v + β w w := by
+    β v w + β w v = β w v + β v w + β v v + β w w := by
       rw[ha v, ha w]
       abel
-    _ = β (v+w) (v+w) := by
-      simp
-      abel
+    _ = β (v+w) (v+w) := by sorry
     _ = 0 := ha _
 
 

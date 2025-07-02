@@ -218,7 +218,7 @@ theorem orthog_intermediate {V:Type} [AddCommGroup V] [Module ℝ V]
       simp_all
     intro i j h
     rcases Classical.em (i=Fin.last n) with h₁ | h₁
-    . exact case1 i j h   h₁
+    . exact case1 i j h h₁
     rcases Classical.em (j=Fin.last n) with h₂ | h₂
     . rw[hs]
       exact case1 j i h.symm h₂
