@@ -41,7 +41,31 @@ lemma union_span (n m:ℕ) (W₁ W₂ : Submodule k V) (s₁:Fin n →  W₁) (s
       intro h₅
       sorry
 
+lemma union_span' (n m :ℕ) (W₁ W₂ : Submodule k V) (s₁ s₂ : Set V)
+  (h₁:∀ x∈ s₁, s ∈ W₁) (h₂:∀ x∈s₂, s∈ W₂)
+  (hs₁: W₁ = Submodule.span k s₁)
+  (hs₂: W₂ = Submodule.span k s₂)
+  (hw: ⊤ = W₁ ⊔ W₂)
+  : ⊤ = Submodule.span k (s₁ ∪ s₂) := by
+    ext v
+    rw[hw]
+    rw[Submodule.mem_sup]
+    constructor
+    · intro h₃
+      rw[Submodule.span_union]
+      rw[← hs₁]
+      rw[← hs₂]
+      rw[← hw]
+      trivial
+    · intro h₃
+      rw[Submodule.span_union] at h₃
+      rw[← hs₁] at h₃
+      rw[← hs₂] at h₃
+      rw[← Submodule.mem_sup]
+      exact h₃
 
+
+#check Submodule.mem_sup
     --intro X h₄
     --simp at h₄
     -- rw[Submodule.span_union
