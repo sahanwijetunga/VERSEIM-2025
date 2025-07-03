@@ -1,53 +1,98 @@
-
 --------------------------------------------------------------------------------
 /-
-Copyright (c) 2025 Clea Bergsman, Katherine Buesing, George McNinch, Sahan Wijetunga. All rights reserved.
-
+Copyright (c) 2025 George McNinch. All rights reserved.
 Released under the Apache 2.0 license as described in the file LICENSE.
-
-VERSEIM-2025 REU VERSEIM-2025 REU @ Tufts University
+Authors: Clea Bergsman, Katherine Buesing, George McNinch, Sahan Wijetunga
 -/
 
+/- VERSEIM-2025 REU -/
+
 import Mathlib.Tactic
-import VERSEIM2025.BilinearForms
 
--- the next lemma says that for a vector space over a field k of
--- characteristic different from 2, for v in V the equation `2v=0`
--- implies that `v=0`.
+-- recall we introduced the disjoint union
 
---------------------------------------------------------------------------------
+inductive DisjointUnion (ι₁ ι₂ : Type) where
+ | left : ι₁ → DisjointUnion ι₁ ι₂
+ | right : ι₂ → DisjointUnion ι₁ ι₂
 
-inductive DisjointUnion (ι κ : Type) where
- | left : ι → DisjointUnion ι κ
- | right : κ → DisjointUnion ι κ
-
-def disjointUnion_funs {ι κ X: Type} ( f₁:ι → X) (f₂:κ → X) (u:DisjointUnion ι κ) : X :=
+def disjointUnion_funs {ι₁ ι₂ X: Type} ( f₁:ι₁ → X) (f₂:ι₂ → X) (u: ι₁ ⊕ ι₂) : X :=
    match u with
-    | DisjointUnion.left x => f₁ x
-    | DisjointUnion.right y => f₂ y
+    | Sum.inl x => f₁ x
+    | Sum.inr y => f₂ y
 
+
+-- here are some statements about disjoint_union that should be established
+
+-- first establish an equivalence of types between the disjoint union
+-- of `Fin n` and `Fin m` with the type `Fin (n+m)`
+
+-- We define the `toFun` of our equivalence as follows:
+
+-- terms of the form `left x` where `(x:Fin n)` is sent to `(x:Fin (n + m))`
+
+-- and terms of the form `right x` where `(x:Fin m)` is sent to
+-- `(x + n : Fin(n+m))`
+
+-- the summation is accomplished via `Fin.castAdd`
+
+#check Fin.castAdd
+
+-- ** exercise ** you'll need to define the remaining components of
+-- the structure determining the equivalence.
+
+open DisjointUnion in
+def invFun (n m :ℕ) : Fin (n+m) → DisjointUnion (Fin n) (Fin m) := by
+  rintro ⟨i,_⟩  -- here (i:ℕ) is the underlying Nat of the Fin (n+m) argument
+  if i < n then
+     have : NeZero n := NeZero.mk (by linarith)
+     exact left (Fin.ofNat n i)
+  else
+     have : NeZero m := NeZero.mk (by linarith)
+     exact right (Fin.ofNat m (n-i))
 
 open DisjointUnion
-def fin_disjoint_fin_equiv_fin (n m: ℕ) : DisjointUnion (Fin n) (Fin m) ≃ Fin (n+m) where
+
+def fin_disjoint_fin_equiv_fin (n m: ℕ) : (Fin n) ⊕ (Fin m) ≃ Fin (n+m) where
   toFun := fun i =>
     match i with
-    | left x => Fin.castAdd m x
-    | right x => by
+    | Sum.inl x => Fin.castAdd m x
+    | Sum.inr x => by
         rw [ add_comm ]
         exact Fin.castAdd n x
   invFun := by
-    rintro ⟨i,_⟩
-    if h : i < n then
-       have : NeZero n := NeZero.mk (by linarith)
-       exact left (Fin.ofNat n i)
+    rintro ⟨i,_⟩  -- here (i:ℕ) is the underlying Nat of the Fin (n+m) argument
+    if i < n then
+      have : NeZero n := NeZero.mk (by linarith)
+      exact Sum.inl (Fin.ofNat n i)
     else
-       have : NeZero m := NeZero.mk (by linarith)
-       exact right (Fin.ofNat m (n-i))
-  left_inv := by sorry
-  right_inv := by sorry
+      have : NeZero m := NeZero.mk (by linarith)
+      exact Sum.inr (Fin.ofNat m (n-i))
+  left_inv := by
+    intro x₀
+    match x₀ with
+    | Sum.inl y => simp
+    | Sum.inr z =>
+      simp
+      sorry
+  right_inv := by
+    intro ⟨ x₀, h₁⟩
+    simp
+    sorry
 
 
+#check Fin.castAdd
+#check Fin.toNat
 --------------------------------------------------------------------------------
+
+-- this result is perhaps what should be proved first before proving
+-- the result I earlier described as `lin_indep_of_orthog`.
+
+
+lemma disjoint_union_sum (I₁ I₂ : Type) [Fintype I₁] [Fintype I₂]
+(k V : Type) [Field k] [AddCommGroup V] [Module k V]
+(a : I₁ ⊕ I₂ → V) : ∑ i : I₁ ⊕ I₂, a i = ∑ j : I₁, a (Sum.inl j) + ∑ k : I₂, a (Sum.inr k) := by
+  exact Fintype.sum_sum_type a
+
 
 theorem lin_indep_by_transverse_subspaces
    (k V : Type) [Field k] [AddCommGroup V] [Module k V] (I₁ I₂ : Type)
@@ -138,31 +183,7 @@ theorem lin_indep_by_transverse_subspaces
     · simp
     · simp
 
-
-
---------------------------------------------------------------------------------
-
-variable { k V : Type } [AddCommGroup V] [Field k] [Module k V]
-
-def f {n m:ℕ} {W₁ W₂ : Submodule k V} (s₁:Fin n →  W₁) (s₂: Fin m → W₂) :
-  (Fin n) ⊕ (Fin m) → V := by
-    intro i
-    match i with
-     | Sum.inl x => exact ↑(s₁ x)
-     | Sum.inr y => exact ↑(s₂ y)
-
-lemma union_span (n m:ℕ) (W₁ W₂ : Submodule k V) (s₁:Fin n →  W₁) (s₂: Fin m → W₂)
-      (h₁:(⊤:Submodule k W₁) = Submodule.span k (s₁ '' ⊤))
-      (h₂:(⊤:Submodule k W₂) = Submodule.span k (s₂ '' ⊤))
-      (h₃:⊤ = W₁ ⊔ W₂)
-    : (⊤:Submodule k V) = Submodule.span k ((f s₁ s₂) '' ⊤)  := by sorry
-
-
-
-
-lemma union_span' (n m :ℕ) (W₁ W₂ : Submodule k V) (s₁ s₂ : Set V)
-  (h₁:∀ x∈ s₁, s ∈ W₁) (h₂:∀ x∈s₂, s∈ W₂)
-  (hs₁: W₁ = Submodule.span k s₁)
-  (hs₂: W₂ = Submodule.span k s₂)
-  (hw: ⊤ = W₁ ⊔ W₂)
-  : ⊤ = Submodule.span k (s₁ ∪ s₂) := by  sorry
+    -- a is coefficients, b1 (x) is the vectors, b2 (x) is the other vectors
+    -- step zero: make a hypothesis that b1a1 = -b2a2 and then show =>
+    -- step one: show its in the intersection
+    -- step two: the intersection is zero.
