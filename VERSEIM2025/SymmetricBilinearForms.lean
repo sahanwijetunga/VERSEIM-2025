@@ -17,12 +17,13 @@ import VERSEIM2025.Sahan.BilinearForms
 
 variable {k V: Type*} [AddCommGroup V][Field k][Module k V]
 
-open LinearMap
 open LinearMap (BilinForm)
+open LinearMap.BilinForm
+open BilinearForms -- This is the namespace in VERSEIM2025.Sahan.BilinearForms
 
 -- Main result: symmetric bilinear form has orthogonal basis, from Mathlib
 example {V : Type u} {K : Type v}
    [Field K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
    [hK : Invertible (2: K)] {B : LinearMap.BilinForm K V} (hB₂ : IsSymm B) :
-    ∃ (v : Basis (Fin (Module.finrank K V)) K V), IsOrthoᵢ B ⇑v := by
+    ∃ (v : Basis (Fin (Module.finrank K V)) K V), LinearMap.IsOrthoᵢ B ⇑v := by
       exact LinearMap.BilinForm.exists_orthogonal_basis hB₂

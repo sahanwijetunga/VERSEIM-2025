@@ -12,7 +12,7 @@ import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
 import VERSEIM2025.Sahan.BilinearForms
 
 /- Sahan: Most major results we are proving do not require reflexivity
-    (or require stronger assumptions like symmetric or alternating),
+    or require stronger assumptions like symmetric or alternating,
     however we collect some results which hold in this specific case.
 
     Mathlib holds many results for bilinear forms under the assumption
@@ -21,16 +21,20 @@ import VERSEIM2025.Sahan.BilinearForms
     Major results
     - A reflexive bilinear form can be written as a direct sum of 0
       and a nondegenerate bilinear form
-      - `reflexive_sum_radForm_nondegenerate`
+      - `reflexive_sum_radForm_nondegenerate` (and `form_on_radForm_eq_zero`)
     - The quotient of a reflexive bilinear form by its radical is nondegenerate
-      - `reflexive_quotient_radForm_nondegenerate`
+      - `reflexive_quotient_radForm_nondegenerate` **Unproven**
+
+    TODO: Clean up definitions (radForm/radForm' excessive amount of theorems?)
+
+    TODO (LATER): Switch out VERSEIM2025.Sahan.BilinearForms for VERSEIM2025.BilinearForms
 -/
 
+open BilinearForms -- This is the namespace in VERSEIM2025.Sahan.BilinearForms
+open LinearMap.BilinForm
+open LinearMap (BilinForm)
 
 variable {k V: Type*} [AddCommGroup V][Field k][Module k V]
-
-open LinearMap
-open LinearMap (BilinForm)
 
 def radForm (B: BilinForm k V) : Submodule k V where
   carrier := {v | ∀ w, B v w = 0}
@@ -86,11 +90,6 @@ theorem radForm'_eq_radForm (B: BilinForm k V) (hr: B.IsRefl) :
   rw[radForm'_eq_flip_orthogonal_top _ hr, radForm_eq_flip_orthogonal_top]
 
 
-/-- States that V is the direct sum of W and its orthogonal complement (w.r.t B)-/
-structure IsOrthogDirectSum (B: BilinForm k V) (W₁ W₂: Submodule k V) where
-  IsCompl : IsCompl W₁ W₂
-  IsOrthog : OrthogSubspaces B W₁ W₂
-
 theorem form_on_radForm_eq_zero (B: BilinForm k V):
   B.restrict (radForm B) = 0 := by
     ext ⟨x, hx⟩ _
@@ -101,31 +100,19 @@ theorem form_on_radForm'_eq_zero (B: BilinForm k V):
     ext _ ⟨y, hy⟩
     apply hy
 
-def quot_form {B: BilinForm k V} (hb: B.IsRefl): BilinForm k (V ⧸ (radForm B)) := sorry
-
-theorem reflexive_quotient_radForm_nondegenerate (B: BilinForm k V) (hr: B.IsRefl):
-   (quot_form hr).Nondegenerate := sorry
-
--- Sahan: Leaving this here so I remember how to do induction :D
-example (B: BilinForm k V) (hr: B.IsRefl)
-  [FiniteDimensional k V] (n: ℕ) (hdim: Module.finrank k V=n) :
-  ∃ (W: Submodule k V), (IsOrthogDirectSum B (radForm B) W ∧ (B.restrict W).Nondegenerate) := by
-    induction' n with n h generalizing V
-    . sorry
-    sorry
-
 -- Sahan: Ideally one would separate out the submodule into a definition,
 -- however the choice is not canonical so it may be more difficult to construct.
 -- (Note: any such definition will have to be noncomputable)
 theorem reflexive_sum_radForm_nondegenerate (B: BilinForm k V) (hr: B.IsRefl):
-  ∃ (W: Submodule k V), (IsOrthogDirectSum B (radForm B) W ∧ (B.restrict W).Nondegenerate) := by
+  ∃ (W: Submodule k V), (is_orthog_direct_sum B (radForm B) W ∧ (B.restrict W).Nondegenerate) := by
     have ⟨W, h⟩ := Submodule.exists_isCompl (radForm B)
     use W
     constructor
-    . constructor; . exact h
-      intro ⟨a, ha⟩ ⟨b, hb⟩
-      dsimp
-      exact hr b a (hr a b (hr b a (hr a b (ha b))))
+    . constructor
+      . apply (direct_sum_iff_iscompl _ _).mpr h
+      . rintro ⟨a,ha⟩ ⟨b,hb⟩
+        dsimp
+        exact hr b a (hr a b (hr b a (hr a b (ha b))))
     intro ⟨a, ha⟩ h'
     suffices a=0 from (Submodule.mk_eq_zero W ha).mpr this
     dsimp at h'
@@ -153,3 +140,9 @@ theorem reflexive_sum_radForm_nondegenerate (B: BilinForm k V) (hr: B.IsRefl):
           rw[h' ⟨y, hy⟩]
         exact congrFun (congrArg HAdd.hAdd (hr a y this)) 0
       _ = 0 := by rw[add_zero]
+
+
+def quot_form {B: BilinForm k V} (hb: B.IsRefl): BilinForm k (V ⧸ (radForm B)) := sorry
+
+theorem reflexive_quotient_radForm_nondegenerate (B: BilinForm k V) (hr: B.IsRefl):
+   (quot_form hr).Nondegenerate := sorry
