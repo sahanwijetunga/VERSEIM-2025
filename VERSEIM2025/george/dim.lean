@@ -25,3 +25,10 @@ lemma union_span (n m:ℕ) (W₁ W₂ : Submodule k V) (s₁:Fin n →  W₁) (s
     : (⊤:Submodule k V) = Submodule.span k ((f s₁ s₂) '' ⊤)  := by sorry
 
 
+
+lemma union_span' (n m :ℕ) (W₁ W₂ : Submodule k V) (s₁ s₂ : Set V)
+  (h₁:∀ x∈ s₁, s ∈ W₁) (h₂:∀ x∈s₂, s∈ W₂)
+  (hs₁: W₁ = Submodule.span k s₁)
+  (hs₂: W₂ = Submodule.span k s₂)
+  (hw: ⊤ = W₁ ⊔ W₂)
+  : ⊤ = Submodule.span k (s₁ ∪ s₂) := by  sorry
