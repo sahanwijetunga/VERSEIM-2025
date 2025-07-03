@@ -24,13 +24,16 @@ import VERSEIM2025.Sahan.BilinearForms
       as all statements about hyperbolic forms were removed from there.
     - We should probably make the files correspond and change the import to
       VERSEIM2025.BilinearForms at some point.
+
+  TODO: **Define Hyperbolic Space** (and prove an equivalence between
+    inductive and non-inductive version)
 -/
 
 variable {k V: Type*} [AddCommGroup V][Field k][Module k V]
 
 open LinearMap (BilinForm)
 open LinearMap.BilinForm
-open BilinearForms -- This is due to VERSEIM2025.Sahan.BilinearForms
+open BilinearForms -- This is the namespace in VERSEIM2025.Sahan.BilinearForms
 
 def hyp_pair (β:BilinForm k V) (e f : V) : Prop :=
   β e e = 0  ∧  β f f = 0  ∧  β e f = 1
@@ -147,17 +150,17 @@ theorem hyp2_nondeg_alt (β:BilinForm k V)
 
 -- using `orthog_decomp` from BilinearForms, we get
 
-def hyp2_decomp_symm (β:BilinForm k V) [FiniteDimensional k V] (bsymm : Symm β) (e f : V) (h2:hyp_pair β e f)
+def hyp2_decomp_symm (β:BilinForm k V) [FiniteDimensional k V] (bsymm : IsSymm β) (e f : V) (h2:hyp_pair β e f)
   : orthog_direct_sum β (hypsubspace_two β h2) :=
   orthog_decomp β (hypsubspace_two β h2) (hyp2_nondeg_symm  β bsymm h2)
 
-def hyp2_decomp_alt (β:BilinForm k V) [FiniteDimensional k V] (balt : Alt β) (e f : V) (h2:hyp_pair β e f)
+def hyp2_decomp_alt (β:BilinForm k V) [FiniteDimensional k V] (balt : IsAlt β) (e f : V) (h2:hyp_pair β e f)
   : orthog_direct_sum β (hypsubspace_two β h2) :=
   orthog_decomp β (hypsubspace_two β h2) (hyp2_nondeg_alt  β balt h2)
 
 
 lemma exists_bilin_one {B: BilinForm k V} (enz: e ≠ 0)
-  (hn: Nondeg B): ∃f, B e f =1 := by
+  (hn: Nondegenerate B): ∃f, B e f =1 := by
     have: ∃ f, B e f ≠ 0 := by
       contrapose! enz
       exact hn e enz
@@ -170,7 +173,7 @@ lemma exists_bilin_one {B: BilinForm k V} (enz: e ≠ 0)
       _ = 1 := inv_mul_cancel₀ hf
 
 
-theorem hyp_pair_exists_symm {β:BilinForm k V} (bsymm : Symm β) (hn: Nondeg β) (enz : e ≠ 0)
+theorem hyp_pair_exists_symm {β:BilinForm k V} (bsymm : IsSymm β) (hn: Nondegenerate β) (enz : e ≠ 0)
   (eiso : β e e  = 0) [CharP k p] (hn2 : p ≠ 2):
   ∃ f, hyp_pair β e f := by
     have ⟨v, hv⟩ := exists_bilin_one enz hn
@@ -182,7 +185,7 @@ theorem hyp_pair_exists_symm {β:BilinForm k V} (bsymm : Symm β) (hn: Nondeg β
     constructor
     . unfold v' c
       have : β v e = 1 := by
-        rw[bsymm]
+        rw[<- bsymm]
         exact hv
       have: (2: k) ≠ 0 := by
         apply Ring.two_ne_zero
@@ -194,7 +197,7 @@ theorem hyp_pair_exists_symm {β:BilinForm k V} (bsymm : Symm β) (hn: Nondeg β
       simp_all
 
 
-theorem hyp_pair_exists_alt {β:BilinForm k V} (balt : Alt β) (hn: Nondeg β) (enz : e ≠ 0) :
+theorem hyp_pair_exists_alt {β:BilinForm k V} (balt : IsAlt β) (hn: Nondegenerate β) (enz : e ≠ 0) :
   ∃ f, hyp_pair β e f := by
     have ⟨v, hv⟩ := exists_bilin_one enz hn
     use v
