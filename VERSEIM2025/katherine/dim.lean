@@ -35,9 +35,11 @@ lemma union_span (n m:ℕ) (W₁ W₂ : Submodule k V) (s₁:Fin n →  W₁) (s
     constructor
     · intro h₅ --x₀-- h₆
       unfold f
-
+      simp
       sorry
-    · sorry
+    · simp
+      intro h₅
+      sorry
 
 
     --intro X h₄

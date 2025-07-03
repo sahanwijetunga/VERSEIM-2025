@@ -21,10 +21,10 @@ inductive DisjointUnion (ι κ : Type) where
  | left : ι → DisjointUnion ι κ
  | right : κ → DisjointUnion ι κ
 
-def disjointUnion_funs {ι κ X: Type} ( f₁:ι → X) (f₂:κ → X) (u:DisjointUnion ι κ) : X :=
+def disjointUnion_funs {ι κ X: Type} ( f₁:ι → X) (f₂:κ → X) (u: ι ⊕ κ) : X :=
    match u with
-    | DisjointUnion.left x => f₁ x
-    | DisjointUnion.right y => f₂ y
+    | Sum.inl x => f₁ x
+    | Sum.inr y => f₂ y
 
 
 open DisjointUnion
