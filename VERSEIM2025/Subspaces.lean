@@ -17,32 +17,27 @@ import VERSEIM2025.BilinearForms
 
 --------------------------------------------------------------------------------
 
-inductive DisjointUnion (ι κ : Type) where
- | left : ι → DisjointUnion ι κ
- | right : κ → DisjointUnion ι κ
-
-def disjointUnion_funs {ι κ X: Type} ( f₁:ι → X) (f₂:κ → X) (u: ι ⊕ κ) : X :=
+def disjointUnion_funs {ι κ X: Type} ( f₁:ι → X) (f₂:κ → X) (u:ι ⊕ κ) : X :=
    match u with
     | Sum.inl x => f₁ x
     | Sum.inr y => f₂ y
 
 
-open DisjointUnion
-def fin_disjoint_fin_equiv_fin (n m: ℕ) : DisjointUnion (Fin n) (Fin m) ≃ Fin (n+m) where
+def fin_disjoint_fin_equiv_fin (n m: ℕ) : (Fin n) ⊕ (Fin m) ≃ Fin (n+m) where
   toFun := fun i =>
     match i with
-    | left x => Fin.castAdd m x
-    | right x => by
+    | Sum.inl x => Fin.castAdd m x
+    | Sum.inr x => by
         rw [ add_comm ]
         exact Fin.castAdd n x
   invFun := by
     rintro ⟨i,_⟩
     if h : i < n then
        have : NeZero n := NeZero.mk (by linarith)
-       exact left (Fin.ofNat n i)
+       exact Sum.inl (Fin.ofNat n i)
     else
        have : NeZero m := NeZero.mk (by linarith)
-       exact right (Fin.ofNat m (n-i))
+       exact Sum.inr (Fin.ofNat m (n-i))
   left_inv := by sorry
   right_inv := by sorry
 
