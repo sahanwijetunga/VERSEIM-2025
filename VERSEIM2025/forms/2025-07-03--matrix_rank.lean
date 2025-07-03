@@ -10,18 +10,18 @@ noncomputable section
 variable { k : Type } [Field k]
 
 -- let's introduce the "standard" k  vector space
---abbrev stdVS (k:Type) [Field k] (n:ℕ) : Type := (Fin n →₀ k)
-abbrev stdVS  (k:Type) [Field k] (n:ℕ) : Type := (Fin n →₀ k)
 
--- we use `abbrev` so that Lean automatically unfolds the definition
--- -- this really is justan abbreviation to avoid typing the pesky
--- arrow →₀
+abbrev stdVS  (k:Type) [Field k] (n:ℕ) : Type := (Fin n → k)
+
+-- we use `abbrev` so that Lean is (more likely to) automatically
+-- unfolds the definition -- this really is mainly an abbreviation to
+-- avoid typing the pesky arrow `→₀`
 
 example (n:ℕ) : Module k (stdVS k n) := inferInstance
 
 -- let's write `sbv n` for the standard basis of `stdVS k n`.
   
-abbrev sbv (n:ℕ) : Basis (Fin n) k (stdVS k n) := Finsupp.basisSingleOne 
+abbrev sbv (n:ℕ) : Basis (Fin n) k (stdVS k n) := Pi.basisFun k (Fin n)
 
 -- given an m × n matrix M, and using the standard bases, we get a
 -- corresponding linear transformation
@@ -36,19 +36,20 @@ def map_of_matrix {m n :ℕ} (M:Matrix (Fin m) (Fin n) k) : stdVS k n →ₗ[k] 
 
 -- and the nullity of M is just the dimension of this null space
 
+-- we *could* treat it as a natural number (ℕ), but some results we
+-- seem to need are stated in terms of the type `Cardinal`, so we'll
+-- use that.
+
 def Nullity (M:Matrix (Fin m) (Fin n) k) : Cardinal :=
   Module.rank k null_space
   where
     null_space : Submodule k (stdVS k n) := LinearMap.ker (map_of_matrix M)
 
--- and the rank of the matrix is precisely the dimension of the image
--- of this linear transformation
+-- The rank of the matrix is precisely the dimension of the image of
+-- the corresponding linear transformation. (This is the "column
+-- space" -- i.e. the span of the columns of M, viewed as vectors in
+-- `stdVS k m`.
 
--- in fact, Lean defines the rank of a linear transformation to be the
--- dimension of its image
-
--- but `LinearMap.rank` considers the rank to be a `Cardinal`
--- (possibly infinite). In our case, we just expect a natural number.
 
 def Rank (M:Matrix (Fin m) (Fin n) k) : Cardinal := 
   Module.rank k image
@@ -57,15 +58,8 @@ def Rank (M:Matrix (Fin m) (Fin n) k) : Cardinal :=
     image : Submodule k (stdVS k m) := LinearMap.range linmap
 
 
--- on the other hand, `Module,finrank_eq_rank` shows the two notions
--- coincide for finite dimensional vector spaces. So the above notion
--- should coincide with the rank defined by Mathlinb:
-
-example (M:Matrix (Fin m) (Fin n) k) : Cardinal := 
-   LinearMap.rank linmap
-   where
-    linmap : stdVS k n →ₗ[k] stdVS k m := map_of_matrix M
-
+-- this is actually already implemented in Mathlib, as `LinearMap.rank`,
+-- and it coincides with the definition we just gave.
 
 example (M:Matrix (Fin m) (Fin n) k) : 
    Rank M  = LinearMap.rank (map_of_matrix M) := by 
@@ -74,7 +68,6 @@ example (M:Matrix (Fin m) (Fin n) k) :
    unfold Rank.linmap
    unfold LinearMap.rank
    rfl
---   apply Module.finrank_eq_rank
 
 -- --------------------------------------------------------------------------------
 -- 
@@ -99,6 +92,11 @@ example (M:Matrix (Fin m) (Fin n) k) :
 
 -- This amounts to the rank-nullity theorem!
 
+example (l:ℕ) : Module.rank k (Fin l → k) = l := by exact rank_fin_fun l 
+
+-- in the next proof, the real work is done by
+-- `LinearMap.rank_range_add_rank_ker`
+
 theorem rank_nullity (M:Matrix (Fin m) (Fin n) k) : 
   Rank M + Nullity M = n := by
   unfold Rank
@@ -106,16 +104,36 @@ theorem rank_nullity (M:Matrix (Fin m) (Fin n) k) :
   unfold Rank.linmap
   unfold Nullity
   unfold Nullity.null_space
-  have : LinearMap.range (map_of_matrix M) ≃ (stdVS k n) ⧸ LinearMap.ker (map_of_matrix M) := by
-   apply (LinearMap.quotKerEquivRange (map_of_matrix M)).symm 
+  rw [ LinearMap.rank_range_add_rank_ker (map_of_matrix M) ]
+  exact rank_fin_fun n
 
-#check (LinearMap.quotKerEquivRange ?_).symm 
-
-open LinearMap
+-- in the next proof, we use the quotient construction on vector
+-- spaces and instead use `LinearMap.rank_range_add_rank_ker`
 
 theorem quotient_dim  ( V : Type )
   [ AddCommGroup V] [ Module k V] 
   (W : Submodule k V) [FiniteDimensional k V]
   : Module.rank k (V ⧸ W) + Module.rank k W = Module.rank k V  := by 
   apply Submodule.rank_quotient_add_rank
+
+
+theorem rank_nullity' (M:Matrix (Fin m) (Fin n) k) : 
+  Rank M + Nullity M = n := by
+  unfold Rank
+  unfold Rank.image
+  unfold Rank.linmap
+  unfold Nullity
+  unfold Nullity.null_space
+  have linear_equiv : LinearMap.range (map_of_matrix M) ≃ₗ[k] (stdVS k n) ⧸ LinearMap.ker (map_of_matrix M) := 
+    (LinearMap.quotKerEquivRange (map_of_matrix M)).symm  
+  have dim_eq : Module.rank k ↥(LinearMap.range (map_of_matrix M)) = 
+                Module.rank k (stdVS k n ⧸ LinearMap.ker (map_of_matrix M)) := 
+   LinearEquiv.rank_eq linear_equiv
+  rw [ LinearMap.rank_range_add_rank_ker (map_of_matrix M) ]
+  exact rank_fin_fun n
+
+
+
+
+
 
