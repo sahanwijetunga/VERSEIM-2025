@@ -8,6 +8,10 @@ VERSEIM-2025 REU @ Tufts University
 -/
 
 import Mathlib.Tactic
+import Mathlib.Data.Matrix.Rank
+
+open LinearMap (BilinForm)
+open LinearMap
 
 
 variable { k V : Type } [Field k] [ AddCommGroup V ]  [Module k V]
@@ -94,7 +98,7 @@ lemma zero_of_two_mul_eq_zero  { k : Type } [ Field k]
   exact two_mul_ne_zero h
 
 lemma alt_iff_skew (β:V →ₗ[k] V →ₗ[k] k)
-   [CharP k p] (hn2 : p ≠ 2)
+   [CharZero k]
    : Alt β ↔ Skew β := by
    constructor
    intro ha
@@ -136,3 +140,136 @@ def OrthogSets  (β:V →ₗ[k] V →ₗ[k] k) (s₁ s₂ : Set V) : Prop :=
 
 lemma orthog_sets_iff_orthog_subspaces (β:V →ₗ[k] V →ₗ[k] k) (s₁ s₂ : Set V) :
   OrthogSets β s₁ s₂ ↔ OrthogSubspaces β (Submodule.span k s₁) (Submodule.span k s₂) := by sorry
+
+-- ===============
+-- Reflexive forms
+-- ===============
+
+-- Mathlib has a predicate for reflexive forms -- namely
+-- `LinearMap.IsRefl`. So it might be useful if we record that our
+-- alternating and symmetric forms are reflexive.
+
+#check LinearMap.IsRefl
+
+lemma skew_is_reflexive (β:BilinForm k V) (h:Skew β) : IsRefl β := by
+  intro v w l
+  rw [h]
+  simp
+  assumption
+
+lemma alt_is_reflexive (β:BilinForm k V) (h:Alt β) : IsRefl β := by
+  intro v w l
+  have hv : β v v = 0 := by apply h
+  have hw : β w w = 0 := by apply h
+  have h1 : β (v+w) (v+w) = (β v) v + (β w) v + (β v) w + (β w) w :=
+    calc
+    (β (v+w)) (v+w) = (β v) (v+w) + (β w) (v+w) := by rw [LinearMap.BilinForm.add_left]
+    _ = (β v) v + (β w) v + (β v) w + (β w) w := by
+      rw [LinearMap.BilinForm.add_right v v w, LinearMap.BilinForm.add_right w v w, ← add_assoc]; ring
+  have hvw : β (v+w) (v+w) = 0 := by apply h
+  rw [hv, hw, hvw, zero_add, add_zero, add_comm] at h1
+  have h2: 0 + -(β w) v = (β v) w + (β w) v + -(β w) v := by
+    apply (@add_right_cancel_iff _ _ _ (-(β w) v) 0 ((β v) w + (β w) v)).mpr h1
+  rw [l, zero_add] at h1
+  symm at h1
+  exact h1
+
+lemma symm_is_reflexive (β:BilinForm k V) (h:Symm β) : IsRefl β := by
+  intro v w l
+  have h1: (β v) w = (β w) v := by apply h
+  rw [l] at h1
+  symm at h1
+  exact h1
+
+--------------------------------------------------------------------------------
+-- non-degenerate forms
+-- ====================
+
+open LinearMap
+open LinearMap (BilinForm)
+
+
+def Nondeg (β : BilinForm k V) : Prop :=
+  ∀ v:V, (∀ w:V, β v w = 0) → v = 0
+
+def NondegOn
+  (β : BilinForm k V) (W : Subspace k V) : Prop :=
+  Nondeg (BilinForm.restrict β W)
+
+
+theorem nondeg_conditions (β : BilinForm k V) [FiniteDimensional k V] (n : ℕ ) (h: Module.finrank V = n)
+  (b : Basis (Fin n) k V):
+    (Nondeg β)
+  ↔ (∀ w:V, (∀ v:V, β v w = 0) → w = 0) := by
+  constructor
+  intro v w h1
+  let M : Matrix (Fin n) (Fin n) k :=
+    BilinForm.toMatrix b β
+  sorry
+
+theorem nondeg_rank (β : BilinForm k V) [FiniteDimensional k V] (n : ℕ ) (h: Module.finrank V = n)
+  (b : Basis (Fin n) k V): (Nondeg β) ↔ Matrix.rank (BilinForm.toMatrix b β ) = n := by
+  constructor
+  intro hn
+  sorry
+
+
+
+#check BilinForm.toMatrix
+#check Matrix.rank
+
+theorem nondeg_via_basis (β: BilinForm k V) [FiniteDimensional k V] :
+    (Nondeg β)
+  ↔ (∃ (b:Basis ι k V), (BilinForm.toMatrix b β).det ≠ 0) := by sorry
+
+
+--------------------------------------------------------------------------------
+-- direct sums and orthogonal complements
+-- ======================================
+
+
+structure internal_direct_sum (W₁ W₂ : Submodule k V)  where
+  zero : W₁ ⊓ W₂ = ⊥
+  span : W₁ ⊔ W₂ = ⊤
+
+
+-- Sahan pointed out that this is the same predicate as `IsCompl`
+-- which is defined for bounded a bounded lattice `α`.
+
+-- So we should prove that the notions are the same, so we'll be able
+--  use results about `IsCompl`.
+
+lemma direct_sum_iff_iscompl (W₁ W₂ : Submodule k V) :
+    internal_direct_sum W₁ W₂
+  ↔ IsCompl W₁ W₂ := by sorry
+
+structure orthog_direct_sum (β:BilinForm k V) (W : Submodule k V) where
+  compl : Submodule k V
+  ds : internal_direct_sum W compl
+  orthog : ∀ v₁ ∈ W, ∀ v₂ ∈ compl, β v₁ v₂ = 0
+
+def OrthogCompl {k V:Type} [AddCommGroup V] [Field k] [Module k V] (S : Set V)
+    (β:BilinForm k V)
+    : Subspace k V where
+  carrier := { v | ∀ (x:S), β x v = 0 }
+  add_mem' := by
+    intro a b ha hb
+    intro s
+    simp_all only [Subtype.forall, Set.mem_setOf_eq, map_add, add_apply, Subtype.coe_prop, add_zero]
+  zero_mem' := by
+    intro s
+    simp
+  smul_mem' := by
+    intro c a ha
+    simp_all only [Subtype.forall, Set.mem_setOf_eq, map_smul, smul_apply, smul_eq_mul, mul_zero,
+      implies_true]
+
+-- Sahan: Do we need some finite dimensional requirement?
+def orthog_decomp (β:BilinForm k V) (W:Submodule k V) (wnd : NondegOn β W):
+  orthog_direct_sum β W where
+   compl := OrthogCompl W β
+   ds :=
+     { span := by sorry
+     , zero := by sorry
+     }
+   orthog := by sorry
