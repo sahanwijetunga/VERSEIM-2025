@@ -27,7 +27,15 @@ import VERSEIM2025.Sahan.BilinearForms
 
   TODO: **Define Hyperbolic Space** (and prove an equivalence between
     inductive and non-inductive version)
+    - Basis definition (e₁, ..., eₙ, f₁, ..., fₙ )
+      - Basis → Inductive: If W₁ and W₂ are hyperbolic and
+          is_orthog_direct_sum β W₁ W₂
+        then V is also hybolic
+      - Inductive → Basis: If V is hyperbolic then it can be constructed a direct sum
+          of 2-dimensional hyperbolic spaces.
 -/
+
+namespace Hyperbolic
 
 variable {k V: Type*} [AddCommGroup V][Field k][Module k V]
 
@@ -35,10 +43,28 @@ open LinearMap (BilinForm)
 open LinearMap.BilinForm
 open BilinearForms -- This is the namespace in VERSEIM2025.Sahan.BilinearForms
 
+abbrev isotropic (B: BilinForm k V) (e: V) := B e e = 0
+
+-- left for e, right for f
+structure hypspace_basis_pred (B: BilinForm k V) (b: Basis (Fin n ⊕ Fin n) k V) where
+  isotropic_left : ∀ i, isotropic B (b (Sum.inl i)) -- B eᵢ eᵢ = 0 ∀ i
+  isotropic_right : ∀ i, isotropic B (b (Sum.inr i)) -- B fᵢ fᵢ = 0 ∀ i
+  orthog1: ∀ i, ∀ j, (i ≠ j) → B (b (Sum.inl i)) (b (Sum.inr j)) = 0 -- B eᵢ fⱼ = 0 for i ≠ j
+  orthog2: ∀ i, ∀ j, (i ≠ j) → B (b (Sum.inr i)) (b (Sum.inl j)) = 0 -- B fᵢ eⱼ = 0 for i ≠ j
+  unital_corr: ∀ i, B (b (Sum.inl i)) (b (Sum.inr i)) = 1 -- B eᵢ fᵢ = 1 ∀ i
+
+def hypspace_pred (B: BilinForm k V): Prop
+  := ∃(n: ℕ), ∃ (b: Basis ((Fin n) ⊕ (Fin n))  k V), hypspace_basis_pred B b
+
+@[ext]
+structure hypsubspace (W: Submodule k V) where
+  submodule : Basis
+
+
 def hyp_pair (β:BilinForm k V) (e f : V) : Prop :=
   β e e = 0  ∧  β f f = 0  ∧  β e f = 1
 
-def hypsubspace_two (β:BilinForm k V) {e f : V} (_:hyp_pair β e f) : Submodule k V :=
+def hypsubspace_two {β:BilinForm k V} {e f : V} (_:hyp_pair β e f) : Submodule k V :=
   Submodule.span k {e,f}
 
 lemma in_span_fin_iff_linear_combination (n: ℕ) (v: V) (vect: Fin n → V) (hv : v ∈ Submodule.span k (Set.range vect)) :
@@ -137,13 +163,13 @@ theorem hyp2_nondeg_refl (β:BilinForm k V)
 
 theorem hyp2_nondeg_symm (β:BilinForm k V)
   (bsymm : IsSymm β) {e f : V} (h2: hyp_pair β e f) :
-  NondegenerateOn β (hypsubspace_two β h2)  := by
+  NondegenerateOn β (hypsubspace_two h2)  := by
   have brefl: IsRefl β := IsSymm.isRefl bsymm
   exact hyp2_nondeg_refl β brefl h2
 
 theorem hyp2_nondeg_alt (β:BilinForm k V)
   (balt : IsAlt β) {e f : V} (h2: hyp_pair β e f) :
-  NondegenerateOn β (hypsubspace_two β h2)  := by
+  NondegenerateOn β (hypsubspace_two h2)  := by
   have brefl: IsRefl β := IsAlt.isRefl balt
   exact hyp2_nondeg_refl β brefl h2
 
@@ -151,12 +177,12 @@ theorem hyp2_nondeg_alt (β:BilinForm k V)
 -- using `orthog_decomp` from BilinearForms, we get
 
 def hyp2_decomp_symm (β:BilinForm k V) [FiniteDimensional k V] (bsymm : IsSymm β) (e f : V) (h2:hyp_pair β e f)
-  : orthog_direct_sum β (hypsubspace_two β h2) :=
-  orthog_decomp β (hypsubspace_two β h2) (hyp2_nondeg_symm  β bsymm h2)
+  : orthog_direct_sum β (hypsubspace_two h2) :=
+  orthog_decomp β (hypsubspace_two h2) (hyp2_nondeg_symm  β bsymm h2)
 
 def hyp2_decomp_alt (β:BilinForm k V) [FiniteDimensional k V] (balt : IsAlt β) (e f : V) (h2:hyp_pair β e f)
-  : orthog_direct_sum β (hypsubspace_two β h2) :=
-  orthog_decomp β (hypsubspace_two β h2) (hyp2_nondeg_alt  β balt h2)
+  : orthog_direct_sum β (hypsubspace_two h2) :=
+  orthog_decomp β (hypsubspace_two h2) (hyp2_nondeg_alt  β balt h2)
 
 
 lemma exists_bilin_one {B: BilinForm k V} (enz: e ≠ 0)
@@ -205,3 +231,5 @@ theorem hyp_pair_exists_alt {β:BilinForm k V} (balt : IsAlt β) (hn: Nondegener
     constructor
     . exact balt v
     . exact hv
+
+end Hyperbolic
