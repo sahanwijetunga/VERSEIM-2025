@@ -56,10 +56,11 @@ structure hypspace_basis_pred (B: BilinForm k V) (b: Basis (Fin n ⊕ Fin n) k V
 def hypspace_pred (B: BilinForm k V): Prop
   := ∃(n: ℕ), ∃ (b: Basis ((Fin n) ⊕ (Fin n))  k V), hypspace_basis_pred B b
 
-@[ext]
-structure hypsubspace (W: Submodule k V) where
-  submodule : Basis
+-- Change to structure
+def hypsubspace (W: Submodule k V): True := sorry
 
+
+/- Add in rest of definitions for hypersubspaces-/
 
 def hyp_pair (β:BilinForm k V) (e f : V) : Prop :=
   β e e = 0  ∧  β f f = 0  ∧  β e f = 1
@@ -103,14 +104,14 @@ lemma exists_two_coefficients_of_in_span_pair (v1 v2 v : V)(hv : v ∈ Submodule
 
 theorem hyp2_nondeg_refl (β:BilinForm k V)
   (brefl : IsRefl β) {e f : V} (h2: hyp_pair β e f) :
-  NondegenerateOn β (hypsubspace_two β h2) := by
+  NondegenerateOn β (hypsubspace_two h2) := by
     rintro ⟨v, hv⟩  h
     have: ∃(a b: k), v = a • e + b • f := by
       unfold hypsubspace_two at hv
       exact exists_two_coefficients_of_in_span_pair e f v hv
     have ⟨a,b,hab⟩ := this
     have hve: β v e = 0 := by
-      have he: e ∈ hypsubspace_two β h2 := by
+      have he: e ∈ hypsubspace_two h2 := by
         simp[hypsubspace_two]
         suffices e ∈ ({e,f} : Set V)from ?_
         . exact Submodule.mem_span_of_mem this
@@ -118,7 +119,7 @@ theorem hyp2_nondeg_refl (β:BilinForm k V)
       apply h ⟨e, he⟩
 
     have hvf: β v f = 0 := by
-      have hf: f ∈ hypsubspace_two β h2 := by
+      have hf: f ∈ hypsubspace_two h2 := by
         simp[hypsubspace_two]
         suffices f ∈ ({e,f} : Set V)from ?_
         . exact Submodule.mem_span_of_mem this
