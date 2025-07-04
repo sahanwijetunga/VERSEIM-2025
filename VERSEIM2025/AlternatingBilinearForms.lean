@@ -12,10 +12,13 @@ import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
 import Mathlib.LinearAlgebra.QuadraticForm.Basic
 -- import VERSEIM2025.HyperbolicBilinearForms --  File left not imported due to current work
 
-/- Sahan: The main results in this file should hold only for symmetric forms.
+/- Sahan: The main results in this file should hold only for alternating forms.
 
-  Major results
-  - Planned: Any nondegenerate alternating bilinear form is hyperbolic
-
-
+  Major results (Completed):
+  - ....
+  Major results (Planned):
+  - Any nondegenerate alternating bilinear form is hyperbolic
+  - - Corollary: Nondegenerate alternating bilinear form is dimension 2
+  - - Corollary: Nondegenerate alternating bilinear forms of equal dimension
+      are isomorphic (as bilinear form spaces)
 -/
