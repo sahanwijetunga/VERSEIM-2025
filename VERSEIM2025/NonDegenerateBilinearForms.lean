@@ -12,7 +12,8 @@ import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
 import Mathlib.LinearAlgebra.QuadraticForm.Basic
 -- import VERSEIM2025.HyperbolicBilinearForms --  File left not imported due to current work
 
-/- Sahan: The main results in this file should hold only for nondegenerate forms.
+/-
+  The main results in this file should hold only for nondegenerate forms.
 
   Major results (Planned)
   - Any nondegenerate bilinear form is a direct sum of a hyperbolic

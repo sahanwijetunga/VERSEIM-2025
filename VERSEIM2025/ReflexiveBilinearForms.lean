@@ -11,25 +11,26 @@ import Mathlib.Tactic
 import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
 import VERSEIM2025.Sahan.BilinearForms
 
-/- Sahan: Most major results we are proving do not require reflexivity
-    or require stronger assumptions like symmetric or alternating,
-    however we collect some results which hold in this specific case.
+/-
+  Most major results we are proving do not require reflexivity
+  or require stronger assumptions like symmetric or alternating,
+  however we collect some results which hold in this specific case.
 
-    Mathlib holds many results for bilinear forms under the assumption
-    of reflexivity, though it is not always needed.
+  Mathlib holds many results for bilinear forms under the assumption
+  of reflexivity, though it is not always needed.
 
-    Major results (Completed)
-    - A reflexive bilinear form can be written as a direct sum of 0
-      and a nondegenerate bilinear form
-      - `reflexive_sum_radForm_nondegenerate` (and `form_on_radForm_eq_zero`)
+  Major results (Completed)
+  - A reflexive bilinear form can be written as a direct sum of 0
+    and a nondegenerate bilinear form
+    - `reflexive_sum_radForm_nondegenerate` (and `form_on_radForm_eq_zero`)
 
-    Major results (Planned)
-    - The quotient of a reflexive bilinear form by its radical is nondegenerate
-      - `reflexive_quotient_radForm_nondegenerate`
+  Major results (Planned)
+  - The quotient of a reflexive bilinear form by its radical is nondegenerate
+    - `reflexive_quotient_radForm_nondegenerate`
 
-    TODO: Clean up definitions (radForm/radForm' excessive amount of theorems?)
+  TODO: Clean up definitions (radForm/radForm' excessive amount of theorems?)
 
-    TODO (LATER): Switch out VERSEIM2025.Sahan.BilinearForms for VERSEIM2025.BilinearForms
+  TODO (LATER): Switch out VERSEIM2025.Sahan.BilinearForms for VERSEIM2025.BilinearForms
 -/
 
 open BilinearForms -- This is the namespace in VERSEIM2025.Sahan.BilinearForms

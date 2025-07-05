@@ -12,7 +12,8 @@ import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
 import Mathlib.LinearAlgebra.QuadraticForm.Basic
 import VERSEIM2025.Sahan.BilinearForms
 
-/- Sahan: The purpose of this file is to define an isomorphism of bilinear formed spaces
+/-
+  The purpose of this file is to define an isomorphism of bilinear formed spaces
 
   Notable Definitions
   - EquivBilin

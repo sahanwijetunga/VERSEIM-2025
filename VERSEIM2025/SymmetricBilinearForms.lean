@@ -12,7 +12,8 @@ import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
 import Mathlib.LinearAlgebra.QuadraticForm.Basic
 import VERSEIM2025.Sahan.BilinearForms
 
-/- Sahan: The main results in this file should hold only for symmetric forms.
+/-
+  The main results in this file should hold only for symmetric forms.
 
   Major results (Completed):
   - Symmetric bilinear form has orthogonal basis (from Mathlib)
