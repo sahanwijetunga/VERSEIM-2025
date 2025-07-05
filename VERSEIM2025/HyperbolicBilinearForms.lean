@@ -248,6 +248,11 @@ def foo_equiv (I: Type*): I ⊕ I ≃ I × (singleton ⊕ singleton) where
   This should be formulated in the sense of isomorphism of bilinear forms. This
   requires things in BilinearFormIsomorphisms not yet created. Make use of
   (planned) theorem reducing to proving basis equivalence.
+
+   --------------- OR ----------------
+
+   Prove its a direct sum as vector space, then show orthogonality for elements
+   of differing subspaces
 -/
 
 theorem hypspace.Nondegenerate{I: Type*}  {B:BilinForm k V}
