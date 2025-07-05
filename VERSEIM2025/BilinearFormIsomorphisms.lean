@@ -10,7 +10,7 @@ VERSEIM-2025 REU @ Tufts University
 import Mathlib.Tactic
 import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
 import Mathlib.LinearAlgebra.QuadraticForm.Basic
-import VERSEIM2025.Sahan.BilinearForms --  File left not imported due to current work
+import VERSEIM2025.Sahan.BilinearForms
 
 /- Sahan: The purpose of this file is to define an isomorphism of bilinear formed spaces
 
@@ -42,7 +42,7 @@ variable {k V V' V'': Type*} [Field k] [AddCommGroup V] [AddCommGroup V'] [AddCo
 structure EquivBilin (β: BilinForm k V) (β': BilinForm k V') where
   equiv : V ≃ₗ[k] V'
   comm_form : ∀v w, β v w = β' (equiv v) (equiv w)
-  -- comm_form' : ∀ v' w', β' v' w' = β (equiv.invFun v') (equiv.invFun w')
+
 
 /-
 Include definitions for symm refl trans ...
@@ -87,11 +87,13 @@ def EquivBilin_of_basis_equiv {I I': Type*} {b: Basis I k V}
 
 
 -- Sahan: Better name?
-theorem EquivBilin_construction_matches_initial {I I': Type*} {b: Basis I k V}
+theorem EquivBilin_of_basis_equiv_align {I I': Type*} {b: Basis I k V}
   {b': Basis I' k V'} {B: BilinForm k V} {B': BilinForm k V'} (hI: I ≃ I')
   (hB: ∀i j, B (b i) (b j) = B' (b' (hI i)) (b' (hI j)) ) :
-  ∀i, (EquivBilin_of_basis_equiv hI hB) (b i) = b' (hI i) := sorry
-
+  ∀i, (EquivBilin_of_basis_equiv hI hB) (b i) = b' (hI i) := by
+    intro i
+    show (b.equiv b' hI) (b i) = b' (hI i)
+    simp
 
 
 end BilinIsomorphisms

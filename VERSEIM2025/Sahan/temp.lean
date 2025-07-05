@@ -1,26 +1,12 @@
--- hi
---
-import Mathlib.Tactic
-import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
+-- import Mathlib.Algebra.Module.LinearMap.Basic
+-- import Mathlib.Tactic
 
-open LinearMap (BilinForm)
-open LinearMap
+-- variable {k : Type*} [Field k]
+-- variable {V W : Type*} [AddCommGroup V] [Module k V]
+-- variable [AddCommGroup W] [Module k W]
 
-variable { K V : Type* } [Field K] [ AddCommGroup V ]  [Module K V]
-variable [FiniteDimensional K V]
-
-example (W U : Submodule K V) (v: (W ⊔ U: Submodule K V)): V := by
-    have ⟨v, hv⟩ := v
-    have : ∃w ∈ W, ∃ u ∈ U, w+u=v := by
-        rw[Submodule.mem_sup] at hv
-        exact hv
-    sorry
+-- def myFunc (x : V) : W := sorry -- your function here
 
 
-lemma Nondegenerate.flip' {B : BilinForm K V} (hB : B.Nondegenerate) :
-    B.flip.Nondegenerate := by
-  intro x hx
-  apply (Module.evalEquiv K V).injective
-  ext f
-  obtain ⟨y, rfl⟩ := (B.toDual hB).surjective f
-  simpa using hx y
+-- def myLinearMap (hf_add : ∀ x y : V, myFunc (x + y) = ((myFunc x) + (myFunc y): W))
+--     (hf_smul : ∀ (c : k) (x : V), myFunc (c • x) = ((c • myFunc x): W)): V →ₗ[k] W where

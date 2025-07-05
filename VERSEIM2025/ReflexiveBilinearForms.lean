@@ -102,46 +102,54 @@ theorem form_on_radForm'_eq_zero (B: BilinForm k V):
     ext _ ⟨y, hy⟩
     apply hy
 
--- Sahan: Ideally one would separate out the submodule into a definition,
--- however the choice is not canonical so it may be more difficult to construct.
--- (Note: any such definition will have to be noncomputable)
-theorem reflexive_sum_radForm_nondegenerate (B: BilinForm k V) (hr: B.IsRefl):
-  ∃ (W: Submodule k V), (is_orthog_direct_sum B (radForm B) W ∧ (B.restrict W).Nondegenerate) := by
-    have ⟨W, h⟩ := Submodule.exists_isCompl (radForm B)
-    use W
-    constructor
-    . constructor
-      . apply (direct_sum_iff_iscompl _ _).mpr h
-      . rintro ⟨a,ha⟩ ⟨b,hb⟩
-        dsimp
-        exact hr b a (hr a b (hr b a (hr a b (ha b))))
+-- Sahan: Name could be improved
+theorem orthog_direct_sum_of_radForm_isCompl (B: BilinForm k V)
+  (W: Submodule k V) (hW: IsCompl (radForm B) W): is_orthog_direct_sum B (radForm B) W := by
+  constructor
+  . apply (direct_sum_iff_iscompl _ _).mpr hW
+  . rintro ⟨a,ha⟩ ⟨b,hb⟩
+    dsimp
+    exact ha b
+
+theorem Nondegenerate_of_iscompl_of_radForm (B: BilinForm k V) (hr: B.IsRefl)
+  (W: Submodule k V) (hW: IsCompl (radForm B) W): (B.restrict W).Nondegenerate := by
     intro ⟨a, ha⟩ h'
     suffices a=0 from (Submodule.mk_eq_zero W ha).mpr this
     dsimp at h'
-    have: W ⊓ radForm B = ⊥ := IsCompl.inf_eq_bot (_root_.id (IsCompl.symm h))
+    have: W ⊓ radForm B = ⊥ := IsCompl.inf_eq_bot (_root_.id (IsCompl.symm hW))
     show a ∈ (⊥: Submodule k V)
     rw[<- this]
     constructor; . exact ha
     show ∀ b, B a b = 0
     intro b
-    rw[hr]
     have: ∃ y ∈ W, ∃ z ∈ (radForm B), y + z = b := by
-      have: W ⊔ (radForm B)= ⊤ := IsCompl.sup_eq_top (_root_.id (IsCompl.symm h))
+      have: W ⊔ (radForm B)= ⊤ := IsCompl.sup_eq_top (_root_.id (IsCompl.symm hW))
       rw[<- Submodule.mem_sup]
       rw[this]
       trivial
     have ⟨y,hy,z,hz,hyz⟩ := this
     rw[<- hyz]
     calc
-      (B (y + z)) a = B y a + B z a := by
-        exact BilinForm.add_left y z a
+      (B a (y + z)) = B a y + B a z := by
+        exact add_right a y z
       _ = 0 + 0 := by
-        have: B z a = 0 := by exact hr a z (hr z a (hr a z (hr z a (hz a))))
+        have: B a z = 0 := hr z a (hz a) -- Note: this is the only place we need reflexivity
         rw[this]
         have: B a y = 0 := by
-          rw[h' ⟨y, hy⟩]
-        exact congrFun (congrArg HAdd.hAdd (hr a y this)) 0
+          exact h' ⟨y, hy⟩
+        rw[this]
       _ = 0 := by rw[add_zero]
+
+-- Sahan: Ideally one would separate out the submodule into a definition,
+-- however the choice is not canonical so it may be more difficult to construct.
+-- (Note: any such definition will have to be noncomputable)
+theorem sum_radForm_nondegenerate (B: BilinForm k V) (hr: B.IsRefl):
+  ∃ (W: Submodule k V), (is_orthog_direct_sum B (radForm B) W ∧ (B.restrict W).Nondegenerate) := by
+    have ⟨W, h⟩ := Submodule.exists_isCompl (radForm B)
+    use W
+    constructor
+    . exact orthog_direct_sum_of_radForm_isCompl B W h
+    exact Nondegenerate_of_iscompl_of_radForm B hr W h
 
 
 def quot_form {B: BilinForm k V} (hb: B.IsRefl): BilinForm k (V ⧸ (radForm B)) := sorry
