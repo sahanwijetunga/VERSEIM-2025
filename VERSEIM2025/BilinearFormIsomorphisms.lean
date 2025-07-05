@@ -21,8 +21,13 @@ import VERSEIM2025.Sahan.BilinearForms
   - Proof (construction) that two spaces (V,β) (V',β') over k are isomorphic from
     a bijection of bases(really type equivalence) that commutes with the bilinear form
     `EquivBilin_of_basis_equiv`
+
   Major Results (Planned):
-  - ...
+  - Construct a bilinear form on direct sum of modules
+  - - Note: ⨁ i, A i for A i modules is a module.
+  - Prove (construct) that if Vᵢ are submodules of V that
+    V ≃ ⊕ᵢ Vᵢ as bilinear form spaces if ⊕ᵢ Bᵢ is a basis for V given
+    bases Bᵢ for Vᵢ
 
   Major Results (Planned - Aspirational)
   - State a version of the bases theorem but instead of commuting w/ bilinear form,
@@ -71,10 +76,7 @@ def EquivBilin_of_basis_equiv {I I': Type*} {b: Basis I k V}
   comm_form := by
     let C : BilinForm k V := by
       apply LinearMap.mk₂' k k (fun v w => (B' ((b.equiv b' hI) v)) ((b.equiv b' hI) w))
-      . simp_all
-      . simp_all
-      . simp_all
-      . simp_all
+      repeat simp_all
     have (v w: V):(B' ((b.equiv b' hI) v)) ((b.equiv b' hI) w)= C v w := by
       rfl
     simp_rw[this]
@@ -84,7 +86,6 @@ def EquivBilin_of_basis_equiv {I I': Type*} {b: Basis I k V}
     intro i j
     unfold C
     simp only [hB, LinearMap.mk₂'_apply, Basis.equiv_apply]
-
 
 -- Sahan: Better name?
 theorem EquivBilin_of_basis_equiv_align {I I': Type*} {b: Basis I k V}

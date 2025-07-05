@@ -74,28 +74,6 @@ structure hypsubspace (B: BilinForm k V) (I: Type*) where
   linind : LinearIndependent k coe
   pred: hypspace_fun_pred B coe
 
--- Sahan: I removed the instances to make simp work better
--- @[simp]
--- noncomputable instance (B: BilinForm k V) (I: Type*): FunLike (hypspace B I) (I ⊕ I) V  where
---   coe := fun H => H.basis
---   coe_injective' := by
---     intro H H' h
---     simp_all
---     exact hypspace.ext h
-
--- @[simp]
--- instance (B: BilinForm k V) (I: Type*): FunLike (hypsubspace B I) (I ⊕ I) V where
---   coe := fun H => H.coe
---   coe_injective' := by
---     intro H H' h
---     simp_all
---     exact hypsubspace.ext_iff.mpr h
-
-
--- @[simp]
--- theorem agree_basis  {B: BilinForm k V} {I: Type*} (H: hypspace B I) (i: I ⊕ I):
---   H i= H.basis i := rfl
-
 @[simp]
 def hypsubspace.toSubmodule {I: Type*} {B: BilinForm k V} (H : hypsubspace B I) : Submodule k V :=
   Submodule.span k (Set.range H.coe)
@@ -249,6 +227,28 @@ def hypsubspace_two {B: BilinForm k V} {e f: V} (h: hyp_pair B e f): hypsubspace
       rw[hec, <- hd]
       simp[h.right.left]
    pred := by sorry
+
+-- Sahan: Better name?
+def foo_equiv (I: Type*): I ⊕ I ≃ I × (singleton ⊕ singleton) where
+  toFun
+  | Sum.inl i => (i,Sum.inl 0)
+  | Sum.inr i => (i,Sum.inr 0)
+  invFun
+  | (i,Sum.inl 0) => Sum.inl i
+  | (i,Sum.inr 0) => Sum.inr i
+  left_inv
+  | Sum.inl i => by simp
+  | Sum.inr i => by simp
+  right_inv
+  | (i,Sum.inl 0) => by simp
+  | (i,Sum.inr 0) => by simp
+
+/- TODO: Prove that a hyspace is a direct sum of hypsubspace_two's
+
+  This should be formulated in the sense of isomorphism of bilinear forms. This
+  requires things in BilinearFormIsomorphisms not yet created. Make use of
+  (planned) theorem reducing to proving basis equivalence.
+-/
 
 theorem hypspace.Nondegenerate{I: Type*}  {B:BilinForm k V}
   (H: hypspace B I) (brefl : IsRefl B) :
