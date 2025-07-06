@@ -7,8 +7,6 @@ Released under the Apache 2.0 license as described in the file LICENSE.
 VERSEIM-2025 REU @ Tufts University
 -/
 
-import Mathlib.Tactic
-import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
 import Mathlib.LinearAlgebra.QuadraticForm.Basic
 import VERSEIM2025.Sahan.BilinearForms
 

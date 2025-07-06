@@ -7,10 +7,9 @@ Released under the Apache 2.0 license as described in the file LICENSE.
 VERSEIM-2025 REU @ Tufts University
 -/
 
-import Mathlib.Tactic
-import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
 import Mathlib.LinearAlgebra.QuadraticForm.Basic
-import VERSEIM2025.Sahan.BilinearForms
+import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
+-- import VERSEIM2025.Sahan.BilinearForms
 
 /-
   The main results in this file should hold only for symmetric forms.
@@ -40,7 +39,7 @@ variable {k V: Type*} [AddCommGroup V][Field k][Module k V]
 
 open LinearMap (BilinForm)
 open LinearMap.BilinForm
-open BilinearForms -- This is the namespace in VERSEIM2025.Sahan.BilinearForms
+-- open BilinearForms -- This is the namespace in VERSEIM2025.Sahan.BilinearForms
 
 -- Main result: symmetric bilinear form has orthogonal basis, from Mathlib
 example {V : Type u} {K : Type v}
