@@ -17,7 +17,7 @@ import VERSEIM2025.Sahan.BilinearForms
   however we collect some results which hold in this specific case.
 
   Mathlib holds many results for bilinear forms under the assumption
-  of reflexivity, though it is not always needed.
+  of reflexivity.
 
   Major results (Completed)
   - A reflexive bilinear form can be written as a direct sum of 0
@@ -103,7 +103,7 @@ theorem form_on_radForm'_eq_zero (B: BilinForm k V):
     ext _ ⟨y, hy⟩
     apply hy
 
--- Sahan: Name could be improved
+-- Name could be improved
 theorem orthog_direct_sum_of_radForm_isCompl (B: BilinForm k V)
   (W: Submodule k V) (hW: IsCompl (radForm B) W): is_orthog_direct_sum B (radForm B) W := by
   constructor
@@ -141,7 +141,7 @@ theorem Nondegenerate_of_iscompl_of_radForm (B: BilinForm k V) (hr: B.IsRefl)
         rw[this]
       _ = 0 := by rw[add_zero]
 
--- Sahan: Ideally one would separate out the submodule into a definition,
+-- Ideally one would separate out the submodule into a definition,
 -- however the choice is not canonical so it may be more difficult to construct.
 -- (Note: any such definition will have to be noncomputable)
 theorem sum_radForm_nondegenerate (B: BilinForm k V) (hr: B.IsRefl):
@@ -151,7 +151,6 @@ theorem sum_radForm_nondegenerate (B: BilinForm k V) (hr: B.IsRefl):
     constructor
     . exact orthog_direct_sum_of_radForm_isCompl B W h
     exact Nondegenerate_of_iscompl_of_radForm B hr W h
-
 
 def quot_form {B: BilinForm k V} (hb: B.IsRefl): BilinForm k (V ⧸ (radForm B)) := sorry
 

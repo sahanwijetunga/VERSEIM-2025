@@ -16,7 +16,7 @@ import Mathlib.LinearAlgebra.QuadraticForm.Basic
   The main results in this file should hold only for nondegenerate forms.
 
   Major results (Planned)
-  - Any nondegenerate bilinear form is a direct sum of a hyperbolic
+  - Any (finite dim) nondegenerate bilinear form is a direct sum of a hyperbolic
     space (see HyperbolicBilinearForms) and a definite space (∀x, β x x ≠ 0)
 
 -/

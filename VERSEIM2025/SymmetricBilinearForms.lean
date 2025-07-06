@@ -25,13 +25,13 @@ import VERSEIM2025.Sahan.BilinearForms
   - - Technically could be a corollary from NonDegenerateBilinearForms.lean
       but should be easier to prove here first
 
-  Major results (Planned - Aspirational!) (These are listed in arbitrary order)
+  Major results (Planned - Aspirational!) (These are listed in arbitrary order, and may not be correct)
   - Isomorphism classes of nondegenerate symmetric bilinear forms
   - Let the psuedo rank of a symmetric bilinear form be the maximal dimension
     of any anisotropic (definite) subspace. Prove that any two symmetric bilinear forms
     with the same dimension and psuedo rank are isomorphic.
   - Prove some sort of uniqueness of the hyperbolic + anisotropic (definite) decomposition
-  - - Sahan: I do not know if the subspaces are unique; if not then (if possible)
+  - - I do not know if the subspaces are unique; if not then (if possible)
       prove if the dimensions are at least invariant.
  -/
 

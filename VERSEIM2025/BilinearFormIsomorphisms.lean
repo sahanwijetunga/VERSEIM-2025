@@ -88,7 +88,7 @@ def EquivBilin_of_basis_equiv {I I': Type*} {b: Basis I k V}
     unfold C
     simp only [hB, LinearMap.mk₂'_apply, Basis.equiv_apply]
 
--- Sahan: Better name?
+-- Better name?
 theorem EquivBilin_of_basis_equiv_align {I I': Type*} {b: Basis I k V}
   {b': Basis I' k V'} {B: BilinForm k V} {B': BilinForm k V'} (hI: I ≃ I')
   (hB: ∀i j, B (b i) (b j) = B' (b' (hI i)) (b' (hI j)) ) :
