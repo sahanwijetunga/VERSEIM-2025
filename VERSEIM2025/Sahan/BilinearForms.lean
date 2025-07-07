@@ -125,23 +125,31 @@ lemma skew_is_reflexive (β:BilinForm k V) (h:Skew β) : IsRefl β := by
   simp
   assumption
 
-lemma alt_is_reflexive (β:BilinForm k V) (h: β.IsAlt) : IsRefl β := by
-  intro a b hab
-  rw[ BilinearForms.skew_of_alt β h]
-  simp[hab]
+lemma alt_is_reflexive (β:BilinForm k V) (h: β.IsAlt) : IsRefl β := IsAlt.isRefl h
 
-lemma symm_is_reflexive (β:BilinForm k V) (h: β.IsSymm) : IsRefl β := by
-  intro a b hab
-  rw[<- h]
-  exact hab
+lemma symm_is_reflexive (β:BilinForm k V) (h: β.IsSymm) : IsRefl β := IsSymm.isRefl h
 
-abbrev OrthogSubspaces (β:BilinForm k V) (W₁ W₂ : Submodule k V) : Prop :=
+abbrev OrthogSubspacesWeak (β:BilinForm k V) (W₁ W₂ : Submodule k V) : Prop :=
   ∀ (x:W₁), ∀ (y:W₂), β x y = 0
 
+lemma swap_OrthogSubspacesWeak {β: BilinForm k V} {W₁ W₂: Submodule k V}
+  (h: OrthogSubspacesWeak β W₁ W₂) (hr: IsRefl β): OrthogSubspacesWeak β W₂ W₁ := by
+  intro x y
+  rw[hr]
+  exact h y x
 
-theorem OrthogSubspaces_of_orthogonal (β: BilinForm k V) (W: Submodule k V) :
-    OrthogSubspaces β W (β.orthogonal W) := by
-    unfold OrthogSubspaces
+abbrev OrthogSubspaces (β:BilinForm k V) (W₁ W₂ : Submodule k V) : Prop :=
+  OrthogSubspacesWeak β W₁ W₂ ∧ OrthogSubspacesWeak β W₂ W₁
+
+theorem OrthogSubspaces_of_OrthogSubspacesWeak_refl {β: BilinForm k V} {W₁ W₂: Submodule k V}
+  (h: OrthogSubspacesWeak β W₁ W₂) (hr: IsRefl β): OrthogSubspaces β W₁ W₂ := by
+  constructor
+  . exact h
+  . exact swap_OrthogSubspacesWeak h hr
+
+theorem OrthogSubspacesWeak_of_orthogonal_complement (β: BilinForm k V) (W: Submodule k V) :
+    OrthogSubspacesWeak β W (β.orthogonal W) := by
+    unfold OrthogSubspacesWeak
     rintro ⟨a, ha⟩ ⟨b, hb⟩
     simp at hb
     show β a b =0
@@ -182,14 +190,11 @@ example (β : BilinForm k V) (vect:Fin n → V)
 def OrthogSets  (β:BilinForm k V) (s₁ s₂ : Set V) : Prop :=
   ∀ x₁ ∈ s₁, ∀ x₂ ∈ s₂, β x₁ x₂ = 0
 
-lemma orthog_sets_iff_orthog_subspaces (β:BilinForm k V) (W₁ W₂ : Submodule k V):
-  OrthogSets β W₁ W₂ ↔ OrthogSets β W₁ W₂ := by rfl
-
 lemma orthog_sets_iff_orthog_subspaces_span (β:BilinForm k V) (s₁ s₂ : Set V) :
-  OrthogSets β s₁ s₂ ↔ OrthogSubspaces β (Submodule.span k s₁) (Submodule.span k s₂) := by
+  OrthogSets β s₁ s₂ ↔ OrthogSubspacesWeak β (Submodule.span k s₁) (Submodule.span k s₂) := by
   constructor
   . intro h
-    unfold OrthogSubspaces
+    unfold OrthogSubspacesWeak
     intro ⟨x, hx⟩  ⟨y, hy⟩
     rw[Submodule.mem_span_iff_exists_finset_subset] at hx
     rw[Submodule.mem_span_iff_exists_finset_subset] at hy
@@ -204,7 +209,7 @@ lemma orthog_sets_iff_orthog_subspaces_span (β:BilinForm k V) (s₁ s₂ : Set 
     intro x hx y hy
     have hx: x ∈ Submodule.span k s₁ := by exact Submodule.mem_span.mpr fun p a ↦ a hx
     have hy: y ∈ Submodule.span k s₂ := by exact Submodule.mem_span.mpr fun p a ↦ a hy
-    simp_all[OrthogSubspaces]
+    simp_all[OrthogSubspacesWeak]
 
 
 --------------------------------------------------------------------------------
@@ -213,8 +218,7 @@ lemma orthog_sets_iff_orthog_subspaces_span (β:BilinForm k V) (s₁ s₂ : Set 
 
 @[simp]
 theorem mem_orthogonal_iff' (B: BilinForm k V) {W : Submodule k V} {w: V} :
-    w ∈ B.orthogonal W ↔ ∀ v ∈ W, B v w=0 :=
-  Iff.rfl
+    w ∈ B.orthogonal W ↔ ∀ v ∈ W, B v w=0 := by rfl
 
 example (β: BilinForm k V) :
   β.Nondegenerate ↔ ∀ v:V, (∀ w:V, β v w = 0) → v = 0 := by rfl
@@ -225,13 +229,6 @@ def coNondegenerate (β : BilinForm k V) : Prop :=
 def NondegenerateOn
   (β : BilinForm k V) (W : Submodule k V) : Prop :=
   (BilinForm.restrict β W).Nondegenerate
-
-/-
-  Sahan: Note LinearMap.Nondegenerate is equivalent to
-    LinearMap.BilinForm.Nondegenerate ∧ coNondegenerate
-  and not the same as Nondegenerate (without assuming IsRefl)
-  and why I decided to remove the open LinearMap from file imports
--/
 
 lemma coNondegenerate_iff_flip_Nondegenerate (β: BilinForm k V):
   coNondegenerate β ↔ β.flip.Nondegenerate := by
@@ -287,13 +284,43 @@ lemma direct_sum_iff_iscompl (W₁ W₂ : Submodule k V) :
       exact codisjoint_iff.mp h.right
     exact {zero, span}
 
+/-- Does not gaurantee V ≃ W₁ ⊕ W₂ as bilinear spaces. -/
+structure is_orthog_direct_sum_weak (β:BilinForm k V) (W₁ W₂ : Submodule k V) where
+  ds : internal_direct_sum W₁ W₂
+  orthog : OrthogSubspacesWeak β W₁ W₂
+
+/-- Gaurantees V ≃ W₁ ⊕ W₂ as bilinear spaces. -/
 structure is_orthog_direct_sum (β:BilinForm k V) (W₁ W₂ : Submodule k V) where
   ds : internal_direct_sum W₁ W₂
   orthog : OrthogSubspaces β W₁ W₂
 
+lemma is_orthog_direct_sum_of_is_orthog_direct_sum_weak_refl {β: BilinForm k V} {W₁ W₂: Submodule k V}
+  (h: is_orthog_direct_sum_weak β W₁ W₂) (hr: IsRefl β): is_orthog_direct_sum β W₁ W₂ := by
+  constructor
+  . exact h.ds
+  . exact OrthogSubspaces_of_OrthogSubspacesWeak_refl h.orthog hr
+
+abbrev orthog_direct_sum_weak (β: BilinForm k V) (W: Submodule k V) :=
+  is_orthog_direct_sum_weak β W (orthogonal β W)
+
 abbrev orthog_direct_sum (β: BilinForm k V) (W: Submodule k V) :=
   is_orthog_direct_sum β W (orthogonal β W)
 
+/-- Does not gaurantee W₁ ⊔ W₂ ≃ W₁ ⊕ W₂ as bilinear spaces. -/
+structure is_orthog_ind_weak (B: BilinForm k V) (W₁: Submodule k V) (W₂: Submodule k V) where
+  ind: W₁ ⊓ W₂ = ⊥
+  orthog: OrthogSubspacesWeak B W₁ W₂
+
+/-- Gaurantees W₁ ⊔ W₂ ≃ W₁ ⊕ W₂ as bilinear spaces. -/
+structure is_orthog_ind (B: BilinForm k V) (W₁: Submodule k V) (W₂: Submodule k V) where
+  ind: W₁ ⊓ W₂ = ⊥
+  orthog: OrthogSubspaces B W₁ W₂
+
+lemma is_orthog_ind_of_is_orthog_ind_weak_refl {β: BilinForm k V} {W₁ W₂: Submodule k V}
+  (h: is_orthog_ind_weak β W₁ W₂) (hr: IsRefl β): is_orthog_ind β W₁ W₂ := by
+  constructor
+  . exact h.ind
+  . exact OrthogSubspaces_of_OrthogSubspacesWeak_refl h.orthog hr
 
 theorem orthog_inter (β: BilinForm k V) [FiniteDimensional k V] (W: Submodule k V) (wnd: NondegenerateOn β W) :
   W ⊓ (β.orthogonal W) = ⊥ := by
@@ -339,29 +366,6 @@ lemma foo_rank_ker_bilin_domRestrict_zero {V : Type*} {K : Type*} [Field K]
     rw[foo_ker_bilin_domRestrict_bot B W wnd]
     exact finrank_bot K V
 
--- Sahan: Better name?
-lemma foo_inf_orthogonal_top_bot{V : Type*} {K : Type*} [Field K]
- [AddCommGroup V] [Module K V] [FiniteDimensional K V]
- (B: BilinForm K V) (W : Submodule K V) (wnd : NondegenerateOn B W) :
- (W ⊓ B.orthogonal ⊤ : Submodule K V)=⊥ := by
-    suffices W ⊓ B.orthogonal ⊤ ≤ ⊥ from ?_
-    . exact (Submodule.eq_bot_iff (W ⊓ B.orthogonal ⊤)).mpr this
-
-    calc
-      W ⊓ B.orthogonal ⊤ ≤W ⊓ B.orthogonal W := by
-        suffices (B.orthogonal ⊤) ≤ B.orthogonal W from ?_
-        . exact inf_le_inf_left W this
-        exact BilinForm.orthogonal_le fun ⦃x⦄ a ↦ trivial
-      _ = ⊥ := by rw[orthog_inter B W wnd]
-
--- Sahan: Better name?
-lemma foo_finrank_zero{V : Type*} {K : Type*} [Field K]
- [AddCommGroup V] [Module K V] [FiniteDimensional K V]
- (B: BilinForm K V) (W : Submodule K V) (wnd : NondegenerateOn B W) :
- Module.finrank K (W ⊓ B.orthogonal ⊤ : Submodule K V)=(0: ℕ) := by
-    rw[foo_inf_orthogonal_top_bot B W wnd]
-    exact finrank_bot K V
-
 theorem finrank_orthogonal_add_total  {V : Type*} {K : Type*} [Field K]
  [AddCommGroup V] [Module K V] [FiniteDimensional K V]
  (B: BilinForm K V) (W : Submodule K V) (wnd : NondegenerateOn B W):
@@ -399,9 +403,15 @@ theorem internal_direct_sum_of_orthogonal_of_restrict_nondegenerate  {V : Type*}
     rw[direct_sum_iff_iscompl]
     exact isCompl_orthogonal_of_restrict_nondegenerate B W wnd
 
-def orthog_decomp (β:BilinForm k V)[FiniteDimensional k V] (W:Submodule k V) (wnd : NondegenerateOn β W):
+def orthog_decomp_weak (β:BilinForm k V)[FiniteDimensional k V] (W:Submodule k V) (wnd : NondegenerateOn β W):
+  orthog_direct_sum_weak β W  where
+    ds := internal_direct_sum_of_orthogonal_of_restrict_nondegenerate β W wnd
+    orthog := OrthogSubspacesWeak_of_orthogonal_complement β W
+
+-- This could be proved using Mathlib results instead of the machinery here, as this theorem requires Reflexivity
+def orthog_decomp (β:BilinForm k V)[FiniteDimensional k V] (W:Submodule k V) (wnd : NondegenerateOn β W) (hr: IsRefl β):
   orthog_direct_sum β W  where
     ds := internal_direct_sum_of_orthogonal_of_restrict_nondegenerate β W wnd
-    orthog := fun ⟨a,ha⟩ ⟨_, hb⟩ => hb a ha
+    orthog := OrthogSubspaces_of_OrthogSubspacesWeak_refl (OrthogSubspacesWeak_of_orthogonal_complement β W) hr
 
 end BilinearForms

@@ -22,11 +22,17 @@ import VERSEIM2025.Sahan.BilinearForms
     `EquivBilin_of_basis_equiv`
 
   Major Results (Planned):
-  - Construct a bilinear form on direct sum of modules
+  - Construct a bilinear form on (arbitrary) direct sum of modules
   - - Note: ⨁ i, A i for A i modules is a module.
   - Prove (construct) that if Vᵢ are submodules of V that
     V ≃ ⊕ᵢ Vᵢ as bilinear form spaces if ⊕ᵢ Bᵢ is a basis for V given
     bases Bᵢ for Vᵢ
+  - Prove that `is_orthog_direct_sum` B W₁ W₂ iff V ≃ W₁ ⊕ W₂ as bilinear form spaces
+    (using the index function
+      def foo (W₁ W₂: Submodule k V): Fin 2 → (Submodule k V)
+      | 0 => W₁
+      | 1 => W₂
+    )
 
   Major Results (Planned - Aspirational)
   - State a version of the bases theorem but instead of commuting w/ bilinear form,
@@ -46,7 +52,6 @@ variable {k V V' V'': Type*} [Field k] [AddCommGroup V] [AddCommGroup V'] [AddCo
 structure EquivBilin (β: BilinForm k V) (β': BilinForm k V') where
   equiv : V ≃ₗ[k] V'
   comm_form : ∀v w, β v w = β' (equiv v) (equiv w)
-
 
 /-
 Include definitions for symm refl trans ...

@@ -44,6 +44,12 @@ structure OddHypspace (B: BilinForm k V) where
 def OddHypspace_pred (B: BilinForm k V): Prop
   := Nonempty ( OddHypspace B)
 
+abbrev OddHypspace.basis_index {B: BilinForm k V} (H: OddHypspace B)
+  := H.hyp.basis_index ⊕ singleton
+
+abbrev OddHypspace.I {B: BilinForm k V} (H: OddHypspace B)
+  := H.hyp.I
+
 noncomputable def OddHypspace_of_OddHypspace_pred {B: BilinForm k V} (h: OddHypspace_pred B): OddHypspace B :=
   Classical.choice h
 
@@ -55,7 +61,6 @@ theorem OddHypspace_pred_of_OddHypspace {B: BilinForm k V} (H: OddHypspace B):
   should probably be heavily modified before proving any of the auxillary theorems/defns
   about it.
 -/
-
 @[ext]
 structure OddHypsubspace (B: BilinForm k V) where
   hyp : Hypsubspace B
@@ -98,50 +103,86 @@ noncomputable def OddHypsubspace.toOddHypspace {B: BilinForm k V} (H: OddHypsubs
 theorem OddHypsubspace_basis_compatible {B: BilinForm k V}  (H: OddHypsubspace B):
   H.toOddHypspace.basis = H.basis := sorry
 
-
-inductive GeneralizedHypspace (B: BilinForm k V) (I: Type) where
-  | even : Hypspace B I → GeneralizedHypspace B I
-  | odd : OddHypspace B I → GeneralizedHypspace B I
-
 -- A `GeneralizedHypspace` is either a Hypspace or an OddHypspace.
+inductive GeneralizedHypspace (B: BilinForm k V) where
+  | even : Hypspace B → GeneralizedHypspace B
+  | odd : OddHypspace B → GeneralizedHypspace B
 
-inductive GeneralizedHypsubspace (B: BilinForm k V) (I: Type) where
-  | even : Hypsubspace B → GeneralizedHypsubspace B I
-  | odd : OddHypsubspace B → GeneralizedHypsubspace B I
-
-@[simp]
-def GeneralizedHypspace.index_basis {I: Type} {B: BilinForm k V} (H : GeneralizedHypspace B I): Type :=
+def GeneralizedHypspace.I {B: BilinForm k V} (H: GeneralizedHypspace B): Type :=
   match H with
-  | GeneralizedHypspace.even _ => I ⊕ I
-  | GeneralizedHypspace.odd _ => (I ⊕ I) ⊕ singleton
+  | GeneralizedHypspace.even H => H.I
+  | GeneralizedHypspace.odd H => H.I
 
 @[simp]
-def GeneralizedHypspace.basis {I: Type} {B: BilinForm k V} (H : GeneralizedHypspace B I): Basis H.index_basis k V :=
+def GeneralizedHypspace.basis_index {B: BilinForm k V} (H : GeneralizedHypspace B): Type :=
+  match H with
+  | GeneralizedHypspace.even H => H.basis_index
+  | GeneralizedHypspace.odd H => H.basis_index
+
+@[simp]
+def GeneralizedHypspace.basis {B: BilinForm k V} (H : GeneralizedHypspace B): Basis H.basis_index k V :=
   match H with
   | GeneralizedHypspace.even H => H.basis
   | GeneralizedHypspace.odd H => H.basis
 
-@[simp]
-def GeneralizedHypsubspace.toSubmodule {I: Type} {B: BilinForm k V} (H : GeneralizedHypsubspace B I) :
-  Submodule k V := sorry
+inductive GeneralizedHypsubspace (B: BilinForm k V)  where
+  | even : Hypsubspace B → GeneralizedHypsubspace B
+  | odd : OddHypsubspace B → GeneralizedHypsubspace B
 
-
-@[simp]
-noncomputable def GeneralizedHypsubspace.basis {I: Type} {B: BilinForm k V} (H : GeneralizedHypsubspace B I) :
-  Basis ((I ⊕ I) ⊕ singleton) k H.toSubmodule := sorry
-
-def GeneralizedHypsubspace_of_GeneralizedHypspace_submodule {I: Type} {B: BilinForm k V} {W: Submodule k V}
- (H : GeneralizedHypspace (B.restrict W) I) : GeneralizedHypsubspace B I := sorry
-
-def GeneralizedHypsubspace_of_GeneralizedHypspace_submodule_toSubmodule_agrees {I: Type} {B: BilinForm k V} {W: Submodule k V}
- (H : GeneralizedHypspace (B.restrict W) I) : (GeneralizedHypsubspace_of_GeneralizedHypspace_submodule H).toSubmodule = W := sorry
+def GeneralizedHypsubspace.I {B: BilinForm k V} (H: GeneralizedHypsubspace B): Type :=
+  match H with
+  | GeneralizedHypsubspace.even H => H.I
+  | GeneralizedHypsubspace.odd H => H.I
 
 @[simp]
-noncomputable def GeneralizedHypsubspace.toGeneralizedHypspace {B: BilinForm k V} {I: Type} (H: GeneralizedHypsubspace B I):
-  GeneralizedHypspace (B.restrict H.toSubmodule) I := sorry
+def GeneralizedHypsubspace.basis_index {B: BilinForm k V} (H : GeneralizedHypsubspace B): Type :=
+  match H with
+  | GeneralizedHypsubspace.even H => H.basis_index
+  | GeneralizedHypsubspace.odd H => H.basis_index
 
-theorem GeneralizedHypsubspace_basis_compatible {B: BilinForm k V} {I: Type} (H: GeneralizedHypsubspace B I):
-  H.toGeneralizedHypspace.basis = H.basis := sorry
+@[simp]
+def GeneralizedHypsubspace.coe {B: BilinForm k V} (H : GeneralizedHypsubspace B): H.basis_index → V :=
+  match H with
+  | GeneralizedHypsubspace.even H => H.coe
+  | GeneralizedHypsubspace.odd H => H.coe
+
+
+@[simp]
+def GeneralizedHypsubspace.toSubmodule {B: BilinForm k V} (H : GeneralizedHypsubspace B) :
+  Submodule k V :=
+  match H with
+  | GeneralizedHypsubspace.even H => H.toSubmodule
+  | GeneralizedHypsubspace.odd H => H.toSubmodule
+
+/- Commented out code dealing with Generalized Hypsubspaces due to issues with
+  things not being definitionally equal (so types didn't work out). -/
+
+-- @[simp]
+-- noncomputable def GeneralizedHypsubspace.basis {B: BilinForm k V} (H : GeneralizedHypsubspace B) :
+--   Basis (H.basis_index) k H.toSubmodule := sorry
+
+def GeneralizedHypsubspace_of_GeneralizedHypspace_submodule {B: BilinForm k V} {W: Submodule k V}
+ (H : GeneralizedHypspace (B.restrict W)) : GeneralizedHypsubspace B:= sorry
+
+def GeneralizedHypsubspace_of_GeneralizedHypspace_submodule_toSubmodule_agrees {B: BilinForm k V} {W: Submodule k V}
+ (H : GeneralizedHypspace (B.restrict W)) : (GeneralizedHypsubspace_of_GeneralizedHypspace_submodule H).toSubmodule = W := sorry
+
+-- @[simp]
+-- noncomputable def GeneralizedHypsubspace.toGeneralizedHypspace {B: BilinForm k V} (H: GeneralizedHypsubspace B):
+--   GeneralizedHypspace (B.restrict H.toSubmodule) :=
+--   match H with
+--   | GeneralizedHypsubspace.even H => GeneralizedHypspace.even H.toHypspace
+--   | GeneralizedHypsubspace.odd H => GeneralizedHypspace.odd H.toOddHypspace
+
+
+-- theorem GeneralizedHypsubspace_basis_index_compatible {B: BilinForm k V} (H: GeneralizedHypsubspace B):
+--   H.toGeneralizedHypspace.basis_index = H.basis_index :=
+--   match H with
+--   | GeneralizedHypsubspace.even _ => rfl
+--   | GeneralizedHypsubspace.odd _ => rfl
+
+-- theorem GeneralizedHypsubspace_basis_compatible {B: BilinForm k V} (H: GeneralizedHypsubspace B):
+--   H.toGeneralizedHypspace.basis = H.basis := sorry
 
 
 end OddHyperbolic

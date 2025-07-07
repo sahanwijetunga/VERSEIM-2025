@@ -10,11 +10,8 @@ VERSEIM-2025 REU @ Tufts University
 import VERSEIM2025.HyperbolicBilinearForms
 
 /-
-  The main results in this file should hold only for alternating forms.
-
-  Major results (Mostly Completed)
+  Major results (Completed)
   - Any nondegenerate alternating bilinear form is hyperbolic (`alternating_is_hyperbolic_aux`)
-    - *Base cases are not proved yet*; Inductive step has been proved
     - Corollary: Nondegenerate alternating bilinear form is dimension 2n (`alternate_is_even_dimension`)
   - - Corollary: Nondegenerate alternating bilinear forms of equal (finite) dimension
       are isomorphic (as bilinear form spaces)  (`alternate_iso`)
@@ -42,39 +39,31 @@ open Hyperbolic -- This is the namespace in VERSEIM2025.HyperbolicBilinearForms
 open BilinIsomorphisms -- This is the namespace in VERSEIM2025.BilinearFormIsomorphisms
 
 
-theorem hyp_pair_exists_alt {e: V} {β:BilinForm k V} (balt : IsAlt β) (hn: Nondegenerate β) (enz : e ≠ 0) :
-  ∃ f, hyp_pair β e f := by
-    have ⟨v, hv⟩ := exists_bilin_one enz hn
-    use v
-    constructor; . exact balt e
-    constructor
-    . exact balt v
-    . exact hv
-
-def hyp2_decomp_alt (β:BilinForm k V) [FiniteDimensional k V] (balt : IsAlt β) (e f : V) (h2:hyp_pair β e f)
-  : orthog_direct_sum β (Hypsubspace_two h2).toSubmodule :=
-  orthog_decomp β (Hypsubspace_two h2).toSubmodule (hyp2_nondeg_alt  β balt h2)
-
--- Clean up proof?
 lemma ex_nonzero (h: Module.finrank k V > 0) : ∃(v: V), v ≠ 0  := by
   contrapose! h
   suffices Module.finrank k V=0 from Nat.le_zero.mpr this
   refine Module.finrank_eq_zero_of_rank_eq_zero ?_
   exact rank_zero_iff_forall_zero.mpr h
 
-
 protected theorem alternating_is_hyperbolic_aux (B: BilinForm k V) (balt: IsAlt B) [FiniteDimensional k V]
 (n: ℕ) (hn: n = Module.finrank k V) (hd: B.Nondegenerate): Hypspace_pred B  := by
   induction' n using Nat.strong_induction_on with n h generalizing V
+  have hr : IsRefl B := IsAlt.isRefl balt
   case h =>
   match n with
   | 0 =>
-    use Empty
-    -- use (Module.finBasisOfFinrankEq k V hn.symm)
-    -- constructor
-    -- repeat intro i; contradiction
-    sorry -- note Module.finrank_eq_rank'
-  | 1 => sorry -- proof should be done by proving false from hd
+    refine Hypspace_pred_of_Hypspace ?_
+    refine Hypspace_zero ?_
+    symm at hn
+    exact finrank_zero_iff_forall_zero.mp hn
+  | 1 =>
+    have: Module.finrank k V = 1 := by exact id (Eq.symm hn)
+    have ⟨v, vnonzero, vspan⟩ := finrank_eq_one_iff'.mp this
+    contrapose! vnonzero
+    apply hd v
+    intro w
+    have ⟨c, hc⟩ := vspan w
+    rw[<- hc, smul_right_of_tower c v v, balt v, smul_zero c]
   | m+2 =>
     have: ∃ (e: V), e ≠ 0 := by
       have: m+2 > 0 := by exact Nat.zero_lt_succ (m + 1)
@@ -84,38 +73,28 @@ protected theorem alternating_is_hyperbolic_aux (B: BilinForm k V) (balt: IsAlt 
     let ⟨f, hef⟩ := hyp_pair_exists_alt balt hd he
     let H : Hypsubspace B := Hypsubspace_two hef
     let W' := B.orthogonal H.toSubmodule
-    have hHW' : is_orthog_direct_sum B H.toSubmodule W' := hyp2_decomp_alt B balt e f hef
-
+    have hHW' : is_orthog_direct_sum B H.toSubmodule W' := hyp2_decomp_refl B hr hef
     have hpredW' : Hypspace_pred (B.restrict W') := by
       have hmm2: m < m+2 := Nat.lt_add_of_pos_right (Nat.zero_lt_two)
-      have hbW'IsAlt: (B.restrict W').IsAlt := fun x ↦ balt (W'.subtype x)
-      have hIsComplW'H: IsCompl W' H.toSubmodule := by
-          refine
-            IsCompl.symm
-              (BilinearForms.isCompl_orthogonal_of_restrict_nondegenerate B H.toSubmodule ?_)
-          exact hyp2_nondeg_alt B balt hef
+      have hbW'IsGoodProp: (B.restrict W').IsAlt := fun x ↦ balt (W'.subtype x)
+      have hIsComplW'H: IsCompl H.toSubmodule W'  := by
+          exact BilinearForms.isCompl_orthogonal_of_restrict_nondegenerate B H.toSubmodule
+            (hyp2_nondeg_refl B (hr) hef)
       have hWrankeqm: m = Module.finrank k ↥W' := by
         have: Module.finrank k ↥W' + Module.finrank k H.toSubmodule = Module.finrank k V := by
+          rw[add_comm]
           exact Submodule.finrank_add_eq_of_isCompl hIsComplW'H
-        rw[Hypsubspace_two_finrank_2] at this
-        rw[<- hn] at this
-        symm
-        exact Nat.add_right_cancel this
+        rw[Hypsubspace_two_finrank_2,<- hn] at this
+        exact (Nat.add_right_cancel this).symm
       have hBW'Nondegenerate: (B.restrict W').Nondegenerate := by
-        refine (restrict_nondegenerate_iff_isCompl_orthogonal (IsAlt.isRefl balt)).mpr ?_
-        have: B.orthogonal W' = H.toSubmodule := by
-          exact orthogonal_orthogonal hd (IsAlt.isRefl balt) H.toSubmodule
-        rw[this]
-        exact hIsComplW'H
-      exact h m hmm2 (B.restrict W') hbW'IsAlt hWrankeqm hBW'Nondegenerate
-
+        apply (restrict_nondegenerate_iff_isCompl_orthogonal hr).mpr
+        rw[orthogonal_orthogonal hd (hr) H.toSubmodule]
+        exact id (IsCompl.symm hIsComplW'H)
+      exact h m hmm2 (B.restrict W') hbW'IsGoodProp hWrankeqm hBW'Nondegenerate
     have ⟨H', _⟩ := Hypsubspace_of_Hypspace_pred_restrict hpredW'
-
     have h: is_orthog_direct_sum B H.toSubmodule H'.toSubmodule := by
       simp_all
-
-    apply Hypspace_pred_of_Hypspace (Hypspace_of_orthog_direct_sum h)
-
+    exact Hypspace_pred_of_Hypspace (Hypspace_of_orthog_direct_sum' h)
 
 noncomputable def alternating_is_hyperbolic {B: BilinForm k V} (balt: IsAlt B) (hd: B.Nondegenerate) [FiniteDimensional k V]:
   Hypspace B :=

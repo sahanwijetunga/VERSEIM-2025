@@ -12,13 +12,6 @@ import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
 import VERSEIM2025.Sahan.BilinearForms
 
 /-
-  Most major results we are proving do not require reflexivity
-  or require stronger assumptions like symmetric or alternating,
-  however we collect some results which hold in this specific case.
-
-  Mathlib holds many results for bilinear forms under the assumption
-  of reflexivity.
-
   Major results (Completed)
   - A reflexive bilinear form can be written as a direct sum of 0
     and a nondegenerate bilinear form
@@ -105,14 +98,14 @@ theorem form_on_radForm'_eq_zero (B: BilinForm k V):
 
 -- Name could be improved
 theorem orthog_direct_sum_of_radForm_isCompl (B: BilinForm k V)
-  (W: Submodule k V) (hW: IsCompl (radForm B) W): is_orthog_direct_sum B (radForm B) W := by
+  (W: Submodule k V) (hW: IsCompl (radForm B) W): is_orthog_direct_sum_weak B (radForm B) W := by
   constructor
   . apply (direct_sum_iff_iscompl _ _).mpr hW
   . rintro ⟨a,ha⟩ ⟨b,hb⟩
     dsimp
     exact ha b
 
-theorem Nondegenerate_of_iscompl_of_radForm (B: BilinForm k V) (hr: B.IsRefl)
+theorem Nondegenerate_of_isCompl_of_radForm (B: BilinForm k V) (hr: B.IsRefl)
   (W: Submodule k V) (hW: IsCompl (radForm B) W): (B.restrict W).Nondegenerate := by
     intro ⟨a, ha⟩ h'
     suffices a=0 from (Submodule.mk_eq_zero W ha).mpr this
@@ -144,13 +137,31 @@ theorem Nondegenerate_of_iscompl_of_radForm (B: BilinForm k V) (hr: B.IsRefl)
 -- Ideally one would separate out the submodule into a definition,
 -- however the choice is not canonical so it may be more difficult to construct.
 -- (Note: any such definition will have to be noncomputable)
+-- (Note: is_orthog_direct_sum and is_orthog_direct_sum' are equivalent given Reflexivity)
 theorem sum_radForm_nondegenerate (B: BilinForm k V) (hr: B.IsRefl):
   ∃ (W: Submodule k V), (is_orthog_direct_sum B (radForm B) W ∧ (B.restrict W).Nondegenerate) := by
     have ⟨W, h⟩ := Submodule.exists_isCompl (radForm B)
     use W
     constructor
-    . exact orthog_direct_sum_of_radForm_isCompl B W h
-    exact Nondegenerate_of_iscompl_of_radForm B hr W h
+    . refine is_orthog_direct_sum_of_is_orthog_direct_sum_weak_refl ?_ hr
+      exact orthog_direct_sum_of_radForm_isCompl B W h
+    exact Nondegenerate_of_isCompl_of_radForm B hr W h
+
+/-
+  Proof outline for `refl_is_alt_or_symm`:
+  Let B be a reflexive bilinear form over V. Suppose B is not alternating. Then there exists
+  v ∈ V with B(v,v) ≠ 0. Then,
+    V ≃ (Span v) ⊕ (Span v)ᗮ as bilinear form spaces (note B reflexive)
+  If (Span v)ᗮ is symmetric, then as (Span v) is trivially symmetric we see V is symmetric.
+
+  Otherwise, take w₁,w₂ ∈ (Span v)ᗮ with B(w₁,w₂) ≠ B(w₂,w₁). Let c := B(v,v) and
+  WLOG B(w₁,w₂) = -c² from scaling. Thus,
+    B(w₁+v,w₂+v) = 0
+    B(w₂+v,w₁+v) = B(w₁+w₂)+c^2 = B(w₁+w₂)-B(w₁,w₂)
+  hence B(w₁,w₂) = B(w₂,w₁) a contradiction.
+-/
+
+theorem refl_is_alt_or_symm {B: BilinForm k V} (h: IsRefl B) [FiniteDimensional k V] : IsAlt B ∨ IsSymm B := sorry
 
 def quot_form {B: BilinForm k V} (hb: B.IsRefl): BilinForm k (V ⧸ (radForm B)) := sorry
 
