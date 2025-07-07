@@ -125,6 +125,9 @@ structure Hypsubspace (B: BilinForm k V) where
   linind : LinearIndependent k coe
   pred: Hypspace_fun_pred B coe
 
+example (W: Submodule k V) (f: I → W): I → V := fun i ↦ f i
+
+
 @[simp]
 abbrev Hypsubspace.basis_index {B: BilinForm k V} (H: Hypsubspace B) := H.I ⊕ H.I
 
