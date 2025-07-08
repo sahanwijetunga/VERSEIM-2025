@@ -352,14 +352,22 @@ theorem Hypspace_repr_left {B: BilinForm k V} (H: Hypspace B) (v: V) (i: H.I):
 theorem Hypspace_repr_right {B: BilinForm k V} (H: Hypspace B) (v: V) (i: H.I):
   (H.basis.repr v) (Sum.inr i) = B (H.basis (Sum.inl i)) v  := sorry
 
+@[simp]
 noncomputable def Hypsubspace_of_orthog_ind {B: BilinForm k V} {H₁: Hypsubspace B}
   {H₂: Hypsubspace B} (h: is_orthog_ind B H₁.toSubmodule  H₂.toSubmodule):
   Hypsubspace B where
   I := H₁.I ⊕ H₂.I
-  coe := sorry
+  coe :=
+    fun i =>
+    match i with
+    | Sum.inl (Sum.inl j) => H₁.coe (Sum.inl j)
+    | Sum.inl (Sum.inr j) => H₂.coe (Sum.inl j)
+    | Sum.inr (Sum.inr j) => H₂.coe (Sum.inr j)
+    | Sum.inr (Sum.inl j) => H₁.coe (Sum.inr j)
   linind := sorry
   pred := sorry
 
+@[simp]
 theorem Hypsubspace_of_direct_sum_Hypsubspaces {B: BilinForm k V}
   {H₁: Hypsubspace B} {H₂: Hypsubspace B} (h: is_orthog_ind B H₁.toSubmodule
   H₂.toSubmodule): (Hypsubspace_of_orthog_ind h).toSubmodule = H₁.toSubmodule ⊔ H₂.toSubmodule := by
