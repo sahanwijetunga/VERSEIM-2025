@@ -36,7 +36,27 @@ def Symm (β:BilinForm k V) : Prop :=
 
 
 lemma skew_of_alt (β:BilinForm k V) (ha : Alt β) :
-  Skew β := by sorry
+  Skew β := by
+    intro v w
+  have h0 : β (v+w) = β v + β w := by simp
+  have h : β (v+w) (v+w) = (β v) v + (β w) v + (β v) w + (β w) w :=
+    calc
+    (β (v+w)) (v+w) = (β v) (v+w) + (β w) (v+w) := by rw [LinearMap.BilinForm.add_left]
+    _ = (β v) v + (β w) v + (β v) w + (β w) w := by
+      rw [LinearMap.BilinForm.add_right v v w, LinearMap.BilinForm.add_right w v w, ← add_assoc]; ring
+  have hv : β v v = 0 := by apply ha
+  have hw : β w w = 0 := by apply ha
+  have hvw : β (v+w) (v+w) = 0 := by apply ha
+  rw [hv, hw, hvw, zero_add, add_zero, add_comm] at h
+  have h1: 0 + -(β w) v = (β v) w + (β w) v + -(β w) v := by
+    apply (@add_right_cancel_iff _ _ _ (-(β w) v) 0 ((β v) w + (β w) v)).mpr h
+  rw [zero_add] at h1
+  rw [← sub_eq_add_neg] at h1
+  rw [← add_sub ((β v) w) ((β w) v) ((β w) v)] at h1
+  rw [sub_self ((β w) v)] at h1
+  rw [add_zero] at h1
+  symm at h1
+  exact h1
 
 
 -- the next lemma says that for a vector space over a field k of
@@ -86,10 +106,31 @@ lemma eq_zero_of_two_mul_eq_zero_vector (k: Type*) { V : Type* }
        smul_ne_zero two_neq_zero v_neq_zero
     exact two_smul_ne_zero two_smul_eq_zero
 
+lemma zero_of_two_mul_eq_zero  { k : Type } [ Field k]
+  [CharZero k] (x:k) (h:2*x = 0) : x = 0 := by
+  --have nz2_inst : NeZero ↑2 := inferInstance
+  have nz2 : (2:k) ≠ 0 := NeZero.ne ↑2
+  by_contra x_neq_zero
+  have two_mul_ne_zero : ↑2*x ≠ 0 :=
+    mul_ne_zero nz2 x_neq_zero
+  exact two_mul_ne_zero h
 
-lemma alt_iff_skew (β:BilinForm k V)
-   [CharP k p] (hn2 : p ≠ 2)
-   : Alt β ↔ Skew β := by sorry
+lemma alt_iff_skew (β:V →ₗ[k] V →ₗ[k] k)
+   [CharZero k]
+   : Alt β ↔ Skew β := by
+   constructor
+   intro ha
+   apply skew_of_alt
+   exact ha
+   intro hs
+   intro v
+   have h1 : β v v = -β v v := by apply hs
+   have h2 : β v v + β v v = β v v + -β v v := by
+     apply (@add_left_cancel_iff _ _ _ (β v v) (β v v) (-β v v)).mpr  h1
+   rw [← sub_eq_add_neg, sub_self ((β v) v)] at h2
+   rw [← two_mul] at h2
+   apply zero_of_two_mul_eq_zero at h2
+   exact h2
 
 -- REMARK: we are really only interested in the case of forms which
 -- are either alternating or symmetric.  We are going to formulate a
@@ -112,11 +153,29 @@ lemma skew_is_reflexive (β:BilinForm k V) (h:Skew β) : IsRefl β := by
   assumption
 
 lemma alt_is_reflexive (β:BilinForm k V) (h:Alt β) : IsRefl β := by
-  sorry
+  intro v w l
+  have hv : β v v = 0 := by apply h
+  have hw : β w w = 0 := by apply h
+  have h1 : β (v+w) (v+w) = (β v) v + (β w) v + (β v) w + (β w) w :=
+    calc
+    (β (v+w)) (v+w) = (β v) (v+w) + (β w) (v+w) := by rw [LinearMap.BilinForm.add_left]
+    _ = (β v) v + (β w) v + (β v) w + (β w) w := by
+      rw [LinearMap.BilinForm.add_right v v w, LinearMap.BilinForm.add_right w v w, ← add_assoc]; ring
+  have hvw : β (v+w) (v+w) = 0 := by apply h
+  rw [hv, hw, hvw, zero_add, add_zero, add_comm] at h1
+  have h2: 0 + -(β w) v = (β v) w + (β w) v + -(β w) v := by
+    apply (@add_right_cancel_iff _ _ _ (-(β w) v) 0 ((β v) w + (β w) v)).mpr h1
+  rw [l, zero_add] at h1
+  symm at h1
+  exact h1
 
 
 lemma symm_is_reflexive (β:BilinForm k V) (h:Symm β) : IsRefl β := by
-  sorry
+  intro v w l
+  have h1: (β v) w = (β w) v := by apply h
+  rw [l] at h1
+  symm at h1
+  exact h1
 
 def OrthogSubspaces (β:BilinForm k V) (W₁ W₂ : Submodule k V) : Prop :=
   ∀ (x:W₁), ∀ (y:W₂), β x y = 0
