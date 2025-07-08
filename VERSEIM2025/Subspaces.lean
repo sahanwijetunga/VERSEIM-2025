@@ -17,32 +17,27 @@ import VERSEIM2025.BilinearForms
 
 --------------------------------------------------------------------------------
 
-inductive DisjointUnion (ι κ : Type) where
- | left : ι → DisjointUnion ι κ
- | right : κ → DisjointUnion ι κ
-
-def disjointUnion_funs {ι κ X: Type} ( f₁:ι → X) (f₂:κ → X) (u: ι ⊕ κ) : X :=
+def disjointUnion_funs {ι κ X: Type} ( f₁:ι → X) (f₂:κ → X) (u:ι ⊕ κ) : X :=
    match u with
     | Sum.inl x => f₁ x
     | Sum.inr y => f₂ y
 
 
-open DisjointUnion
-def fin_disjoint_fin_equiv_fin (n m: ℕ) : DisjointUnion (Fin n) (Fin m) ≃ Fin (n+m) where
+def fin_disjoint_fin_equiv_fin (n m: ℕ) : (Fin n) ⊕ (Fin m) ≃ Fin (n+m) where
   toFun := fun i =>
     match i with
-    | left x => Fin.castAdd m x
-    | right x => by
+    | Sum.inl x => Fin.castAdd m x
+    | Sum.inr x => by
         rw [ add_comm ]
         exact Fin.castAdd n x
   invFun := by
     rintro ⟨i,_⟩
     if h : i < n then
        have : NeZero n := NeZero.mk (by linarith)
-       exact left (Fin.ofNat n i)
+       exact Sum.inl (Fin.ofNat n i)
     else
        have : NeZero m := NeZero.mk (by linarith)
-       exact right (Fin.ofNat m (n-i))
+       exact Sum.inr (Fin.ofNat m (n-i))
   left_inv := by sorry
   right_inv := by sorry
 
@@ -158,27 +153,9 @@ lemma union_span (n m:ℕ) (W₁ W₂ : Submodule k V) (s₁:Fin n →  W₁) (s
     : (⊤:Submodule k V) = Submodule.span k ((f s₁ s₂) '' ⊤)  := by sorry
 
 
-
-
-lemma union_span' (n m :ℕ) (W₁ W₂ : Submodule k V) (s₁ s₂ : Set V)
-  (h₁:∀ x∈ s₁, s ∈ W₁) (h₂:∀ x∈s₂, s∈ W₂)
+lemma union_span' (W₁ W₂ : Submodule k V) (s₁ s₂ : Set V)
   (hs₁: W₁ = Submodule.span k s₁)
   (hs₂: W₂ = Submodule.span k s₂)
   (hw: ⊤ = W₁ ⊔ W₂)
   : ⊤ = Submodule.span k (s₁ ∪ s₂) := by
-    ext v
-    rw[hw]
-    rw[Submodule.mem_sup]
-    constructor
-    · intro h₃
-      rw[Submodule.span_union]
-      rw[← hs₁]
-      rw[← hs₂]
-      rw[← hw]
-      trivial
-    · intro h₃
-      rw[Submodule.span_union] at h₃
-      rw[← hs₁] at h₃
-      rw[← hs₂] at h₃
-      rw[← Submodule.mem_sup]
-      exact h₃
+    rw[Submodule.span_union s₁ s₂,hw,hs₁,hs₂]
