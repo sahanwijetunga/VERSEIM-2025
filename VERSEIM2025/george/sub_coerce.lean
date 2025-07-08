@@ -76,3 +76,10 @@ example (X:Type) (Z Y:Set X) (h:Z ⊆ Y) : (Set ↑Y) := by
 
 example (X :Type) (Y:Set X) (Z: Set Y) : Set X :=  Set.image id Z
   
+
+def two_set {X : Type} (x y : X) : Fin 2 → X 
+  | 0 => x
+  | 1 => y
+
+example (ι : Type) (b:Basis ι k V) [Nontrivial ι] : ∃  (v w : V), LinearIndependent k (two_set v w) :=
+  let (v w:V) 
