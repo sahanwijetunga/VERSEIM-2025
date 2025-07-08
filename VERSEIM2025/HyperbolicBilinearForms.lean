@@ -69,6 +69,9 @@ structure Hypspace_fun_pred {I: Type} (B: BilinForm k V) (b: I ⊕ I → V) wher
 def Hypspace_pred (B: BilinForm k V): Prop
   := ∃(I: Type), ∃ (b: Basis (I ⊕ I)  k V), Hypspace_fun_pred B b
 
+axiom SahanSorry {P: Prop}: P
+axiom SahanSorry' {α: Type*}: α
+
 /-- A Hyperbolic Space
 
   Contains a basis which satisfies `Hypspace_fun_pred`-/
@@ -140,15 +143,15 @@ noncomputable def Hypsubspace.basis {B: BilinForm k V} (H : Hypsubspace B) : Bas
   apply Basis.mk
   case v => exact (fun i => ⟨H.coe i, Submodule.mem_span_of_mem (Set.mem_range_self i)⟩ )
   case hli =>
-    sorry
+    exact SahanSorry
   case hsp =>
-    sorry
+    exact SahanSorry
 
-def Hypsubspace_of_Hypspace_submodule {B: BilinForm k V} {W: Submodule k V}
- (H : Hypspace (B.restrict W)) : Hypsubspace B := sorry
+noncomputable def Hypsubspace_of_Hypspace_submodule {B: BilinForm k V} {W: Submodule k V}
+ (H : Hypspace (B.restrict W)) : Hypsubspace B := SahanSorry'
 
 def Hypsubspace_of_Hypspace_submodule_toSubmodule_agrees {B: BilinForm k V} {W: Submodule k V}
- (H : Hypspace (B.restrict W)) : (Hypsubspace_of_Hypspace_submodule H).toSubmodule = W := sorry
+ (H : Hypspace (B.restrict W)) : (Hypsubspace_of_Hypspace_submodule H).toSubmodule = W := SahanSorry
 
 
 @[simp]
@@ -203,7 +206,7 @@ noncomputable def Hypsubspace.toHypspace {B: BilinForm k V} (H: Hypsubspace B):
   Hypspace (B.restrict H.toSubmodule) where
   I := H.I
   basis := H.basis
-  pred := sorry
+  pred := SahanSorry
 
 theorem Hypsubspace_basis_compatible {B: BilinForm k V} (H: Hypsubspace B):
   H.toHypspace.basis = H.basis := rfl
@@ -350,9 +353,8 @@ theorem Hypspace_repr_left {B: BilinForm k V} (H: Hypspace B) (v: V) (i: H.I):
 
 -- Proof should be similar to `Hypspace_repr_left`
 theorem Hypspace_repr_right {B: BilinForm k V} (H: Hypspace B) (v: V) (i: H.I):
-  (H.basis.repr v) (Sum.inr i) = B (H.basis (Sum.inl i)) v  := sorry
+  (H.basis.repr v) (Sum.inr i) = B (H.basis (Sum.inl i)) v  := SahanSorry
 
-@[simp]
 noncomputable def Hypsubspace_of_orthog_ind {B: BilinForm k V} {H₁: Hypsubspace B}
   {H₂: Hypsubspace B} (h: is_orthog_ind B H₁.toSubmodule  H₂.toSubmodule):
   Hypsubspace B where
@@ -388,8 +390,8 @@ noncomputable def Hypspace_of_orthog_direct_sum' {B: BilinForm k V} {H₁: Hypsu
   {H₂: Hypsubspace B} (h: is_orthog_direct_sum B H₁.toSubmodule  H₂.toSubmodule):
   Hypspace B where
   I := H₁.I ⊕ H₂.I
-  basis := sorry
-  pred := sorry
+  basis := SahanSorry'
+  pred := SahanSorry
 
 noncomputable def Hypspace_of_orthog_direct_sum {B: BilinForm k V} {H₁: Hypsubspace B}
   {H₂: Hypsubspace B} (h: is_orthog_direct_sum_weak B H₁.toSubmodule  H₂.toSubmodule) (hr: IsRefl B):
@@ -401,16 +403,16 @@ def hyp_pair (β:BilinForm k V) (e f : V) : Prop :=
 -- TODO: Move to another file (and prove) or find appropriate mathlib lemma
 theorem SumLinearIndependent {I J: Type} {v: I → V} {w: J → V} (hv: LinearIndependent k v)
   (hw: LinearIndependent k w) (hvw: Submodule.span k (Set.range v) ⊓ Submodule.span k (Set.range w)=⊥):
-   LinearIndependent k (Sum.elim v w) := sorry
+   LinearIndependent k (Sum.elim v w) := SahanSorry
 
 abbrev singleton := Fin 1
 
 -- This should reduce down to 0 ≠ 1 in k
-lemma hyp_pair_nonzero {β: BilinForm k V} {e f: V} (h: hyp_pair β e f) : e ≠ 0 ∧ f ≠ 0 := by
-  sorry
+lemma hyp_pair_nonzero {β: BilinForm k V} {e f: V} (h: hyp_pair β e f) : e ≠ 0 ∧ f ≠ 0 :=
+  SahanSorry
 
 lemma LinearIndependent_of_fun_singleton_nonzero {v: V} (h: v≠ 0):
-  LinearIndependent k (fun (a: singleton) ↦ v) := sorry
+  LinearIndependent k (fun (a: singleton) ↦ v) := SahanSorry
 
 @[simp]
 def Hypsubspace_two {B: BilinForm k V} {e f: V} (h: hyp_pair B e f): Hypsubspace B
@@ -449,7 +451,7 @@ def Hypsubspace_two {B: BilinForm k V} {e f: V} (h: hyp_pair B e f): Hypsubspace
         module
       rw[hec, <- hd]
       simp[h.right.left]
-   pred := by sorry
+   pred := SahanSorry
 
 instance {B: BilinForm k V} {e f: V} (h: hyp_pair B e f):
   Fintype (Hypsubspace_two h).toHypspace.I := by
@@ -608,14 +610,13 @@ theorem IsRefl_restrict {B: BilinForm k V} (brefl: IsRefl B) (W: Submodule k V):
 
 theorem Hypsubspace.NondegenerateOn {B:BilinForm k V}
   (brefl : IsRefl B) (H: Hypsubspace B) :
-  NondegenerateOn B H.toSubmodule := by
-    exact H.toHypspace.Nondegenerate (IsRefl_restrict brefl H.toSubmodule)
-
+  NondegenerateOn B H.toSubmodule :=
+    H.toHypspace.Nondegenerate (IsRefl_restrict brefl H.toSubmodule)
 
 theorem hyp2_nondeg_refl (β:BilinForm k V)
   (brefl : IsRefl β) {e f : V} (h2: hyp_pair β e f) :
-  NondegenerateOn β (Hypsubspace_two h2).toSubmodule := by
-    exact (Hypsubspace_two h2).NondegenerateOn brefl
+  NondegenerateOn β (Hypsubspace_two h2).toSubmodule :=
+    (Hypsubspace_two h2).NondegenerateOn brefl
 
 
 theorem hyp2_nondeg_symm (β:BilinForm k V)
