@@ -26,21 +26,26 @@ def LinearIndep_in_subspace
    LinearIndependent k (fn_subspace hmem) := by 
      sorry
 
-lemma fn_image_subspace {W:Submodule k V} {f:ι → V} (hf:∀i, f i ∈ W) :
-  Set.range f = promote (Set.range (fn_subspace hf)) := by 
-  unfold promote
-  unfold fn_subspace 
-  ext
-  simp  
+lemma image_in  {W:Submodule k V} {f:ι → V} (hf:∀i, f i ∈ W) :
+  Set.range f ⊆ W := by 
+  intro x hx
+  have : ∃ i, f i = x:=  Set.mem_range.mp hx
+  rcases this with ⟨i,hi⟩
+  apply Set.mem_of_eq_of_mem 
+  · exact Eq.symm hi
+  · exact hf i
+  
 
 lemma span_in_subspace {W:Submodule k V} {f : ι → V} (hf : ∀i, f i ∈ W) 
   (hspan : W = Submodule.span k (Set.range f)) :
-  ⊤ ≤ Submodule.span k (Set.range (fn_subspace hf)) := by
+  (⊤:Set ↑W) ≤ Submodule.span k (Set.range (fn_subspace hf)) := by
   intro ⟨x,hw⟩ _ 
   have : x ∈ Submodule.span k (Set.range f) := by 
     rw [ ← hspan ]
     exact hw
-  
+  apply Submodule.mem_span.mpr
+  intro p hsubp
+  have : promote (Set.range (fn_subspace hf)) ⊂ (p:Submodule k V) :=
  
 
   
@@ -49,6 +54,7 @@ def basis_of_subspace_basis (W:Submodule k V)
   (b:Basis_of_subspace ι W) : Basis ι k W := by
  apply Basis.mk (LinearIndep_in_subspace b.mem b.indep) 
  · intro ⟨w,hw⟩ _ 
+   sorry
    
 
 example (I X: Type) (Y : Set X) (f:I → X) (hf: ∀i,f i ∈ Y) : Set ↑Y :=
@@ -68,7 +74,5 @@ example (I X:Type) (Y:Set X) (f:I → Y) : I → X :=
 example (X:Type) (Z Y:Set X) (h:Z ⊆ Y) : (Set ↑Y) := by 
   exact { x | x.val ∈ Z}  
 
+example (X :Type) (Y:Set X) (Z: Set Y) : Set X :=  Set.image id Z
   
-
-
-
