@@ -77,9 +77,17 @@ example (X:Type) (Z Y:Set X) (h:Z ⊆ Y) : (Set ↑Y) := by
 example (X :Type) (Y:Set X) (Z: Set Y) : Set X :=  Set.image id Z
   
 
-def two_set {X : Type} (x y : X) : Fin 2 → X 
-  | 0 => x
-  | 1 => y
+def fun_restrict {X Y: Type} {f:X → Y} (S:Set X) : S → Y := Set.restrict S f
+  
 
-example (ι : Type) (b:Basis ι k V) [Nontrivial ι] : ∃  (v w : V), LinearIndependent k (two_set v w) :=
-  let (v w:V) 
+example (ι : Type) (b:Basis ι k V) [hnt:Nontrivial ι] : ∃  (i j : ι), LinearIndependent k 
+  (fun_restrict ⇑b {i,j}) := by
+  
+  
+
+  #check nontrivial_iff.mp
+
+
+
+example (W:Submodule k V) (X:Submodule k W) : Submodule k V :=
+   Submodule.map W.subtype X
