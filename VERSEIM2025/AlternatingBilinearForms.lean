@@ -144,4 +144,6 @@ noncomputable def alternate_iso {B: BilinForm k V} {B': BilinForm k V'} (balt: I
     rw[b'skew]
     simp
 
+#print axioms alternate_iso
+
 end Alternating

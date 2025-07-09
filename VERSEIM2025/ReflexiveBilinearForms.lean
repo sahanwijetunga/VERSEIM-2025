@@ -101,8 +101,7 @@ theorem orthog_direct_sum_of_radForm_isCompl (B: BilinForm k V)
   (W: Submodule k V) (hW: IsCompl (radForm B) W): is_orthog_direct_sum_weak B (radForm B) W := by
   constructor
   . apply (direct_sum_iff_iscompl _ _).mpr hW
-  . rintro ⟨a,ha⟩ ⟨b,hb⟩
-    dsimp
+  . rintro a ha b hb
     exact ha b
 
 theorem Nondegenerate_of_isCompl_of_radForm (B: BilinForm k V) (hr: B.IsRefl)
