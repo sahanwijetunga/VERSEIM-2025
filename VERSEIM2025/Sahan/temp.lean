@@ -1,16 +1,19 @@
--- import Mathlib.Algebra.Module.LinearMap.Basic
--- import Mathlib.Tactic
+import Mathlib.Tactic
+import Mathlib.LinearAlgebra.QuadraticForm.Basic
+import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
 
--- variable {k : Type*} [Field k]
--- variable {V W : Type*} [AddCommGroup V] [Module k V]
--- variable [AddCommGroup W] [Module k W]
+open LinearMap (BilinForm)
+open LinearMap.BilinForm
 
--- def myFunc (x : V) : W := sorry -- your function here
+variable {k V: Type*} [Field k] [AddCommGroup V] [Module k V]
 
-
--- def myLinearMap (hf_add : ∀ x y : V, myFunc (x + y) = ((myFunc x) + (myFunc y): W))
---     (hf_smul : ∀ (c : k) (x : V), myFunc (c • x) = ((c • myFunc x): W)): V →ₗ[k] W where
-
-import VERSEIM2025.Sahan.BilinearForms --  File left not imported due to current work
-
-import VERSEIM2025.HyperbolicBilinearForms --  File left not imported due to current work
+example {I: Type*} {B: BilinForm k V} (g : I → V) (f: I →₀ k) (v: V):
+  (B ((Finsupp.linearCombination k g) f)) v
+       = Finsupp.linearCombination k (fun j => B (g j) v) f := by
+    sorry
+    -- simp [Finsupp.linearCombination_apply, map_sum, map_smul]
+    -- rw [B.map_finsupp_linearCombination]  -- distributes B over the sum
+    -- Now inside the sum: B (a • g i) v = a * B (g i) v
+    -- congr 1  -- reduce goal to pointwise equality inside sum
+    -- ext i
+    -- rw [B.map_smul]  -- scalar multiplication out of the first argument
