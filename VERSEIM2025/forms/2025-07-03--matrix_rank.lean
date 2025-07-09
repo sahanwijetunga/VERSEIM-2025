@@ -68,6 +68,16 @@ example (M:Matrix (Fin m) (Fin n) k) :
    unfold LinearMap.rank
    rfl
 
+-- and it also coincides with `Matrix.rank`
+
+
+example (M:Matrix (Fin m) (Fin n) k) : 
+   M.rank = LinearMap.rank (map_of_matrix M) := by 
+   unfold Matrix.rank
+   unfold map_of_matrix
+      
+
+
 -- --------------------------------------------------------------------------------
 -- 
 -- now the rank-nullity theory compares these numbers!
@@ -125,6 +135,17 @@ theorem rank_nullity' (M:Matrix (Fin m) (Fin n) k) :
   rw [ LinearMap.rank_range_add_rank_ker (map_of_matrix M) ]
   exact rank_fin_fun n
 
+--------------------------------------------------------------------------------
+
+theorem matrix_fullrank_iff_det_ne_zero (n:ℕ) (M:Matrix (Fin n) (Fin n) k) 
+  (hdet : M.det ≠ 0) : M.rank = ↑n := by
+  have im : IsUnit M := by 
+    apply (Matrix.isUnit_iff_isUnit_det M).mpr
+    simp
+    exact hdet
+  rw [ Matrix.rank_of_isUnit M im ]
+  simp
+  
 
 
 
