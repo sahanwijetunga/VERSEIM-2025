@@ -76,3 +76,7 @@ example (X:Type) (Z Y:Set X) (h:Z ⊆ Y) : (Set ↑Y) := by
 
 example (X :Type) (Y:Set X) (Z: Set Y) : Set X :=  Set.image id Z
   
+example (W:Subspace k V) : Function.Injective W.subtype := by simp 
+
+
+example (W:Subspace k V) : ⊥ = LinearMap.ker  W.subtype := by simp
