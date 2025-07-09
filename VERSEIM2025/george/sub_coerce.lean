@@ -96,3 +96,21 @@ example (ι:Type) (W:Submodule k V) (f:ι → V) (hf:∀i, f i ∈ W) (hindep : 
   :  LinearIndependent k (fun i => (⟨f i, hf i⟩:↑W)) := by 
   
   sorry
+
+
+
+lemma span_range {W:Submodule k V} {f:ι → W}
+  (hf : Submodule.span k (Set.range f) = ⊤)
+  : W = Submodule.span k (Set.range (W.subtype ∘ f)) := by 
+  rw [ Set.range_comp ]
+  rw [ Submodule.span_image ]
+  rw [ hf ]
+  simp
+
+
+example (W:Submodule k V) (b:Basis ι k W) 
+  : W = Submodule.span k (Set.range (W.subtype ∘ ⇑b:ι → V)) := by
+  exact span_range  (Basis.span_eq b)
+
+
+
