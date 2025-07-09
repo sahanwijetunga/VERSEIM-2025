@@ -130,13 +130,13 @@ lemma alt_is_reflexive (β:BilinForm k V) (h: β.IsAlt) : IsRefl β := IsAlt.isR
 lemma symm_is_reflexive (β:BilinForm k V) (h: β.IsSymm) : IsRefl β := IsSymm.isRefl h
 
 abbrev OrthogSubspacesWeak (β:BilinForm k V) (W₁ W₂ : Submodule k V) : Prop :=
-  ∀ (x:W₁), ∀ (y:W₂), β x y = 0
+  ∀ x ∈ W₁, ∀ y ∈ W₂, β x y = 0
 
 lemma swap_OrthogSubspacesWeak {β: BilinForm k V} {W₁ W₂: Submodule k V}
   (h: OrthogSubspacesWeak β W₁ W₂) (hr: IsRefl β): OrthogSubspacesWeak β W₂ W₁ := by
-  intro x y
+  intro x hx y hy
   rw[hr]
-  exact h y x
+  exact h y hy x hx
 
 abbrev OrthogSubspaces (β:BilinForm k V) (W₁ W₂ : Submodule k V) : Prop :=
   OrthogSubspacesWeak β W₁ W₂ ∧ OrthogSubspacesWeak β W₂ W₁
@@ -150,7 +150,7 @@ theorem OrthogSubspaces_of_OrthogSubspacesWeak_refl {β: BilinForm k V} {W₁ W�
 theorem OrthogSubspacesWeak_of_orthogonal_complement (β: BilinForm k V) (W: Submodule k V) :
     OrthogSubspacesWeak β W (β.orthogonal W) := by
     unfold OrthogSubspacesWeak
-    rintro ⟨a, ha⟩ ⟨b, hb⟩
+    rintro a ha b hb
     simp at hb
     show β a b =0
     apply hb
@@ -195,10 +195,9 @@ lemma orthog_sets_iff_orthog_subspaces_span (β:BilinForm k V) (s₁ s₂ : Set 
   constructor
   . intro h
     unfold OrthogSubspacesWeak
-    intro ⟨x, hx⟩  ⟨y, hy⟩
+    intro x hx  y hy
     rw[Submodule.mem_span_iff_exists_finset_subset] at hx
     rw[Submodule.mem_span_iff_exists_finset_subset] at hy
-    simp
     have ⟨fx,tx, hstx, hsuppx, hx⟩ := hx
     have ⟨fy,ty, hsty, hsuppy, hy⟩ := hy
     rw[<- hx, <- hy]
