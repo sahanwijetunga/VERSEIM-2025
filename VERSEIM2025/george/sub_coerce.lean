@@ -83,9 +83,9 @@ example (W:Subspace k V) : Function.Injective W.subtype := by simp
 example (W:Subspace k V) : ⊥ = LinearMap.ker  W.subtype := by simp
 
 
-def convert {ι:Type} {W:Submodule k V} {f:ι → V} (hf:∀i, f i ∈ W) 
-  : ι → ↑W 
-  | i => ⟨f i, hf i⟩
+-- def convert {ι:Type} {W:Submodule k V} {f:ι → V} (hf:∀i, f i ∈ W) 
+--   : ι → ↑W 
+--   | i => ⟨f i, hf i⟩
 
 example (ι:Type) (W:Submodule k V) (f:ι → V) (hf:∀i, f i ∈ W) 
   : f = W.subtype ∘ (fun i => ⟨f i, hf i⟩) := by 
