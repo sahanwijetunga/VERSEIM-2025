@@ -179,7 +179,6 @@ noncomputable def Hypspace.toHypsubspace {B: BilinForm k V} (H: Hypspace B):
   Hypsubspace B where
   I := H.I
   coe := H.basis
-  linind := sorry
   pred := sorry
 
 

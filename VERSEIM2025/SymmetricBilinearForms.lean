@@ -63,12 +63,6 @@ structure AnisotropicSubspace (B: BilinForm k V) where
   submodule : Submodule k V
   pred : ∀ v ∈ submodule, (B v v = 0 → v=0)
 
--- def AnisotropicSubspaceZeroSpace (B: BilinForm k V) (h: ∀ (v: V), v = 0):
---   AnisotropicSubspace B := sorry
-
--- def GeneralizedHypspaceZeroSpace (B: BilinForm k V) (h: ∀ (v: V), v = 0):
---   GeneralizedHypspace B := sorry
-
 structure FooSymm {B: BilinForm k V} (bsymm: IsSymm B) where
   orthog : GeneralizedHypsubspace B
   anisotropic : AnisotropicSubspace B
@@ -114,8 +108,6 @@ def FooSymm.mk''' {B: BilinForm k V} (bsymm: IsSymm B) (orthog : OddHypsubspace 
 def ZeroHypSubspace (B: BilinForm k V): Hypsubspace B where
   I := Empty
   coe := fun _ ↦ 0
-  linind := by
-    exact linearIndependent_empty_type
   pred :=
     { isotropic_left := by exact fun i j ↦ zero_left 0,
       isotropic_right := by exact fun i j ↦ zero_left 0,
@@ -159,42 +151,18 @@ noncomputable def OddHypsubspace_of_orthog_ind {B: BilinForm k V} {H₁: Hypsubs
       bsymm.isRefl
 
 
--- @[simp]
--- noncomputable def GeneralizedHypsubspaceExpand {B: BilinForm k V} (H: Hypsubspace B)
---   (H': GeneralizedHypsubspace B) (is_orthog_ind : is_orthog_ind  B H.toSubmodule H'.toSubmodule) (bsymm: IsSymm B):
---   GeneralizedHypsubspace B :=
---     match H' with
---     | GeneralizedHypsubspace.even _ => GeneralizedHypsubspace.even (
---         Hypsubspace_of_orthog_ind is_orthog_ind)
---     | GeneralizedHypsubspace.odd  _ => GeneralizedHypsubspace.odd (
---       OddHypsubspace_of_orthog_ind is_orthog_ind bsymm
---     )
-
-
--- @[simp]
--- theorem GeneralizedHypsubspaceExpand_Span  {B: BilinForm k V} (H: Hypsubspace B)
---   (H': GeneralizedHypsubspace B) (is_orthog_ind : is_orthog_ind  B H.toSubmodule H'.toSubmodule) (bsymm: IsSymm B):
---   (GeneralizedHypsubspaceExpand H H' is_orthog_ind bsymm).toSubmodule = H.toSubmodule ⊔ H'.toSubmodule := by
---     sorry
-
-
 @[simp]
-def HypsubspaceRemoveFormRestriction {B: BilinForm k V} {W: Submodule k V}
+abbrev HypsubspaceRemoveFormRestriction {B: BilinForm k V} {W: Submodule k V}
   (H: Hypsubspace (B.restrict W)): Hypsubspace B where
   I := H.I
   coe := fun i => (H.coe i)
-  linind := by
-    intro i j h
-    have hnice (ind: H.I ⊕ H.I →₀ k): (((Finsupp.linearCombination k fun i ↦ H.coe i) ind): V) = (Finsupp.linearCombination k (fun i ↦ (↑(H.coe i): W): H.I ⊕ H.I → W)) ind := by
-      sorry
-    have: (Finsupp.linearCombination k fun i ↦ H.coe i) i = (Finsupp.linearCombination k fun i ↦ H.coe i) j
-      := by
-      sorry
-    exact H.linind this
   pred := sorry
 
+theorem foo_helper1 {B: BilinForm k V} {W: Submodule k V} {x: V} {H: Hypsubspace (B.restrict W)}
+   (hx: x ∈ (HypsubspaceRemoveFormRestriction H).toSubmodule): ∃(h: x ∈ W), ⟨x,h⟩ ∈ H.toSubmodule := sorry
+
 @[simp]
-def OddHypsubspaceRemoveFormRestriction {B: BilinForm k V} {W: Submodule k V}
+abbrev OddHypsubspaceRemoveFormRestriction {B: BilinForm k V} {W: Submodule k V}
   (H: OddHypsubspace (B.restrict W)): OddHypsubspace B where
   hyp := HypsubspaceRemoveFormRestriction H.hyp
   v := H.v
@@ -216,11 +184,13 @@ def GeneralizedHypsubspaceRemoveFormRestriction {B: BilinForm k V} {W: Submodule
     | GeneralizedHypsubspace.even H => GeneralizedHypsubspace.even (HypsubspaceRemoveFormRestriction H)
     | GeneralizedHypsubspace.odd H => GeneralizedHypsubspace.odd (OddHypsubspaceRemoveFormRestriction H)
 
+set_option pp.proofs true
+
 theorem FooSymmPredExpand {B: BilinForm k V} (bsymm: IsSymm B) (H: Hypsubspace B)
   (horthog: orthog_direct_sum B (H.toSubmodule)) (hsymmpredorthog: FooSymmPred
   (SymmRestrict bsymm (B.orthogonal H.toSubmodule))):
   FooSymmPred bsymm := by
-    let ⟨⟨orthog, anisotropic, ⟨⟨spanOld, interOld⟩, comp2⟩⟩⟩ := hsymmpredorthog
+    let ⟨⟨orthog, anisotropic, ⟨⟨spanOld, interOld⟩, ⟨comp21, comp22⟩ ⟩⟩⟩ := hsymmpredorthog
     match orthog with
     | GeneralizedHypsubspace.even orthog =>
       let W := (B.orthogonal H.toSubmodule)
@@ -260,7 +230,7 @@ theorem FooSymmPredExpand {B: BilinForm k V} (bsymm: IsSymm B) (H: Hypsubspace B
       have mutually_orthog: OrthogSubspacesWeak B orthog_new.toSubmodule anisotropic_new.submodule := by
         unfold OrthogSubspacesWeak
         rw[Hypsubspace_of_direct_sum_Hypsubspaces]
-        intro ⟨x,hx⟩ ⟨y, hy⟩
+        intro x hx y hy
         have hyuw : y ∈ U.map W.subtype := hy
         have: ∃ x₁ ∈ H.toSubmodule, ∃ x₂ ∈ ((HypsubspaceRemoveFormRestriction orthog).toSubmodule),
           x₁ + x₂ = x := by exact Submodule.mem_sup.mp hx
@@ -277,13 +247,23 @@ theorem FooSymmPredExpand {B: BilinForm k V} (bsymm: IsSymm B) (H: Hypsubspace B
             exact hu
         . apply hyW
           exact hx₁
-        . have ⟨⟨u, hu⟩ , huy1, huy2⟩ := hyuw
+        . have hyW: y ∈ W := by
+            have ⟨⟨u, hu⟩ , huy1, huy2⟩ := hyuw
+            rw[<- huy2]
+            exact hu
+          have ⟨⟨u, hu⟩ , huy1, huy2⟩ := hyuw
           rw[<- huy2]
-          have: OrthogSubspaces (B.restrict (B.orthogonal H.toSubmodule)) orthog.toSubmodule
-            anisotropic.submodule := comp2
-          have: OrthogSubspacesWeak (B.restrict (B.orthogonal H.toSubmodule)) orthog.toSubmodule
-            anisotropic.submodule := comp2.1
-          sorry
+          have h1: OrthogSubspaces (B.restrict (B.orthogonal H.toSubmodule)) orthog.toSubmodule
+            anisotropic.submodule := ⟨comp21, comp22⟩
+          have h2: OrthogSubspacesWeak (B.restrict (B.orthogonal H.toSubmodule)) orthog.toSubmodule
+            anisotropic.submodule := comp21
+          have ⟨hx₂, hx₂proof⟩ := foo_helper1 hx₂
+          have: (B.restrict (B.orthogonal H.toSubmodule)) ⟨x₂, hx₂⟩ ⟨u, hu⟩ = B x₂ (W.subtype ⟨u, hu⟩) := by
+            simp
+          rw[<- this]
+          apply h2
+          . exact hx₂proof
+          exact huy1
       exact Nonempty.intro <| FooSymm.mk'' bsymm orthog_new anisotropic_new span mutually_orthog
     | GeneralizedHypsubspace.odd orthog => sorry
 

@@ -14,15 +14,8 @@ import VERSEIM2025.BilinearFormIsomorphisms
   This file is to state definitions for hyperbolic forms,
   and prove theorems proving various equivalences.
 
-  Proofs that other forms (say symmetric, alternating, nondegenerate) are
+  Proofs that other forms (symmetric, alternating) are
   hyperbolic should be included in other files.
-
-  Note: There will likely be some differences between definitions/theorems here and in
-  BilinearForms
-    - For now, statements are imported from VERSEIM2025.Sahan.BilinearForms
-      as all statements about hyperbolic forms were removed from there.
-    - We should probably make the files correspond and change the import to
-      VERSEIM2025.BilinearForms at some point.
 
   Note: Everything is Type not Type* due to issues with existence statements
   - As a result, anything relying on the results here must be Type not Type*
@@ -45,7 +38,7 @@ variable {k V: Type} [AddCommGroup V][Field k][Module k V]
 
 open LinearMap (BilinForm)
 open LinearMap.BilinForm
-open BilinearForms -- This is the namespace in VERSEIM2025.Sahan.BilinearForms
+open BilinearForms -- This is the namespace in VERSEIM2025.BilinearForms
 open BilinIsomorphisms -- This is the namespace in VERSEIM2025.BilinearFormIsomorphisms
 
 @[simp]
@@ -220,41 +213,6 @@ theorem Hypsubspace_orthog' {B: BilinForm k V} (H: Hypsubspace B) (i: H.I) {x: H
   | Sum.inr j => by
     symm at hxi
     simp_all
-
-
--- protected def Basis_repr_left{B: BilinForm k V}(coe : I ⊕ I → V) (f: I ⊕ I →₀ k) (i: H.I):
---   V →ₗ[k] k where
---   toFun := fun v ↦ (H.basis.repr v) (Sum.inl i)
---   map_add' := by simp
---   map_smul' := by simp
-
--- protected noncomputable def Basis_form_right {B: BilinForm k V} (H: Hypspace B) (i: H.I):
---   V →ₗ[k] k where
---   toFun := fun v ↦ B v (H.basis (Sum.inr i))
---   map_add' := by simp
---   map_smul' := by simp
-
--- protected theorem Basis_repr_left_eq_Basis_form_right {B: BilinForm k V} (H: Hypspace B) (i: H.I):
---   Temporary.Basis_repr_left H i = Temporary.Basis_form_right H i := by
---     apply  Basis.ext H.basis
---     intro j
---     match j with
---     | Sum.inl j =>
---       dsimp[Temporary.Basis_repr_left,Temporary.Basis_form_right]
---       by_cases h:i = j
---       . simp[h]
---       . have: j ≠ i := by exact fun a ↦ h (id (Eq.symm a))
---         simp_all
---     | Sum.inr j =>
---       dsimp[Temporary.Basis_repr_left,Temporary.Basis_form_right]
---       by_cases h:i = j
---       . simp[h]
---       . simp_all
-
--- def foo_appl {I: Type} {B: BilinForm k V} (g : I → V) (f: I →₀ k)(v: V):
---   I →₀ k := by
---   apply Finsupp.bilinearCombination
-
 
 lemma bilin_commute_lincomb_nice {I: Type} {B: BilinForm k V} (g : I → V) (f: I →₀ k) (v: V):
   (B ((Finsupp.linearCombination k g) f)) v
@@ -461,6 +419,7 @@ noncomputable def Hypsubspace.toHypspace' {B: BilinForm k V} (H: Hypsubspace B)
   I := H.I
   basis := by  sorry -- apply @Basis.mk
   pred := sorry
+
 
 
 @[simp]

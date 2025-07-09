@@ -8,7 +8,7 @@ VERSEIM-2025 REU @ Tufts University
 -/
 
 import Mathlib.LinearAlgebra.QuadraticForm.Basic
-import VERSEIM2025.Sahan.BilinearForms
+import VERSEIM2025.BilinearForms
 
 /-
   The purpose of this file is to define an isomorphism of bilinear formed spaces
@@ -39,7 +39,6 @@ import VERSEIM2025.Sahan.BilinearForms
     a condition on the corresponding matrices of bilinear form being equal
 -/
 
-open BilinearForms
 open LinearMap (BilinForm)
 open LinearMap.BilinForm
 
