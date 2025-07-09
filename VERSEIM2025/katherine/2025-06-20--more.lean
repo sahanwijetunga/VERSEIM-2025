@@ -72,11 +72,12 @@ def fin_disjoint_fin_equiv_fin (n m: ℕ) : (Fin n) ⊕ (Fin m) ≃ Fin (n+m) wh
     match x₀ with
     | Sum.inl y => simp
     | Sum.inr z =>
-      simp
+
       sorry
   right_inv := by
     intro ⟨ x₀, h₁⟩
     simp
+
     sorry
 
 

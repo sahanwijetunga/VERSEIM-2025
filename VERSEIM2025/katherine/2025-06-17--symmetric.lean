@@ -135,10 +135,10 @@ inductive DisjointUnion (ι₁ ι₂ : Type) where
  | left : ι₁ → DisjointUnion ι₁ ι₂
  | right : ι₂ → DisjointUnion ι₁ ι₂
 
-def disjointUnion_funs {ι₁ ι₂ X: Type} ( f₁:ι₁ → X) (f₂:ι₂ → X) (u:DisjointUnion ι₁ ι₂) : X :=
+def disjointUnion_funs {ι₁ ι₂ X: Type} ( f₁:ι₁ → X) (f₂:ι₂ → X) (u: ι₁ ⊕ ι₂) : X :=
    match u with
-    | DisjointUnion.left x => f₁ x
-    | DisjointUnion.right y => f₂ y
+    | Sum.inl x => f₁ x
+    | Sum.inr y => f₂ y
 
 
 theorem lin_indep_of_orthog (V : Type) [AddCommGroup V] [Module ℝ V] (β:V →ₗ[ℝ] V →ₗ[ℝ] ℝ)
@@ -147,12 +147,11 @@ theorem lin_indep_of_orthog (V : Type) [AddCommGroup V] [Module ℝ V] (β:V →
   (f₁:ι₁ → V) (f₂:ι₂ → V)
   (hi₁:LinearIndependent ℝ f₁) (hi₂:LinearIndependent ℝ f₂) :
   LinearIndependent ℝ (disjointUnion_funs f₁ f₂) := by
-  intro h₀ h₁ h₂
-  -- maybe use linearIndependent_iff
+  intro g₁ g₂ h₀
   ext x₀
-  rcases h₀ with ⟨y₁, y₂, y₃⟩
-  rcases h₁ with ⟨z₁, z₂, z₃⟩
-  simp
+  unfold disjointUnion_funs at h₀
+  rw[Finsupp.linearCombination_apply, Finsupp.linearCombination_apply] at h₀
+
   sorry
 
 #check Submodule

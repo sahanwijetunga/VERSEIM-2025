@@ -83,9 +83,9 @@ example (W:Subspace k V) : Function.Injective W.subtype := by simp
 example (W:Subspace k V) : ⊥ = LinearMap.ker  W.subtype := by simp
 
 
-def convert {ι:Type} {W:Submodule k V} {f:ι → V} (hf:∀i, f i ∈ W) 
-  : ι → ↑W 
-  | i => ⟨f i, hf i⟩
+-- def convert {ι:Type} {W:Submodule k V} {f:ι → V} (hf:∀i, f i ∈ W) 
+--   : ι → ↑W 
+--   | i => ⟨f i, hf i⟩
 
 example (ι:Type) (W:Submodule k V) (f:ι → V) (hf:∀i, f i ∈ W) 
   : f = W.subtype ∘ (fun i => ⟨f i, hf i⟩) := by 
@@ -96,6 +96,22 @@ example (ι:Type) (W:Submodule k V) (f:ι → V) (hf:∀i, f i ∈ W) (hindep : 
   :  LinearIndependent k (fun i => (⟨f i, hf i⟩:↑W)) := by 
   
   sorry
+
+lemma span_range {W:Submodule k V} {f:ι → W}
+  (hf : Submodule.span k (Set.range f) = ⊤)
+  : W = Submodule.span k (Set.range (W.subtype ∘ f)) := by 
+  rw [ Set.range_comp ]
+  rw [ Submodule.span_image ]
+  rw [ hf ]
+  simp
+
+
+example (W:Submodule k V) (b:Basis ι k W) 
+  : W = Submodule.span k (Set.range (W.subtype ∘ ⇑b:ι → V)) := by
+  exact span_range  (Basis.span_eq b)
+
+
+
 
 
 
@@ -115,6 +131,4 @@ example (W:Fin 2 → Type)
     [(i:Fin 2) → AddCommGroup (W i)]
     [(i:Fin 2) → Module k (W i)]
  : Module k ((W 0) × (W 1))  := inferInstance
-
-
 
