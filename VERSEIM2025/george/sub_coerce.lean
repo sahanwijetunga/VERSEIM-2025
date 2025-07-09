@@ -45,7 +45,8 @@ lemma span_in_subspace {W:Submodule k V} {f : ι → V} (hf : ∀i, f i ∈ W)
     exact hw
   apply Submodule.mem_span.mpr
   intro p hsubp
-  have : promote (Set.range (fn_subspace hf)) ⊂ (p:Submodule k V) :=
+  --have : promote (Set.range (fn_subspace hf)) ⊂ (p:Submodule k V) := sorry
+  sorry
  
 
   
@@ -80,3 +81,18 @@ example (W:Subspace k V) : Function.Injective W.subtype := by simp
 
 
 example (W:Subspace k V) : ⊥ = LinearMap.ker  W.subtype := by simp
+
+
+def convert {ι:Type} {W:Submodule k V} {f:ι → V} (hf:∀i, f i ∈ W) 
+  : ι → ↑W 
+  | i => ⟨f i, hf i⟩
+
+example (ι:Type) (W:Submodule k V) (f:ι → V) (hf:∀i, f i ∈ W) 
+  : f = W.subtype ∘ (fun i => ⟨f i, hf i⟩) := by 
+  ext
+  simp
+  
+example (ι:Type) (W:Submodule k V) (f:ι → V) (hf:∀i, f i ∈ W) (hindep : LinearIndependent k f)
+  :  LinearIndependent k (fun i => (⟨f i, hf i⟩:↑W)) := by 
+  
+  sorry
