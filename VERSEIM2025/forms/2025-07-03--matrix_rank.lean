@@ -28,7 +28,7 @@ abbrev sbv (n:ℕ) : Basis (Fin n) k (stdVS k n) := Pi.basisFun k (Fin n)
 
 -- `stdVS n ---> stdVS m` using `Matrix.toLin`
 
-def map_of_matrix {m n :ℕ} (M:Matrix (Fin m) (Fin n) k) : stdVS k n →ₗ[k] stdVS k m := 
+example {m n :ℕ} (M:Matrix (Fin m) (Fin n) k) : stdVS k n →ₗ[k] stdVS k m := 
   Matrix.toLin (sbv n) (sbv m) M
 
 -- now the null space of the matrix is precise the kernel of this
@@ -41,42 +41,29 @@ def map_of_matrix {m n :ℕ} (M:Matrix (Fin m) (Fin n) k) : stdVS k n →ₗ[k] 
 -- use that.
 
 def Nullity (M:Matrix (Fin m) (Fin n) k) : Cardinal :=
-  let null_space : Submodule k (stdVS k n) := LinearMap.ker (map_of_matrix M)
+  let null_space : Submodule k (stdVS k n) := 
+    LinearMap.ker (Matrix.toLin (sbv n) (sbv m) M)
   Module.rank k null_space    
 
 -- The rank of the matrix is precisely the dimension of the image of
--- the corresponding linear transformation. (This is the "column
+-- the corresponding linear transformation. This is the "column
 -- space" -- i.e. the span of the columns of M, viewed as vectors in
 -- `stdVS k m`.
 
+-- lWe can compare `LinearMap.rank` with `Matrix.rank`
+   
+-- the main point is that the column space of a matrix identifies with
+-- the image of the corresponding linear map k^n → k^n.
+ 
+lemma mulVecLin_eq_toLin_sbv (M:Matrix (Fin m) (Fin n) k) : 
+   M.mulVecLin = Matrix.toLin (sbv n) (sbv m) M := by
+   rfl 
 
-def Rank (M:Matrix (Fin m) (Fin n) k) : Cardinal := 
-  let linmap : stdVS k n →ₗ[k] stdVS k m := map_of_matrix M
-  let image : Submodule k (stdVS k m) := LinearMap.range linmap
-  Module.rank k image
-
-    
-    
-
-
--- this is actually already implemented in Mathlib, as `LinearMap.rank`,
--- and it coincides with the definition we just gave.
-
-example (M:Matrix (Fin m) (Fin n) k) : 
-   Rank M  = LinearMap.rank (map_of_matrix M) := by 
-   unfold Rank
-   unfold LinearMap.rank
-   rfl
-
--- and it also coincides with `Matrix.rank`
-
-
-example (M:Matrix (Fin m) (Fin n) k) : 
-   M.rank = LinearMap.rank (map_of_matrix M) := by 
-   unfold Matrix.rank
-   unfold map_of_matrix
-      
-
+lemma rank_eq_linmap_rank  {m n :ℕ} (M:Matrix (Fin m) (Fin n) k) : 
+   (M.rank:Cardinal)  = LinearMap.rank (Matrix.toLin (sbv n) (sbv m) M) := by 
+   unfold Matrix.rank 
+   rw [ mulVecLin_eq_toLin_sbv M ]
+   simp 
 
 -- --------------------------------------------------------------------------------
 -- 
@@ -107,14 +94,14 @@ example (l:ℕ) : Module.rank k (Fin l → k) = l := by exact rank_fin_fun l
 -- `LinearMap.rank_range_add_rank_ker`
 
 theorem rank_nullity (M:Matrix (Fin m) (Fin n) k) : 
-  Rank M + Nullity M = n := by
-  unfold Rank
+  M.rank + Nullity M = n := by
   unfold Nullity
-  rw [ LinearMap.rank_range_add_rank_ker (map_of_matrix M) ]
+  rw [ rank_eq_linmap_rank ]
+  rw [ LinearMap.rank_range_add_rank_ker (Matrix.toLin (sbv n) (sbv m) M) ]
   exact rank_fin_fun n
 
 -- in the next proof, we use the quotient construction on vector
--- spaces and instead use `LinearMap.rank_range_add_rank_ker`
+-- spaces and instead use `LinearMap.rank_quotient_add_rank`
 
 theorem quotient_dim  ( V : Type )
   [ AddCommGroup V] [ Module k V] 
@@ -124,27 +111,51 @@ theorem quotient_dim  ( V : Type )
 
 
 theorem rank_nullity' (M:Matrix (Fin m) (Fin n) k) : 
-  Rank M + Nullity M = n := by
-  unfold Rank
+  M.rank + Nullity M = n := by
+  let linmap : stdVS k n →ₗ[k] stdVS k m := Matrix.toLin (sbv n) (sbv m) M
   unfold Nullity
-  have linear_equiv : LinearMap.range (map_of_matrix M) ≃ₗ[k] (stdVS k n) ⧸ LinearMap.ker (map_of_matrix M) := 
-    (LinearMap.quotKerEquivRange (map_of_matrix M)).symm  
-  have dim_eq : Module.rank k ↥(LinearMap.range (map_of_matrix M)) = 
-                Module.rank k (stdVS k n ⧸ LinearMap.ker (map_of_matrix M)) := 
+  have linear_equiv : LinearMap.range (Matrix.toLin (sbv n) (sbv m) M) 
+                ≃ₗ[k] (stdVS k n) ⧸ (LinearMap.ker linmap) := 
+    (LinearMap.quotKerEquivRange (Matrix.toLin (sbv n) (sbv m) M)).symm  
+  have dim_eq : Module.rank k ↥(LinearMap.range linmap) = 
+                Module.rank k (stdVS k n ⧸ LinearMap.ker linmap) := 
    LinearEquiv.rank_eq linear_equiv
-  rw [ LinearMap.rank_range_add_rank_ker (map_of_matrix M) ]
+  rw [ rank_eq_linmap_rank M] 
+  rw [ LinearMap.rank_range_add_rank_ker linmap ]
   exact rank_fin_fun n
 
 --------------------------------------------------------------------------------
 
+-- the "invertible matrix theorem" results which give the main results over fields are
+
+-- `LinearMap.isUnit_iff_range_eq_top` and
+-- `LinearMap.isUnit_iff_ker_eq_bot`
+
 theorem matrix_fullrank_iff_det_ne_zero (n:ℕ) (M:Matrix (Fin n) (Fin n) k) 
-  (hdet : M.det ≠ 0) : M.rank = ↑n := by
-  have im : IsUnit M := by 
-    apply (Matrix.isUnit_iff_isUnit_det M).mpr
+  : M.det ≠ 0 ↔ M.rank = (n:Cardinal) := by
+  constructor
+  · intro hdet
+    have im : IsUnit M := by 
+      apply (Matrix.isUnit_iff_isUnit_det M).mpr
+      simp
+      exact hdet
+    rw [ Matrix.rank_of_isUnit M im ]
     simp
-    exact hdet
-  rw [ Matrix.rank_of_isUnit M im ]
-  simp
+  · intro h
+
+    let linmap : stdVS k n →ₗ[k] stdVS k n := M.mulVecLin -- Matrix.toLin (sbv n) (sbv n) M
+    --    rw [ rank_eq_linmap_rank M ] at h
+    
+    apply (Matrix.isUnit_iff_isUnit_det M).mp 
+
+    apply (LinearMap.isUnit_iff_range_eq_top linmap).mpr ?_
+
+
+example (n m :ℕ) (f:stdVS k n →ₗ[k] stdVS k n)  (finv : LinearMap.ker f = ⊥) :
+  IsUnit f := by exact (LinearMap.isUnit_iff_ker_eq_bot f).mpr finv
+
+
+
   
 
 
