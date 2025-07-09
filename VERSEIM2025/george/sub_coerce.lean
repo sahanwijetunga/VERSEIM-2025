@@ -96,3 +96,25 @@ example (ι:Type) (W:Submodule k V) (f:ι → V) (hf:∀i, f i ∈ W) (hindep : 
   :  LinearIndependent k (fun i => (⟨f i, hf i⟩:↑W)) := by 
   
   sorry
+
+
+
+open DirectSum
+
+example (ι:Type) (W:ι → Type) 
+    [(i:ι) → AddCommGroup (W i)]
+    [(i:ι) → Module k (W i)]
+ : Module k (⨁ i, W i) := inferInstance
+
+example (ι:Type) (W:ι → Type) 
+    [(i:ι) → AddCommGroup (W i)]
+    [(i:ι) → Module k (W i)]
+ : Module k (Π i, W i) := inferInstance
+
+example (W:Fin 2 → Type) 
+    [(i:Fin 2) → AddCommGroup (W i)]
+    [(i:Fin 2) → Module k (W i)]
+ : Module k ((W 0) × (W 1))  := inferInstance
+
+
+
