@@ -96,9 +96,11 @@ protected theorem alternating_is_hyperbolic_aux (B: BilinForm k V) (balt: IsAlt 
       simp_all
     exact Hypspace_pred_of_Hypspace (Hypspace_of_orthog_direct_sum' h)
 
+
 noncomputable def alternating_is_hyperbolic {B: BilinForm k V} (balt: IsAlt B) (hd: B.Nondegenerate) [FiniteDimensional k V]:
   Hypspace B :=
     Hypspace_of_Hypspace_pred <| Alternating.alternating_is_hyperbolic_aux B balt (Module.finrank k V) rfl hd
+
 
 theorem alternate_is_even_dimension {B: BilinForm k V} (balt: IsAlt B) (hd: B.Nondegenerate) [FiniteDimensional k V]:
   Even (Module.finrank k V) := (alternating_is_hyperbolic balt hd).is_even_dimension
@@ -141,5 +143,7 @@ noncomputable def alternate_iso {B: BilinForm k V} {B': BilinForm k V'} (balt: I
     rw[bskew]
     rw[b'skew]
     simp
+
+#print axioms alternate_iso
 
 end Alternating
