@@ -41,8 +41,8 @@ lemma union_span (n m:ℕ) (W₁ W₂ : Submodule k V) (s₁:Fin n →  W₁) (s
       intro h₅
       sorry
 
-lemma union_span' (n m :ℕ) (W₁ W₂ : Submodule k V) (s₁ s₂ : Set V)
-  (h₁:∀ x∈ s₁, s ∈ W₁) (h₂:∀ x∈s₂, s∈ W₂)
+lemma union_span' /- (n m :ℕ) -/ (W₁ W₂ : Submodule k V) (s₁ s₂ : Set V)
+  /- (h₁:∀ x ∈ s₁, s ∈ W₁) (h₂:∀ x∈s₂, s∈ W₂) -/
   (hs₁: W₁ = Submodule.span k s₁)
   (hs₂: W₂ = Submodule.span k s₂)
   (hw: ⊤ = W₁ ⊔ W₂)
@@ -93,10 +93,10 @@ theorem lin_indep_by_transverse_subspaces
    (hbw1 : ∀ i, b₁ i ∈ W₁)
    (hbw2 : ∀ i, b₂ i ∈ W₂)
    [DecidableEq I₁] [DecidableEq I₂]
-   : LinearIndependent k (disjointUnion_funs b₁ b₂) := by
+   : LinearIndependent k (Sum.elim b₁ b₂) := by
     rw[linearIndependent_iff'']
     intro s a g h₁ t
-    have k₀ : ∑ i ∈ s, a i • disjointUnion_funs b₁ b₂ i = ∑ i : (I₁ ⊕ I₂), a i • disjointUnion_funs b₁ b₂ i := by
+    have k₀ : ∑ i ∈ s, a i • Sum.elim b₁ b₂ i = ∑ i : (I₁ ⊕ I₂), a i • Sum.elim b₁ b₂ i := by
       rw[h₁]
       have k₀₀ : Disjoint s sᶜ := by
         unfold Disjoint
@@ -129,15 +129,13 @@ theorem lin_indep_by_transverse_subspaces
       rw[k₀₃]
       simp
       exact h
-    have eq_h : ∑ a₁, a (Sum.inl a₁) • disjointUnion_funs b₁ b₂ (Sum.inl a₁) +
-    ∑ a₂, a (Sum.inr a₂) • disjointUnion_funs b₁ b₂ (Sum.inr a₂) =
+    have eq_h : ∑ a₁, a (Sum.inl a₁) • Sum.elim b₁ b₂ (Sum.inl a₁) +
+    ∑ a₂, a (Sum.inr a₂) • Sum.elim b₁ b₂ (Sum.inr a₂) =
     ∑ i, (a (Sum.inl i)) • (b₁ i) + ∑ j, (a (Sum.inr j)) • (b₂ j) := by
-      unfold disjointUnion_funs
       simp
     have k₁ : ∑ i, (a (Sum.inl i)) • (b₁ i) = - ∑ j, (a (Sum.inr j)) • (b₂ j)  := by
       rw[k₀] at h₁
       simp at h₁
-      rw[eq_h] at h₁
       rw[add_eq_zero_iff_eq_neg'] at h₁
       rw[h₁]
       simp
@@ -232,34 +230,73 @@ example (W₁ W₂ : Submodule k V)
         (hindep : W₁ ⊓ W₂ = (⊥:Submodule k V))
         [DecidableEq ι₁] [DecidableEq ι₂]:
        Basis (ι₁ ⊕ ι₂) k V := by
-      have hli: LinearIndependent k (disjointUnion_funs' ( B₁) (B₂)) := by
+      have hli: LinearIndependent k (Sum.elim (W₁.subtype ∘ B₁) (W₂.subtype ∘ B₂)) := by
         apply lin_indep_by_transverse_subspaces
-        · -- could use a theorem saying bases are linearly indep
-          have k₁: (fun x ↦ ↑(B₁ x)) =  ⇑B₁ := by
-            simp
-
-
-          rw[k₁ ]
-          exact Basis.linearIndependent B₁
-
-          --rw[linearIndependent_iff_ker]
-          have k₀ : (LinearIndependent k fun x ↦ ((⇑ B₁ x))) ↔ (LinearIndependent k ↑ B₁) := by
-            simp
-          rw[k₀]
-          exact Basis.linearIndependent B₁
-
-          sorry
-        · -- could use a theorem saying bases are linearly indep
-          sorry
+        · apply LinearIndependent.map' B₁.linearIndependent W₁.subtype (by simp)
+        · apply LinearIndependent.map' B₂.linearIndependent W₂.subtype (by simp)
         · have k₀ : Disjoint W₁ W₂ := by
             rw[disjoint_iff]
             exact hindep
           rw[Disjoint.eq_bot k₀]
         · simp
         · simp
-      have hsp: ⊤ ≤ Submodule.span k (Set.range (disjointUnion_funs' B₁ B₂)) := by
+      have hsp: ⊤ ≤ Submodule.span k (Set.range (Sum.elim (W₁.subtype ∘ B₁) (W₂.subtype ∘ B₂))) := by
+        simp
+        ext v
+        simp
+        have hs₁ : W₁ = Submodule.span k (Set.range (Subtype.val ∘ ⇑B₁)) := by
+          sorry
+        have hs₂ : W₂ = Submodule.span k (Set.range (Subtype.val ∘ ⇑B₂)) := by
+          sorry
 
-        sorry
+        rw[union_span' 1 2 hs₁ W₁ hs₂ hspan]
+        -- failed to synthesize finite dimensional???
+
+        by_cases h:  v ∈ W₁
+        ·
+          --rw[Set.range_comp, Set.range_comp]
+          --rw[Submodule.span_union]
+
+          #check union_span'
+
+          suffices vmem: (v ∈ Submodule.span k (Set.range (Subtype.val ∘  ⇑B₁))) from ?_
+          ·  exact Submodule.mem_sup_left vmem
+          /-
+          suffices vmem: (v ∈ Submodule.span k (Subtype.val ∘  Set.range ⇑B₁)) from ?_
+          ·  exact Submodule.mem_sup_left vmem
+          -/
+
+
+          /- have k₁ : Submodule.span k (Set.range (Subtype.val ∘ ⇑B₁)) = Submodule.map (W₁.subtype) (Submodule.span k (Set.range (⇑B₁))) := by
+            simp
+            sorry -/
+
+          rw[Submodule.apply_mem_span_image_iff_mem_span Subtype.val]
+          #check Submodule.span_image'
+
+          #check Basis.span_eq
+          #check Basis.mem_span
+
+
+
+          rw[Submodule.mem_span]
+          intro X g
+          rw[Set.union_subset_iff] at g
+          rcases g with ⟨ g₁,  g₂ ⟩
+          --rw[Set.range_comp] at g₁
+          /- have k₀: v ∈ (Set.range ⇑ B₁) := by
+            sorry  -/
+          --Set.mem_image_of_mem
+          --apply Set.range_comp_subset_range at g₁
+          have k₀: (Set.range ⇑ B₁ ) ⊆  (⊤ : Set W₁ ) := by
+            simp
+          rw[k₀] at g₁
+          #check Basis.span_eq
+          #check Basis.mem_span
+          sorry
+        ·
+          sorry
+
 
       exact Basis.mk hli hsp
 
