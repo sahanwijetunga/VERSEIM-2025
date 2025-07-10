@@ -35,166 +35,100 @@ open BilinIsomorphisms -- This is the namespace in VERSEIM2025.BilinearFormIsomo
 
 
 /- Note: This definition may be clunky; could be worth changing. -/
--- @[ext]
--- structure OddHypspace (B: BilinForm k V) where
---   hyp : Hypsubspace B
---   v: V
---   hv: B v v ≠ 0
---   orthog1: ∀ i, B (hyp.coe i) v = 0
---   orthog2: ∀ i, B v (hyp.coe i) = 0
---   span:
+@[ext]
+structure OddHypspace (B: BilinForm k V) where
+  hyp : Hypsubspace B
+  basis : Basis ((hyp.I ⊕ hyp.I ) ⊕ singleton) k V
+  compatible : hyp.coe = basis ∘ Sum.inl
 
--- def OddHypspace_pred (B: BilinForm k V): Prop
---   := Nonempty ( OddHypspace B)
+def OddHypspace_pred (B: BilinForm k V): Prop
+  := Nonempty ( OddHypspace B)
 
--- abbrev OddHypspace.basis_index {B: BilinForm k V} (H: OddHypspace B)
---   := H.hyp.basis_index ⊕ singleton
+abbrev OddHypspace.basis_index {B: BilinForm k V} (H: OddHypspace B)
+  := H.hyp.basis_index ⊕ singleton
 
--- abbrev OddHypspace.I {B: BilinForm k V} (H: OddHypspace B)
---   := H.hyp.I
+abbrev OddHypspace.I {B: BilinForm k V} (H: OddHypspace B)
+  := H.hyp.I
 
--- noncomputable def OddHypspace_of_OddHypspace_pred {B: BilinForm k V} (h: OddHypspace_pred B): OddHypspace B :=
---   Classical.choice h
+noncomputable def OddHypspace_of_OddHypspace_pred {B: BilinForm k V} (h: OddHypspace_pred B): OddHypspace B :=
+  Classical.choice h
 
--- theorem OddHypspace_pred_of_OddHypspace {B: BilinForm k V} (H: OddHypspace B):
---   OddHypspace_pred B:= ⟨H⟩
+theorem OddHypspace_pred_of_OddHypspace {B: BilinForm k V} (H: OddHypspace B):
+  OddHypspace_pred B:= ⟨H⟩
 
 /-
   Note: This below definition `OddHypsubspace` was created purely to have a type down. It
   should probably be heavily modified before proving any of the auxillary theorems/defns
   about it.
 -/
-
-def singleton_fun (v: V) : singleton → V := fun _ ↦ v
-
-theorem singleton_fun_linind {v: V} (hv: v ≠ 0): LinearIndependent k (singleton_fun v) := sorry
-
 @[ext]
 structure OddHypsubspace (B: BilinForm k V) where
   hyp : Hypsubspace B
-  v: V
-  hv: B v v ≠ 0
-  orthog1: ∀ i, B (hyp.coe i) v = 0
-  orthog2: ∀ i, B v (hyp.coe i) = 0
+  coe :  (hyp.basis_index ⊕ singleton) →  V
+  compatible : hyp.coe = coe ∘ Sum.inl
+  linind : LinearIndependent k coe
 
-@[simp]
-def OddHypsubspace.mk' {B: BilinForm k V} (hyp: Hypsubspace B) {v: V}
-  (hv: B v v ≠ 0) (orthog: ∀ i, B (hyp.coe i ) v = 0) (hr: IsRefl B) : OddHypsubspace B where
-  hyp := hyp
-  v := v
-  hv := hv
-  orthog1 := orthog
-  orthog2 := fun i ↦ hr (hyp.coe i) v (orthog i)
-
-
-@[simp]
-abbrev OddHypsubspace.vfun {B: BilinForm k V} (H: OddHypsubspace B):= singleton_fun H.v
-
-@[simp]
-abbrev OddHypsubspace.vspan {B: BilinForm k V} (H: OddHypsubspace B): Submodule k V:=
-  Submodule.span k {H.v}
-
-@[simp]
-abbrev OddHypsubspace.coe {B: BilinForm k V} (H: OddHypsubspace B):= Sum.elim (H.hyp.coe) (H.vfun)
-
-@[simp]
-theorem OddHypsubspace.linind {B: BilinForm k V} (H: OddHypsubspace B):
-  LinearIndependent k H.coe := sorry
-
-@[simp]
-theorem OddHypsubspace.orthogSubspaces {B: BilinForm k V} (H: OddHypsubspace B):
-  OrthogSubspaces B H.hyp.toSubmodule H.vspan := sorry
-
-
-@[simp]
 abbrev OddHypsubspace.basis_index {B: BilinForm k V} (H: OddHypsubspace B)
   := H.hyp.basis_index ⊕ singleton
 
-@[simp]
 abbrev OddHypsubspace.I {B: BilinForm k V} (H: OddHypsubspace B)
   := H.hyp.I
 
 @[simp]
 def OddHypsubspace.toSubmodule {B: BilinForm k V} (H : OddHypsubspace B) :
-  Submodule k V := H.hyp.toSubmodule ⊔ H.vspan
+  Submodule k V := Submodule.span k (Set.range H.coe)
 
 @[simp]
-def OddHypsubspace.compatible_toSubmodule {B: BilinForm k V} (H : OddHypsubspace B) :
-  H.toSubmodule = Submodule.span k (Set.range H.coe) := sorry
+noncomputable def OddHypsubspace.basis {B: BilinForm k V} (H : OddHypsubspace B) :
+  Basis H.basis_index k H.toSubmodule := sorry
 
+def OddHypsubspace_of_OddHypspace_submodule  {B: BilinForm k V} {W: Submodule k V}
+ (H : OddHypspace (B.restrict W)) : OddHypsubspace B := sorry
 
--- @[simp]
--- noncomputable def OddHypsubspace.basis {B: BilinForm k V} (H : OddHypsubspace B) :
---   Basis H.basis_index k H.toSubmodule := sorry
+def OddHypsubspace_of_OddHypspace_submodule_toSubmodule_agrees {B: BilinForm k V} {W: Submodule k V}
+ (H : OddHypspace (B.restrict W)) : (OddHypsubspace_of_OddHypspace_submodule H).toSubmodule = W := sorry
 
--- def OddHypsubspace_of_OddHypspace_submodule  {B: BilinForm k V} {W: Submodule k V}
---  (H : OddHypspace (B.restrict W)) : OddHypsubspace B := sorry
+@[simp]
+noncomputable def OddHypsubspace.toOddHypspace {B: BilinForm k V} (H: OddHypsubspace B):
+  OddHypspace (B.restrict H.toSubmodule) where
+  hyp := {
+    I := H.I
+    coe := fun i => ⟨ H.hyp.coe i,sorry⟩
+    linind := sorry
+    pred := sorry
+  }
+  basis := sorry
+  compatible := sorry
 
--- def OddHypsubspace_of_OddHypspace_submodule_toSubmodule_agrees {B: BilinForm k V} {W: Submodule k V}
---  (H : OddHypspace (B.restrict W)) : (OddHypsubspace_of_OddHypspace_submodule H).toSubmodule = W := sorry
-
--- @[simp]
--- noncomputable def OddHypsubspace.toOddHypspace {B: BilinForm k V} (H: OddHypsubspace B):
---   OddHypspace (B.restrict H.toSubmodule) where
---   hyp := {
---     I := H.I
---     coe := fun i => ⟨ H.hyp.coe i,sorry⟩
---     linind := sorry
---     pred := sorry
---   }
---   basis := sorry
---   compatible := sorry
-
--- theorem OddHypsubspace_basis_compatible {B: BilinForm k V}  (H: OddHypsubspace B):
---   H.toOddHypspace.basis = H.basis := sorry
+theorem OddHypsubspace_basis_compatible {B: BilinForm k V}  (H: OddHypsubspace B):
+  H.toOddHypspace.basis = H.basis := sorry
 
 -- A `GeneralizedHypspace` is either a Hypspace or an OddHypspace.
--- inductive GeneralizedHypspace (B: BilinForm k V) where
---   | even : Hypspace B → GeneralizedHypspace B
---   | odd : OddHypspace B → GeneralizedHypspace B
+inductive GeneralizedHypspace (B: BilinForm k V) where
+  | even : Hypspace B → GeneralizedHypspace B
+  | odd : OddHypspace B → GeneralizedHypspace B
 
--- def GeneralizedHypspace.I {B: BilinForm k V} (H: GeneralizedHypspace B): Type :=
---   match H with
---   | GeneralizedHypspace.even H => H.I
---   | GeneralizedHypspace.odd H => H.I
+def GeneralizedHypspace.I {B: BilinForm k V} (H: GeneralizedHypspace B): Type :=
+  match H with
+  | GeneralizedHypspace.even H => H.I
+  | GeneralizedHypspace.odd H => H.I
 
--- @[simp]
--- def GeneralizedHypspace.basis_index {B: BilinForm k V} (H : GeneralizedHypspace B): Type :=
---   match H with
---   | GeneralizedHypspace.even H => H.basis_index
---   | GeneralizedHypspace.odd H => H.basis_index
+@[simp]
+def GeneralizedHypspace.basis_index {B: BilinForm k V} (H : GeneralizedHypspace B): Type :=
+  match H with
+  | GeneralizedHypspace.even H => H.basis_index
+  | GeneralizedHypspace.odd H => H.basis_index
 
--- @[simp]
--- def GeneralizedHypspace.basis {B: BilinForm k V} (H : GeneralizedHypspace B): Basis H.basis_index k V :=
---   match H with
---   | GeneralizedHypspace.even H => H.basis
---   | GeneralizedHypspace.odd H => H.basis
+@[simp]
+def GeneralizedHypspace.basis {B: BilinForm k V} (H : GeneralizedHypspace B): Basis H.basis_index k V :=
+  match H with
+  | GeneralizedHypspace.even H => H.basis
+  | GeneralizedHypspace.odd H => H.basis
 
 inductive GeneralizedHypsubspace (B: BilinForm k V)  where
   | even : Hypsubspace B → GeneralizedHypsubspace B
   | odd : OddHypsubspace B → GeneralizedHypsubspace B
 
-@[simp]
-noncomputable def Hypspace.toHypsubspace {B: BilinForm k V} (H: Hypspace B):
-  Hypsubspace B where
-  I := H.I
-  coe := H.basis
-  linind := sorry
-  pred := sorry
-
-
--- @[simp]
--- noncomputable def OddHypspace.toOddHypsubspace {B: BilinForm k V} (H: OddHypspace B):
---   OddHypsubspace B where
---   hyp := H.hyp
-
--- def GeneralizedHypspace.toGeneralizedHypsubspace {B: BilinForm k V} (H: GeneralizedHypspace B): GeneralizedHypsubspace B :=
---   match H with
---   | GeneralizedHypspace.even H => GeneralizedHypsubspace.even H.Hypsubspace
---   | GeneralizedHypspace.odd H => GeneralizedHypsubspace.even H.OddHypsubspace
-
-
-@[simp]
 def GeneralizedHypsubspace.I {B: BilinForm k V} (H: GeneralizedHypsubspace B): Type :=
   match H with
   | GeneralizedHypsubspace.even H => H.I
@@ -227,11 +161,11 @@ def GeneralizedHypsubspace.toSubmodule {B: BilinForm k V} (H : GeneralizedHypsub
 -- noncomputable def GeneralizedHypsubspace.basis {B: BilinForm k V} (H : GeneralizedHypsubspace B) :
 --   Basis (H.basis_index) k H.toSubmodule := sorry
 
--- def GeneralizedHypsubspace_of_GeneralizedHypspace_submodule {B: BilinForm k V} {W: Submodule k V}
---  (H : GeneralizedHypspace (B.restrict W)) : GeneralizedHypsubspace B:= sorry
+def GeneralizedHypsubspace_of_GeneralizedHypspace_submodule {B: BilinForm k V} {W: Submodule k V}
+ (H : GeneralizedHypspace (B.restrict W)) : GeneralizedHypsubspace B:= sorry
 
--- def GeneralizedHypsubspace_of_GeneralizedHypspace_submodule_toSubmodule_agrees {B: BilinForm k V} {W: Submodule k V}
---  (H : GeneralizedHypspace (B.restrict W)) : (GeneralizedHypsubspace_of_GeneralizedHypspace_submodule H).toSubmodule = W := sorry
+def GeneralizedHypsubspace_of_GeneralizedHypspace_submodule_toSubmodule_agrees {B: BilinForm k V} {W: Submodule k V}
+ (H : GeneralizedHypspace (B.restrict W)) : (GeneralizedHypsubspace_of_GeneralizedHypspace_submodule H).toSubmodule = W := sorry
 
 -- @[simp]
 -- noncomputable def GeneralizedHypsubspace.toGeneralizedHypspace {B: BilinForm k V} (H: GeneralizedHypsubspace B):

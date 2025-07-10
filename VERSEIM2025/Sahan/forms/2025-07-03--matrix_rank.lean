@@ -52,10 +52,11 @@ def Nullity (M:Matrix (Fin m) (Fin n) k) : ℕ :=
 
 
 def Rank (M:Matrix (Fin m) (Fin n) k) : Cardinal :=
+  let linmap : stdVS k n →ₗ[k] stdVS k m := map_of_matrix M
+  let image : Submodule k (stdVS k m) := LinearMap.range linmap
   Module.rank k image
-  where
-    linmap : stdVS k n →ₗ[k] stdVS k m := map_of_matrix M
-    image : Submodule k (stdVS k m) := LinearMap.range linmap
+
+
 
 
 -- this is actually already implemented in Mathlib, as `LinearMap.rank`,
@@ -63,10 +64,6 @@ def Rank (M:Matrix (Fin m) (Fin n) k) : Cardinal :=
 
 example (M:Matrix (Fin m) (Fin n) k) :
    Rank M  = LinearMap.rank (map_of_matrix M) := by
-   unfold Rank
-   unfold Rank.image
-   unfold Rank.linmap
-   unfold LinearMap.rank
    rfl
 
 -- --------------------------------------------------------------------------------
@@ -100,10 +97,9 @@ example (l:ℕ) : Module.rank k (Fin l → k) = l := by exact rank_fin_fun l
 theorem rank_nullity (M:Matrix (Fin m) (Fin n) k) :
   Rank M + Nullity M = n := by
   unfold Rank
-  unfold Rank.image
-  unfold Rank.linmap
   unfold Nullity
   unfold Nullity.null_space
+  simp
   rw [ LinearMap.rank_range_add_rank_ker (map_of_matrix M) ]
   exact rank_fin_fun n
 
@@ -120,8 +116,6 @@ theorem quotient_dim  ( V : Type )
 theorem rank_nullity' (M:Matrix (Fin m) (Fin n) k) :
   Rank M + Nullity M = n := by
   unfold Rank
-  unfold Rank.image
-  unfold Rank.linmap
   unfold Nullity
   unfold Nullity.null_space
   have linear_equiv : LinearMap.range (map_of_matrix M) ≃ₗ[k] (stdVS k n) ⧸ LinearMap.ker (map_of_matrix M) :=
@@ -129,5 +123,6 @@ theorem rank_nullity' (M:Matrix (Fin m) (Fin n) k) :
   have dim_eq : Module.rank k ↥(LinearMap.range (map_of_matrix M)) =
                 Module.rank k (stdVS k n ⧸ LinearMap.ker (map_of_matrix M)) :=
    LinearEquiv.rank_eq linear_equiv
+  simp
   rw [ LinearMap.rank_range_add_rank_ker (map_of_matrix M) ]
   exact rank_fin_fun n
