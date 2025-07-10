@@ -15,7 +15,7 @@ abbrev stdVS  (k:Type) [Field k] (n:ℕ) : Type := (Fin n → k)
 
 -- we use `abbrev` so that Lean is (more likely to) automatically
 -- unfolds the definition -- this really is mainly an abbreviation to
--- avoid typing the pesky arrow `→ₗ[k]`
+-- avoid extra typing 
 
 example (n:ℕ) : Module k (stdVS k n) := inferInstance
 
@@ -42,9 +42,10 @@ lemma mulVecLin_eq_toLin_sbv (M:Matrix (Fin m) (Fin n) k) :
 
 -- and the nullity of M is just the dimension of this null space
 
--- we *could* treat it as a natural number (ℕ), but some results we
--- seem to need are stated in terms of the type `Cardinal`, so we'll
--- use that.
+-- we find this dimension via `finrank` so that it is a natural
+-- number. We could have instead used `Module.rank` and then the
+-- dimension would be represented as a `Cardinal`, which includes
+-- infinite cardinals.
 
 def Nullity (M:Matrix (Fin m) (Fin n) k) : ℕ :=
   let null_space : Submodule k (stdVS k n) := 
@@ -52,9 +53,9 @@ def Nullity (M:Matrix (Fin m) (Fin n) k) : ℕ :=
   Module.finrank k null_space    
 
 -- The rank of the matrix is precisely the dimension of the image of
--- the corresponding linear transformation. This is the "column
--- space" -- i.e. the span of the columns of M, viewed as vectors in
--- `stdVS k m`.
+-- the corresponding linear transformation. This is the dimension of
+-- the "column space" -- i.e. the span of the columns of M, viewed as
+-- vectors in `stdVS k m`.
 
 -- lWe can compare `LinearMap.finrank` with `Matrix.rank`
    
@@ -112,6 +113,8 @@ theorem quotient_dim  ( V : Type )
   : Module.rank k (V ⧸ W) + Module.rank k W = Module.rank k V  := by 
   apply Submodule.rank_quotient_add_rank
 
+-- here we can give a proof of rank-nullity using the argument via the
+-- quotient vector space described above
 
 theorem rank_nullity' {m n : ℕ} (M:Matrix (Fin m) (Fin n) k) : 
   M.rank + Nullity M = n := by
@@ -129,20 +132,23 @@ theorem rank_nullity' {m n : ℕ} (M:Matrix (Fin m) (Fin n) k) :
   exact Module.finrank_fin_fun k
 
 --------------------------------------------------------------------------------
+-- Finally, let's relate the non-vanishing of `M.det` to the rank of the
+-- matrix `M`.
 
 -- the "invertible matrix theorem" results which give the main results over fields are
 
 -- `LinearMap.isUnit_iff_range_eq_top` and
 -- `LinearMap.isUnit_iff_ker_eq_bot`
 
--- for example, we have
+-- for example, we have (for finite dimensional V) that a linear map
+-- `f:V → V` is invertible ↔ `ker f = ⊥`
 
 example (n :ℕ) (f:stdVS k n →ₗ[k] stdVS k n)  (finv : LinearMap.ker f = ⊥) :
     IsUnit f := by exact (LinearMap.isUnit_iff_ker_eq_bot f).mpr finv
 
 
 -- note that the determinant of a linear map is the same as that of
--- the corresponding matrix
+-- the corresponding matrix. 
 
 example  (n:ℕ) (M:Matrix (Fin n) (Fin n) k) : (M.toLin (sbv n) (sbv n)).det = M.det := by 
   apply LinearMap.det_toLin (sbv n) M
@@ -151,14 +157,18 @@ example  (n:ℕ) (M:Matrix (Fin n) (Fin n) k) : (M.toLin (sbv n) (sbv n)).det = 
 theorem matrix_fullrank_iff_det_ne_zero (n:ℕ) (M:Matrix (Fin n) (Fin n) k) 
   : M.det ≠ 0 ↔ M.rank = n := by
   constructor
-  · intro hdet
+
+  · -- the mp direction
+    intro hdet
     have im : IsUnit M := by 
       apply (Matrix.isUnit_iff_isUnit_det M).mpr
       simp
       exact hdet
     rw [ Matrix.rank_of_isUnit M im ]
     simp
-  · intro h
+
+  · -- the mpr direction 
+    intro h
     rw [ ←LinearMap.det_toLin (sbv n) M ]
     rw [ ←mulVecLin_eq_toLin_sbv M ]
 
