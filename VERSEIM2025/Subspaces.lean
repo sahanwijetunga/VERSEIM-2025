@@ -55,10 +55,10 @@ theorem lin_indep_by_transverse_subspaces
    (hbw1 : ∀ i, b₁ i ∈ W₁)
    (hbw2 : ∀ i, b₂ i ∈ W₂)
    [DecidableEq I₁] [DecidableEq I₂]
-   : LinearIndependent k (disjointUnion_funs b₁ b₂) := by
+   : LinearIndependent k (Sum.elim b₁ b₂) := by
     rw[linearIndependent_iff'']
     intro s a g h₁ t
-    have k₀ : ∑ i ∈ s, a i • disjointUnion_funs b₁ b₂ i = ∑ i : (I₁ ⊕ I₂), a i • disjointUnion_funs b₁ b₂ i := by
+    have k₀ : ∑ i ∈ s, a i • Sum.elim b₁ b₂ i = ∑ i : (I₁ ⊕ I₂), a i • Sum.elim b₁ b₂ i := by
       rw[h₁]
       have k₀₀ : Disjoint s sᶜ := by
         unfold Disjoint
@@ -91,15 +91,13 @@ theorem lin_indep_by_transverse_subspaces
       rw[k₀₃]
       simp
       exact h
-    have eq_h : ∑ a₁, a (Sum.inl a₁) • disjointUnion_funs b₁ b₂ (Sum.inl a₁) +
-    ∑ a₂, a (Sum.inr a₂) • disjointUnion_funs b₁ b₂ (Sum.inr a₂) =
+    have eq_h : ∑ a₁, a (Sum.inl a₁) • Sum.elim b₁ b₂ (Sum.inl a₁) +
+    ∑ a₂, a (Sum.inr a₂) • Sum.elim b₁ b₂ (Sum.inr a₂) =
     ∑ i, (a (Sum.inl i)) • (b₁ i) + ∑ j, (a (Sum.inr j)) • (b₂ j) := by
-      unfold disjointUnion_funs
       simp
     have k₁ : ∑ i, (a (Sum.inl i)) • (b₁ i) = - ∑ j, (a (Sum.inr j)) • (b₂ j)  := by
       rw[k₀] at h₁
       simp at h₁
-      rw[eq_h] at h₁
       rw[add_eq_zero_iff_eq_neg'] at h₁
       rw[h₁]
       simp
@@ -132,6 +130,8 @@ theorem lin_indep_by_transverse_subspaces
         rw[k₃]
     · simp
     · simp
+
+
 
 
 
@@ -183,3 +183,41 @@ lemma union_span'' (n m :ℕ) (W₁ W₂ : Submodule k V) (s₁ s₂ : Set V)
       rw[← hs₂] at h₃
       rw[← Submodule.mem_sup]
       exact h₃
+
+
+lemma span_range {ι: Type} {W: Submodule k V} {f: ι → W} (hf : Submodule.span k (Set.range f) = ⊤) :
+W = Submodule.span k (Set.range (W.subtype ∘ f)) := by
+  rw[Set.range_comp]
+  rw[Submodule.span_image]
+  rw[hf]
+  simp
+
+
+noncomputable
+def basis_of_direct_sum (W₁ W₂ : Submodule k V)
+        (ι₁ ι₂ : Type) [Fintype ι₁] [Fintype ι₂]
+        (B₁ : Basis ι₁ k W₁)
+        (B₂ : Basis ι₂ k W₂)
+        (hspan : W₁ ⊔ W₂ = (⊤: Submodule k V))
+        (hindep : W₁ ⊓ W₂ = (⊥:Submodule k V))
+        [DecidableEq ι₁] [DecidableEq ι₂] [FiniteDimensional k V]:
+       Basis (ι₁ ⊕ ι₂) k V := by
+      have hli: LinearIndependent k (Sum.elim (W₁.subtype ∘ B₁) (W₂.subtype ∘ B₂)) := by
+        apply lin_indep_by_transverse_subspaces
+        · apply LinearIndependent.map' B₁.linearIndependent W₁.subtype (by simp)
+        · apply LinearIndependent.map' B₂.linearIndependent W₂.subtype (by simp)
+        · have k₀ : Disjoint W₁ W₂ := by
+            rw[disjoint_iff]
+            exact hindep
+          rw[Disjoint.eq_bot k₀]
+        · simp
+        · simp
+      have hsp: ⊤ ≤ Submodule.span k (Set.range (Sum.elim (W₁.subtype ∘ B₁) (W₂.subtype ∘ B₂))) := by
+        simp
+        rw[union_span']
+        exact W₁
+        exact W₂
+        · exact span_range (Basis.span_eq B₁)
+        · exact span_range (Basis.span_eq B₂)
+        · rw[hspan]
+      exact Basis.mk hli hsp
