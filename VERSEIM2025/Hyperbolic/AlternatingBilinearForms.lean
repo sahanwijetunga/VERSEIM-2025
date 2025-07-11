@@ -7,7 +7,7 @@ Released under the Apache 2.0 license as described in the file LICENSE.
 VERSEIM-2025 REU @ Tufts University
 -/
 
-import VERSEIM2025.HyperbolicBilinearForms
+import VERSEIM2025.Hyperbolic.HyperbolicBilinearForms
 
 /-
   Major results (Completed)
@@ -34,7 +34,7 @@ variable {k V V': Type} [AddCommGroup V][AddCommGroup V'] [Field k] [Module k V]
 
 open LinearMap (BilinForm)
 open LinearMap.BilinForm
-open BilinearForms -- This is the namespace in VERSEIM2025.Sahan.BilinearForms
+open BilinearForms -- This is the namespace in VERSEIM2025.BilinearForms
 open Hyperbolic -- This is the namespace in VERSEIM2025.HyperbolicBilinearForms
 open BilinIsomorphisms -- This is the namespace in VERSEIM2025.BilinearFormIsomorphisms
 

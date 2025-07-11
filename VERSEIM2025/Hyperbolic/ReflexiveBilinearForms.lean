@@ -9,7 +9,7 @@ VERSEIM-2025 REU @ Tufts University
 
 import Mathlib.Tactic
 import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
-import VERSEIM2025.Sahan.BilinearForms
+import VERSEIM2025.Hyperbolic.BilinearForms
 
 /-
   Major results (Completed)
@@ -22,11 +22,9 @@ import VERSEIM2025.Sahan.BilinearForms
     - `reflexive_quotient_radForm_nondegenerate`
 
   TODO: Clean up definitions (radForm/radForm' excessive amount of theorems?)
-
-  TODO (LATER): Switch out VERSEIM2025.Sahan.BilinearForms for VERSEIM2025.BilinearForms
 -/
 
-open BilinearForms -- This is the namespace in VERSEIM2025.Sahan.BilinearForms
+open BilinearForms -- This is the namespace in VERSEIM2025.BilinearForms
 open LinearMap.BilinForm
 open LinearMap (BilinForm)
 

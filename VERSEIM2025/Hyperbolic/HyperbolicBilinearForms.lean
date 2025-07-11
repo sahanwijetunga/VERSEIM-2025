@@ -7,22 +7,15 @@ Released under the Apache 2.0 license as described in the file LICENSE.
 VERSEIM-2025 REU @ Tufts University
 -/
 
-import VERSEIM2025.BilinearFormIsomorphisms
+import VERSEIM2025.Hyperbolic.BilinearFormIsomorphisms
 
 
 /-
   This file is to state definitions for hyperbolic forms,
   and prove theorems proving various equivalences.
 
-  Proofs that other forms (say symmetric, alternating, nondegenerate) are
+  Proofs that other forms (symmetric, alternating) are
   hyperbolic should be included in other files.
-
-  Note: There will likely be some differences between definitions/theorems here and in
-  BilinearForms
-    - For now, statements are imported from VERSEIM2025.Sahan.BilinearForms
-      as all statements about hyperbolic forms were removed from there.
-    - We should probably make the files correspond and change the import to
-      VERSEIM2025.BilinearForms at some point.
 
   Note: Everything is Type not Type* due to issues with existence statements
   - As a result, anything relying on the results here must be Type not Type*
@@ -45,7 +38,7 @@ variable {k V: Type} [AddCommGroup V][Field k][Module k V]
 
 open LinearMap (BilinForm)
 open LinearMap.BilinForm
-open BilinearForms -- This is the namespace in VERSEIM2025.Sahan.BilinearForms
+open BilinearForms -- This is the namespace in VERSEIM2025.BilinearForms
 open BilinIsomorphisms -- This is the namespace in VERSEIM2025.BilinearFormIsomorphisms
 
 @[simp]
@@ -220,41 +213,6 @@ theorem Hypsubspace_orthog' {B: BilinForm k V} (H: Hypsubspace B) (i: H.I) {x: H
   | Sum.inr j => by
     symm at hxi
     simp_all
-
-
--- protected def Basis_repr_left{B: BilinForm k V}(coe : I ⊕ I → V) (f: I ⊕ I →₀ k) (i: H.I):
---   V →ₗ[k] k where
---   toFun := fun v ↦ (H.basis.repr v) (Sum.inl i)
---   map_add' := by simp
---   map_smul' := by simp
-
--- protected noncomputable def Basis_form_right {B: BilinForm k V} (H: Hypspace B) (i: H.I):
---   V →ₗ[k] k where
---   toFun := fun v ↦ B v (H.basis (Sum.inr i))
---   map_add' := by simp
---   map_smul' := by simp
-
--- protected theorem Basis_repr_left_eq_Basis_form_right {B: BilinForm k V} (H: Hypspace B) (i: H.I):
---   Temporary.Basis_repr_left H i = Temporary.Basis_form_right H i := by
---     apply  Basis.ext H.basis
---     intro j
---     match j with
---     | Sum.inl j =>
---       dsimp[Temporary.Basis_repr_left,Temporary.Basis_form_right]
---       by_cases h:i = j
---       . simp[h]
---       . have: j ≠ i := by exact fun a ↦ h (id (Eq.symm a))
---         simp_all
---     | Sum.inr j =>
---       dsimp[Temporary.Basis_repr_left,Temporary.Basis_form_right]
---       by_cases h:i = j
---       . simp[h]
---       . simp_all
-
--- def foo_appl {I: Type} {B: BilinForm k V} (g : I → V) (f: I →₀ k)(v: V):
---   I →₀ k := by
---   apply Finsupp.bilinearCombination
-
 
 lemma bilin_commute_lincomb_nice {I: Type} {B: BilinForm k V} (g : I → V) (f: I →₀ k) (v: V):
   (B ((Finsupp.linearCombination k g) f)) v
@@ -456,13 +414,6 @@ noncomputable def Hypsubspace.toHypspace {B: BilinForm k V} (H: Hypsubspace B):
 theorem Hypsubspace_basis_compatible {B: BilinForm k V} (H: Hypsubspace B):
   H.toHypspace.basis = H.basis := rfl
 
-noncomputable def Hypsubspace.toHypspace' {B: BilinForm k V} (H: Hypsubspace B)
-  (hspan: H.toSubmodule= ⊤): Hypspace B where
-  I := H.I
-  basis := by  sorry -- apply @Basis.mk
-  pred := sorry
-
-
 @[simp]
 abbrev sum_iso {I I': Type} (π: I ≃ I') : I ⊕ I ≃ I' ⊕ I' := π.sumCongr π
 
@@ -542,7 +493,9 @@ noncomputable instance {B: BilinForm k V}[FiniteDimensional k V] (H: Hypsubspace
   Fintype H.toHypspace.I := inferInstance
 
 theorem Hypspace.is_even_dimension {B: BilinForm k V}  [FiniteDimensional k V] (H: Hypspace B):
-  Even (Module.finrank k V) := sorry
+  Even (Module.finrank k V) := by
+  rw[Hypspace_finrank H]
+  exact even_two_mul (Fintype.card H.I)
 
 -- This should be provable without finiteness requirement, however proving
 -- 2 * Cardinal.mk α = 2 * Cardinal.mk β  → Cardinal.mk α = Cardinal.mk β will involve splitting
@@ -647,13 +600,104 @@ noncomputable def Hypsubspace_of_orthog_ind {B: BilinForm k V} {H₁: Hypsubspac
     | Sum.inl (Sum.inr j) => H₂.coe (Sum.inl j)
     | Sum.inr (Sum.inr j) => H₂.coe (Sum.inr j)
     | Sum.inr (Sum.inl j) => H₁.coe (Sum.inr j)
-  pred := sorry
+  pred := by
+    constructor
+    . intro i j
+      match i,j with
+      | Sum.inl i, Sum.inl j => simp
+      | Sum.inr i, Sum.inl j => simp[h.orthog]
+      | Sum.inl i, Sum.inr j => simp[h.orthog]
+      | Sum.inr i, Sum.inr j => simp
+    . intro i j
+      match i,j with
+      | Sum.inl i, Sum.inl j => simp
+      | Sum.inr i, Sum.inl j => simp[h.orthog]
+      | Sum.inl i, Sum.inr j => simp[h.orthog]
+      | Sum.inr i, Sum.inr j => simp
+    . intro i j h'
+      match i,j with
+      | Sum.inl i, Sum.inl j => simp_all
+      | Sum.inr i, Sum.inl j => simp[h.orthog]
+      | Sum.inl i, Sum.inr j => simp[h.orthog]
+      | Sum.inr i, Sum.inr j => simp_all
+    . intro i j h'
+      match i,j with
+      | Sum.inl i, Sum.inl j => simp_all
+      | Sum.inr i, Sum.inl j => simp[h.orthog]
+      | Sum.inl i, Sum.inr j => simp[h.orthog]
+      | Sum.inr i, Sum.inr j => simp_all
+    . intro i
+      match i with
+      | Sum.inl i => simp_all
+      | Sum.inr i => simp_all
 
 @[simp]
 theorem Hypsubspace_of_direct_sum_Hypsubspaces {B: BilinForm k V}
   {H₁: Hypsubspace B} {H₂: Hypsubspace B} (h: is_orthog_ind B H₁.toSubmodule
   H₂.toSubmodule): (Hypsubspace_of_orthog_ind h).toSubmodule = H₁.toSubmodule ⊔ H₂.toSubmodule := by
-    sorry
+    have h1: (Hypsubspace_of_orthog_ind h).toSubmodule ≤ H₁.toSubmodule ⊔ H₂.toSubmodule := by
+      unfold Hypsubspace.toSubmodule
+      suffices (Set.range (Hypsubspace_of_orthog_ind h).coe) ≤ H₁.toSubmodule ⊔ H₂.toSubmodule from ?_
+      . exact Submodule.span_le.mpr this
+      rintro _ ⟨i, rfl⟩
+      match i with
+      | Sum.inl (Sum.inl i) =>
+        have h1: (Hypsubspace_of_orthog_ind h).coe (Sum.inl (Sum.inl i)) ∈ H₁.toSubmodule := by
+          exact Hypsubspace.contained' H₁ (Sum.inl i)
+        have h2: H₁.toSubmodule ≤ H₁.toSubmodule ⊔ H₂.toSubmodule := le_sup_left
+        exact h2 h1
+      | Sum.inr (Sum.inl i) =>
+        have h1: (Hypsubspace_of_orthog_ind h).coe (Sum.inr (Sum.inl i)) ∈ H₁.toSubmodule := by
+          exact Hypsubspace.contained H₁ (Sum.inr i)
+        have h2: H₁.toSubmodule ≤ H₁.toSubmodule ⊔ H₂.toSubmodule := le_sup_left
+        exact h2 h1
+      | Sum.inl (Sum.inr i) =>
+        have h1: (Hypsubspace_of_orthog_ind h).coe (Sum.inl (Sum.inr i)) ∈ H₂.toSubmodule := by
+          exact Hypsubspace.contained' H₂ (Sum.inl i)
+        have h2: H₂.toSubmodule ≤ H₁.toSubmodule ⊔ H₂.toSubmodule := le_sup_right
+        exact h2 h1
+      | Sum.inr (Sum.inr i) =>
+        have h1: (Hypsubspace_of_orthog_ind h).coe (Sum.inr (Sum.inr i)) ∈ H₂.toSubmodule := by
+          exact Hypsubspace.contained' H₂ (Sum.inr i)
+        have h2: H₂.toSubmodule ≤ H₁.toSubmodule ⊔ H₂.toSubmodule := le_sup_right
+        exact h2 h1
+
+    have h2:  H₁.toSubmodule ≤ (Hypsubspace_of_orthog_ind h).toSubmodule := by
+      unfold Hypsubspace.toSubmodule
+      suffices (Set.range (H₁.coe)) ⊆ Submodule.span k (Set.range (Hypsubspace_of_orthog_ind h).coe) from ?_
+      . exact Submodule.span_le.mpr this
+      rintro x ⟨i, rfl⟩
+      match i with
+      | Sum.inl i =>
+        have:  H₁.coe (Sum.inl i) = (Hypsubspace_of_orthog_ind h).coe (Sum.inl (Sum.inl i)) := by
+          rfl
+        rw[this]
+        simp
+      | Sum.inr i =>
+        have:  H₁.coe (Sum.inr i) = (Hypsubspace_of_orthog_ind h).coe (Sum.inr (Sum.inl i)) := by
+          rfl
+        rw[this]
+        simp
+    have h3:  H₂.toSubmodule ≤ (Hypsubspace_of_orthog_ind h).toSubmodule := by
+      unfold Hypsubspace.toSubmodule
+      suffices (Set.range (H₂.coe)) ⊆ Submodule.span k (Set.range (Hypsubspace_of_orthog_ind h).coe) from ?_
+      . exact Submodule.span_le.mpr this
+      rintro x ⟨i, rfl⟩
+      match i with
+      | Sum.inl i =>
+        have:  H₂.coe (Sum.inl i) = (Hypsubspace_of_orthog_ind h).coe (Sum.inl (Sum.inr i)) := by
+          rfl
+        rw[this]
+        simp
+      | Sum.inr i =>
+        have:  H₂.coe (Sum.inr i) = (Hypsubspace_of_orthog_ind h).coe (Sum.inr (Sum.inr i)) := by
+          rfl
+        rw[this]
+        simp
+    have h4: H₁.toSubmodule ⊔ H₂.toSubmodule ≤ (Hypsubspace_of_orthog_ind h).toSubmodule := by
+      exact sup_le h2 h3
+    exact le_antisymm h1 h4
+
 
 noncomputable def Hypsubspace_of_orthog_ind' {B: BilinForm k V} {H₁: Hypsubspace B}
   {H₂: Hypsubspace B} (h: is_orthog_ind_weak B H₁.toSubmodule  H₂.toSubmodule) (hr: IsRefl B):
@@ -664,11 +708,6 @@ theorem Hypsubspace_of_direct_sum_Hypsubspaces' {B: BilinForm k V}
   {H₁: Hypsubspace B} {H₂: Hypsubspace B} (h: is_orthog_ind_weak B H₁.toSubmodule
   H₂.toSubmodule) (hr: IsRefl B): (Hypsubspace_of_orthog_ind' h hr).toSubmodule = H₁.toSubmodule ⊔ H₂.toSubmodule := by
     simp only [Hypsubspace_of_orthog_ind',Hypsubspace_of_direct_sum_Hypsubspaces]
-
-@[simp]
-noncomputable def basis_adjoin_IsCompl (W₁ W₂: Submodule k V) (h: IsCompl W₁ W₂) {I₁ I₂: Type*}
-  (b₁: Basis I₁ k W₁) (b₂: Basis I₂ k W₂): Basis (I₁ ⊕ I₂) k V :=
-    (b₁.prod b₂).map (W₁.prodEquivOfIsCompl _ h)
 
 noncomputable def Hypspace_of_orthog_direct_sum' {B: BilinForm k V} {H₁: Hypsubspace B}
   {H₂: Hypsubspace B} (h: is_orthog_direct_sum B H₁.toSubmodule  H₂.toSubmodule):
@@ -770,6 +809,11 @@ instance {B: BilinForm k V} {e f: V} (h: hyp_pair B e f):
     simp only [Hypsubspace_two, Hypsubspace.toSubmodule, Hypsubspace.toHypspace, Hypsubspace.basis]
     exact inferInstance
 
+instance {B: BilinForm k V} {e f: V} (h: hyp_pair B e f):
+  Fintype (Hypsubspace_two h).basis_index:= by
+    simp only [Hypsubspace_two, Hypsubspace.toSubmodule, Hypsubspace.toHypspace, Hypsubspace.basis]
+    exact inferInstance
+
 theorem Hypsubspace_two_finrank_2 {B: BilinForm k V} {e f: V} (h: hyp_pair B e f):
   Module.finrank k ((Hypsubspace_two h).toSubmodule)=2 := by
   rw[Hypspace_finrank (Hypsubspace_two h).toHypspace]
@@ -804,7 +848,11 @@ def foo_equiv (I: Type): I ⊕ I ≃ I × (singleton ⊕ singleton) where
 -/
 
 def Hypspace.hyp_pair {B: BilinForm k V} (H: Hypspace B) (i: H.I):
-  hyp_pair B (H.basis (Sum.inl i)) (H.basis (Sum.inr i)) := sorry
+  hyp_pair B (H.basis (Sum.inl i)) (H.basis (Sum.inr i)) := by
+    constructor
+    . simp_all
+    constructor
+    repeat simp_all
 
 abbrev OrthogIndexedSubspaces {ι: Type} (B:BilinForm k V) (W: ι → Submodule k V) : Prop :=
   ∀ i j, (i ≠ j) → ∀ w ∈ W i, ∀ w' ∈ W j, B w w' = 0
@@ -817,11 +865,125 @@ structure is_orthog_indexed_direct_sum {ι: Type} [DecidableEq ι]  (B: BilinFor
 def Hypspace.Hypspace_two_collection {B: BilinForm k V} (H: Hypspace B):
   H.I → Submodule k V := fun i => (Hypsubspace_two <| H.hyp_pair i ).toSubmodule
 
+lemma Hypspace.in_hyp_pair {B: BilinForm k V} (H: Hypspace B) {i: H.I} {w: V} (hiw: w ∈ H.Hypspace_two_collection i):
+  ∃(a b: k), w = a • (H.basis (Sum.inl i))+ b • (H.basis (Sum.inr i)) := by
+    have hiw: w ∈ (Hypsubspace_two <| H.hyp_pair i ).toSubmodule := hiw
+    simp at hiw
+    have ⟨a,b,h⟩ := Submodule.mem_span_pair.mp hiw
+    use b, a
+    rw[add_comm]
+    exact h.symm
+
 theorem Hypspace.is_orthog_indexed_direct_sum_Hypsubspace_two (B: BilinForm k V)
 (H: Hypspace B) [DecidableEq H.I]: is_orthog_indexed_direct_sum B H.Hypspace_two_collection where
-  ds := sorry
-  orthog := sorry
+  ds := by
+    apply DirectSum.isInternal_submodule_of_iSupIndep_of_iSup_eq_top
+    . refine iSupIndep_def.mpr ?_
+      intro i
+      suffices (H.Hypspace_two_collection i) ⊓ (⨆ j, ⨆ (_ : j ≠ i), H.Hypspace_two_collection j)=⊥ from ?_
+      . exact disjoint_iff.mpr this
+      suffices (H.Hypspace_two_collection i) ⊓ (⨆ j, ⨆ (_ : j ≠ i), H.Hypspace_two_collection j) ≤ ⊥ from ?_
+      . exact
+        (Submodule.eq_bot_iff
+              (H.Hypspace_two_collection i ⊓ ⨆ j, ⨆ (_ : j ≠ i), H.Hypspace_two_collection j)).mpr
+          this
+      let W := (H.Hypspace_two_collection i)
+      let E := {ind: H.I ⊕ H.I| ind ≠ (Sum.inl i) ∧ ind ≠ (Sum.inr i)}
+      let U := Submodule.span k (H.basis '' E)
+      have hWU: W ⊓ U ≤  ⊥ := by
+        let F: Set (H.I ⊕ H.I) := {Sum.inl i, Sum.inr i}
+        have hW: W ≤  Submodule.span k (H.basis '' F) := by
+          show Submodule.span k (Set.range (Hypsubspace_two <| H.hyp_pair i ).coe) ≤ Submodule.span k (H.basis '' F)
+          suffices  Set.range (Hypsubspace_two <| H.hyp_pair i ).coe ≤ Submodule.span k (H.basis '' F) from ?_
+          . exact Submodule.span_le.mpr this
+          rintro _ ⟨j, rfl⟩
+          match j with
+          | Sum.inl j => simp[F]
+          | Sum.inr j => simp[F]
+        have hU: U ≤  Submodule.span k (H.basis '' E) := by
+          rfl
+        have interzero: Submodule.span k (H.basis '' F) ⊓  Submodule.span k (H.basis '' E) =⊥  := by
+          suffices Disjoint ( Submodule.span k (H.basis '' F) ) (Submodule.span k (H.basis '' E) ) from ?_
+          . exact disjoint_iff.mp this
+          apply LinearIndependent.disjoint_span_image H.basis.linearIndependent
+          rw[disjoint_iff]
+          show F ∩ E = ∅
+          suffices F ∩ E ⊆ ∅ from by exact Set.subset_eq_empty this rfl
+          intro a ⟨hf, he⟩
+          have: a = Sum.inl i ∨ a=Sum.inr i := by
+            unfold F at hf
+            exact hf
+          rcases this with h'|h'
+          . exfalso
+            apply he.1 h'
+          . exfalso
+            apply he.2 h'
+        rw[<- interzero]
+        apply inf_le_inf hW hU
+      have hCollectionU: (⨆ j, ⨆ (_ : j ≠ i), H.Hypspace_two_collection j) ≤ U := by
+        suffices ∀ j, (⨆ (_ : j ≠ i), H.Hypspace_two_collection j ≤ U) from ?_
+        . simp_all
+        intro j
+        suffices ∀ (_ : j ≠ i), H.Hypspace_two_collection j ≤ U from ?_
+        . simp_all
+        intro h
+        intro x hx
+        have ⟨a, b, hab⟩ := H.in_hyp_pair hx
+        rw[hab]
+        have hleft: H.basis ((Sum.inl j)) ∈ U := by
+          suffices H.basis (Sum.inl j) ∈ Set.image H.basis E from ?_
+          . exact Submodule.mem_span_of_mem this
+          have: Sum.inl j ∈ E := by
+            constructor
+            . simp[h]
+            . exact Sum.inl_ne_inr
+          exact Set.mem_image_of_mem (⇑H.basis) this
+        have hleft: a • (H.basis ((Sum.inl j))) ∈ U := by
+          exact Submodule.smul_mem U a hleft
+        have hright: H.basis ((Sum.inr j)) ∈ U := by
+          suffices H.basis (Sum.inr j) ∈ Set.image H.basis E from ?_
+          . exact Submodule.mem_span_of_mem this
+          have: Sum.inr j ∈ E := by
+            constructor
+            . exact Sum.inr_ne_inl
+            . simp[h]
+          exact Set.mem_image_of_mem (⇑H.basis) this
 
+        have hright: b • (H.basis ((Sum.inr j))) ∈ U := by
+          exact Submodule.smul_mem U b hright
+        exact Submodule.add_mem U hleft hright
+      calc
+        W ⊓ (⨆ j, ⨆ (_ : j ≠ i), H.Hypspace_two_collection j) ≤ W ⊓ U := by
+          apply inf_le_inf_left
+          exact hCollectionU
+        _ ≤  ⊥ := by exact hWU
+    . suffices ⊤ ≤ iSup H.Hypspace_two_collection from ?_
+      . exact Submodule.eq_top_iff'.mpr fun x ↦ this trivial
+      have: Submodule.span k (Set.range H.basis) = ⊤ := by
+        exact Basis.span_eq H.basis
+      rw[<- this]
+      suffices (Set.range ⇑H.basis) ≤ iSup H.Hypspace_two_collection from ?_
+      . exact Submodule.span_le.mpr this
+      rintro _ ⟨i,rfl⟩
+      match i with
+      | Sum.inl i =>
+        have h1: H.Hypspace_two_collection i ≤ ↑(iSup H.Hypspace_two_collection) := by
+          exact le_iSup_iff.mpr fun b a ↦ a i
+        have h2: H.basis (Sum.inl i) ∈ H.Hypspace_two_collection i  := by
+          simp[Submodule.mem_span_of_mem]
+        exact h1 h2
+      | Sum.inr i =>
+        have h1: H.Hypspace_two_collection i ≤ ↑(iSup H.Hypspace_two_collection) := by
+          exact le_iSup_iff.mpr fun b a ↦ a i
+        have h2: H.basis (Sum.inr i) ∈ H.Hypspace_two_collection i  := by
+          simp[Submodule.mem_span_of_mem]
+        exact h1 h2
+  orthog := by
+    intro i j h wi hwi wj hwj
+    have ⟨ai,bi,habi⟩ := H.in_hyp_pair hwi
+    have ⟨aj,bj,habj⟩ := H.in_hyp_pair hwj
+    rw[habi, habj]
+    simp_all
 
 /- The theorem `Hypspace_of_orthog_direct_sum` earlier proves the direct sum
     of two Hypsubspaces is a Hypspace. The below results prove this again
@@ -831,7 +993,8 @@ theorem Hypspace.is_orthog_indexed_direct_sum_Hypsubspace_two (B: BilinForm k V)
 -- TODO: Move this to a better file.
 @[simp]
 def hyp_basis_iso {J: Type} (I: J → Type):
-  (j: J)× (I j ⊕ (I j)) ≃ ((j : J) × I j ⊕ (j : J) × I j) := sorry
+  (j: J)× (I j ⊕ (I j)) ≃ ((j : J) × I j ⊕ (j : J) × I j) := by
+  exact Equiv.sigmaSumDistrib I I
 
 @[simp]
 noncomputable def Hypspace_from_orthog_indexed_direct_sum_Hypsubspace {J: Type} [DecidableEq J]
@@ -842,12 +1005,78 @@ Hypspace B where
   basis :=
     Basis.reindex (DirectSum.IsInternal.collectedBasis (h.ds) (fun j => (W j).basis)) (hyp_basis_iso (fun j ↦ (W j).I))
   pred := by
-    constructor -- Note: Proof must have `hyp_basis_iso` filled in to prove
-    . sorry
-    . sorry
-    . sorry
-    . sorry
-    . sorry
+    constructor
+    . intro i j
+      obtain ⟨ia, indi⟩ := i
+      obtain ⟨ja, indj⟩ := j
+      simp[Sigma.map]
+      by_cases h': ia=ja
+      . show (B ((W ia).coe (Sum.inl indi))) ((W ja).coe (Sum.inl indj)) = 0
+        have: ((W ja).coe (Sum.inl indj)) = (W ia).coe (Sum.inl (h' ▸ indj))  := by
+          have: W ja  = W ia := by rw[h']
+          congr
+          simp
+        rw[this]
+        simp
+      . have := h.orthog ia ja
+        simp_all[this]
+    . intro i j
+      obtain ⟨ia, indi⟩ := i
+      obtain ⟨ja, indj⟩ := j
+      simp[Sigma.map]
+      by_cases h': ia=ja
+      . show (B ((W ia).coe (Sum.inr indi))) ((W ja).coe (Sum.inr indj)) = 0
+        have: ((W ja).coe (Sum.inr indj)) = (W ia).coe (Sum.inr (h' ▸ indj))  := by
+          congr
+          . exact h'.symm
+          . exact h'.symm
+          . exact h'.symm
+          . simp
+        rw[this]
+        simp
+      . have := h.orthog ia ja
+        simp_all[this]
+    . intro i j hij
+      obtain ⟨ia, indi⟩ := i
+      obtain ⟨ja, indj⟩ := j
+      simp[Sigma.map]
+      by_cases h': ia=ja
+      . show (B ((W ia).coe (Sum.inl indi))) ((W ja).coe (Sum.inr indj)) = 0
+        have hij': indi ≠ (h' ▸ indj) := by
+          intro hindij
+          simp_all
+        have: ((W ja).coe (Sum.inr indj)) = (W ia).coe (Sum.inr (h' ▸ indj))  := by
+          congr
+          . exact h'.symm
+          . exact h'.symm
+          . exact h'.symm
+          . simp
+        rw[this]
+        simp[hij']
+      . have := h.orthog ia ja
+        simp_all[this]
+    . intro i j hij
+      obtain ⟨ia, indi⟩ := i
+      obtain ⟨ja, indj⟩ := j
+      simp[Sigma.map]
+      by_cases h': ia=ja
+      . show (B ((W ia).coe (Sum.inr indi))) ((W ja).coe (Sum.inl indj)) = 0
+        have hij': indi ≠ (h' ▸ indj) := by
+          intro hindij
+          simp_all
+        have: ((W ja).coe (Sum.inl indj)) = (W ia).coe (Sum.inl (h' ▸ indj))  := by
+          congr
+          . exact h'.symm
+          . exact h'.symm
+          . exact h'.symm
+          . simp
+        rw[this]
+        simp[hij']
+      . have := h.orthog ia ja
+        simp_all[this]
+    . intro i
+      obtain ⟨ia, indi⟩ := i
+      simp[Sigma.map]
 
 -- Specialization of Hypspace_from_orthog_indexed_direct_sum_Hypsubspace'
 @[simp]
@@ -869,7 +1098,9 @@ def Hypspace.index_change {J: Type} {B: BilinForm k V} (H: Hypspace B)
   (f: H.I ≃ J): Hypspace B where
   I := J
   basis := H.basis.reindex (sum_iso f)
-  pred := sorry
+  pred := by
+    constructor
+    repeat simp_all
 
 @[simp]
 def index_iso_singleton' (I: Type): (_: I) × singleton ≃ I :=

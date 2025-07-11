@@ -4,12 +4,14 @@ Copyright (c) 2025 Clea Bergsman, Katherine Buesing, George McNinch, Sahan Wijet
 
 Released under the Apache 2.0 license as described in the file LICENSE.
 
-VERSEIM-2025 REU VERSEIM-2025 REU @ Tufts University 
+VERSEIM-2025 REU VERSEIM-2025 REU @ Tufts University
 -/
 
-import Mathlib.Tactic
-import VERSEIM2025.BilinearForms
 import VERSEIM2025.Subspaces
+
+open BilinearForms
+open LinearMap (BilinForm)
+open LinearMap.BilinForm
 
 -- In this file we consider a vector space over the real numbers ℝ
 -- equipped with a positive definite bilinear form
@@ -36,7 +38,7 @@ def Orthog {V : Type} [AddCommGroup V] [ Module ℝ V ] (β:V →ₗ[ℝ] V →�
   {n:ℕ} (c:Fin n → V) : Prop := ∀ (i j : Fin n), i ≠ j → β (c i) (c j) = 0
 
 def restrict {X:Type} {m:ℕ} (f:Fin (m+1) → X) : Fin m → X :=
-  fun i => f i.castSucc 
+  fun i => f i.castSucc
 
 def extend {X:Type} {m:ℕ} (f:Fin m → X) (x :X) : Fin (m+1) → X :=
   fun i =>
@@ -46,10 +48,10 @@ def extend {X:Type} {m:ℕ} (f:Fin m → X) (x :X) : Fin (m+1) → X :=
 
 structure orthog_fun (β:V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (n:ℕ) where
    vect : Fin n → V
-   is_orthog : fun_is_orthog β vect 
+   is_orthog : ∀ ( i j: Fin n), i ≠ j → β (vect i) (vect j) = 0
 
-def orthog_by_gram_schmidt (β:V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (hs : Symm β) {hp : PosDef β} {m:ℕ}
-  (b : Fin n → V) (hb : LinearIndependent ℝ b) : 
+def orthog_by_gram_schmidt (β:V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (hs : IsSymm β) {hp : PosDef β} {m:ℕ}
+  (b : Fin n → V) (hb : LinearIndependent ℝ b) :
   orthog_fun β n := by sorry
 
 
@@ -61,8 +63,8 @@ def orthog_by_gram_schmidt (β:V →ₗ[ℝ] V →ₗ[ℝ] ℝ) (hs : Symm β) {
 
 
 theorem lin_indep_of_orthog_subspaces (V : Type) [AddCommGroup V] [Module ℝ V] (β:V →ₗ[ℝ] V →ₗ[ℝ] ℝ)
-  (hp:PosDef β) (W₁ W₂ : Submodule ℝ V) (ho:OrthogSubspaces ℝ V β W₁ W₂) 
-  (ι₁ ι₂: Type) [Fintype ι₁] [Fintype ι₂] 
+  (hp:PosDef β) (W₁ W₂ : Submodule ℝ V) (ho:OrthogSubspaces β W₁ W₂)
+  (ι₁ ι₂: Type) [Fintype ι₁] [Fintype ι₂]
   (f₁:ι₁ → V) (f₂:ι₂ → V)
-  (hi₁:LinearIndependent ℝ f₁) (hi₂:LinearIndependent ℝ f₂) : 
+  (hi₁:LinearIndependent ℝ f₁) (hi₂:LinearIndependent ℝ f₂) :
   LinearIndependent ℝ (disjointUnion_funs f₁ f₂) := by sorry

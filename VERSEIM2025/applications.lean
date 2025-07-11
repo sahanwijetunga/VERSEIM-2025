@@ -19,7 +19,7 @@ variable {β:BilinForm k V}
 -- looked in his code and in mathlib and didn't see exactly what I
 -- wanted...)
 
-def Nondeg_subspace (W:Submodule k V) : Prop := 
+def Nondeg_subspace (W:Submodule k V) : Prop :=
   BilinForm.Nondegenerate (BilinForm.restrict β W)
 
 -- we want to prove: if W is a non-degenerate subspace, then also its
@@ -29,6 +29,6 @@ def Nondeg_subspace (W:Submodule k V) : Prop :=
 -- complement, but it is actually already in Mathlib, as
 -- `LinearMap.BilinForm.orthogonal`
 
-theorem ortho_complement_nondeg (bnd : BilinForm.Nondegenerate β)  
-   (W:Submodule k V) (wnd :Nondeg_subspace W) : 
+theorem ortho_complement_nondeg (bnd : BilinForm.Nondegenerate β)
+   (W:Submodule k V) (wnd :Nondeg_subspace W) :
    Nondeg_subspace (BilinForm.orthogonal β W) := by sorry
