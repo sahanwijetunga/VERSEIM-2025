@@ -184,22 +184,51 @@ lemma symm_is_reflexive (β:BilinForm k V) (h:Symm β) : IsRefl β := by
 --------------------------------------------------------------------------------
 -- non-degenerate forms
 -- ====================
+noncomputable section
 
 open LinearMap
 open LinearMap (BilinForm)
 
+abbrev stdVS  (k:Type) [Field k] (n:ℕ) : Type := (Fin n → k)
 
-def Nondeg (β : BilinForm k V) : Prop :=
+abbrev sbv (n:ℕ) : Basis (Fin n) k (stdVS k n) := Pi.basisFun k (Fin n)
+
+def map_of_matrix {m n :ℕ} (M:Matrix (Fin m) (Fin n) k) : stdVS k n →ₗ[k] stdVS k m :=
+  Matrix.toLin (sbv n) (sbv m) M
+
+def Nullity (M:Matrix (Fin m) (Fin n) k) : ℕ :=
+  let null_space : Submodule k (stdVS k n) :=
+    LinearMap.ker M.mulVecLin
+  Module.finrank k null_space
+
+lemma mulVecLin_eq_toLin_sbv (M:Matrix (Fin m) (Fin n) k) :
+   M.mulVecLin = M.toLin (sbv n) (sbv m) := by
+   rfl
+
+lemma rank_eq_linmap_rank  {m n :ℕ} (M:Matrix (Fin m) (Fin n) k) :
+   M.rank  = Module.finrank k (LinearMap.range M.mulVecLin)
+   := by
+   unfold Matrix.rank
+   rw [ mulVecLin_eq_toLin_sbv M ]
+
+theorem rank_nullity (M:Matrix (Fin m) (Fin n) k) :
+  M.rank + Nullity M = n := by
+  unfold Nullity
+  rw [ rank_eq_linmap_rank ]
+  rw [ LinearMap.finrank_range_add_finrank_ker M.mulVecLin ]
+  simp
+
+--def Nondeg (β : BilinForm k V) : Prop :=
   ∀ v:V, (∀ w:V, β v w = 0) → v = 0
 
-def NondegOn
+--def NondegOn
   (β : BilinForm k V) (W : Subspace k V) : Prop :=
   Nondeg (BilinForm.restrict β W)
 
 
 theorem nondeg_conditions (β : BilinForm k V) [FiniteDimensional k V] (n : ℕ ) (h: Module.finrank V = n)
   (b : Basis (Fin n) k V):
-    (Nondeg β)
+    (LinearMap.BilinForm.Nondegenerate β)
   ↔ (∀ w:V, (∀ v:V, β v w = 0) → w = 0) := by
   constructor
   intro v w h1
@@ -207,19 +236,52 @@ theorem nondeg_conditions (β : BilinForm k V) [FiniteDimensional k V] (n : ℕ 
     BilinForm.toMatrix b β
   sorry
 
-theorem nondeg_rank (β : BilinForm k V) [FiniteDimensional k V] (n : ℕ ) (h: Module.finrank V = n)
-  (b : Basis (Fin n) k V): (Nondeg β) ↔ Matrix.rank (BilinForm.toMatrix b β ) = n := by
+theorem nondeg_rank (β : BilinForm k V) [FiniteDimensional k V] (n : ℕ ) (h: Module.rank k V = n)
+  (b : Basis (Fin n) k V): (LinearMap.BilinForm.Nondegenerate β) ↔ Matrix.rank (BilinForm.toMatrix b β ) = n := by
   constructor
+  -- Nondegenerate β → rank M = n
   intro hn
-  sorry
+  have nondeg : β.Nondegenerate := by apply hn
+  have nul_zero : LinearMap.ker β = ⊥ := by
+    apply LinearMap.BilinForm.nondegenerate_iff_ker_eq_bot.mp; exact nondeg
+  let M : Matrix (Fin n) (Fin n) k := BilinForm.toMatrix b β
+  have h1 : Module.rank k ↥(range β ) + (Module.rank k (ker β)) = Module.rank k V  :=
+      by apply LinearMap.rank_range_add_rank_ker
+  have zero : (Module.rank k ↥(ker β)) = 0 := by rw [nul_zero]; simp
+  rw [zero, add_zero] at h1
+  rw [h] at h1
+  simp at h1
+  exact h1
+  --  rank M = n → Nondegenerate β
+  intro hn
+  have h1 : Module.rank k ↥(range β ) + (Module.rank k (ker β)) = Module.rank k V  :=
+      by apply LinearMap.rank_range_add_rank_ker
+  simp at h1
+  rw [hn] at h1
+  have nul_zero : Module.rank k ↥(ker β) = 0 := by
+    apply (add_eq_left _ _ (↑n) (Module.rank k ↥(ker β))).mp at h1
+  simp at nul_zero
+  apply LinearMap.BilinForm.nondegenerate_iff_ker_eq_bot.mpr
+  exact nul_zero
 
-
+--have det_zero : M.det ≠ 0 := by
+    --apply (LinearMap.BilinForm.nondegenerate_iff_det_ne_zero b).mp;
+    --apply nondeg
 
 #check BilinForm.toMatrix
 #check Matrix.rank
+#check LinearMap.BilinForm.nondegenerate_iff_ker_eq_bot
+#check Matrix.nondegenerate_iff_det_ne_zero
+#check LinearMap.BilinForm.nondegenerate_iff_det_ne_zero
+#check Matrix.rank_unit --rank of invertible matrix equals full rank
+#check LinearMap.ker_eq_bot_iff_range_eq_top_of_finrank_eq_finrank
+#check LinearMap.BilinForm.nondegenerate_toMatrix_iff
+#check LinearMap.BilinForm.nondegenerate_iff_det_ne_zero
+#check LinearMap.rank_range_add_rank_ker
+#check add_eq_left
 
 theorem nondeg_via_basis (β: BilinForm k V) [FiniteDimensional k V] :
-    (Nondeg β)
+    (LinearMap.BilinForm.Nondegenerate β)
   ↔ (∃ (b:Basis ι k V), (BilinForm.toMatrix b β).det ≠ 0) := by sorry
 
 

@@ -108,7 +108,7 @@ lemma eq_zero_of_two_mul_eq_zero_vector (k: Type*) { V : Type* }
 
 lemma zero_of_two_mul_eq_zero  { k : Type } [ Field k]
   [CharZero k] (x:k) (h:2*x = 0) : x = 0 := by
-  --have nz2_inst : NeZero ↑2 := inferInstance
+  have nz2_inst : NeZero ↑2 := inferInstance
   have nz2 : (2:k) ≠ 0 := NeZero.ne ↑2
   by_contra x_neq_zero
   have two_mul_ne_zero : ↑2*x ≠ 0 :=
