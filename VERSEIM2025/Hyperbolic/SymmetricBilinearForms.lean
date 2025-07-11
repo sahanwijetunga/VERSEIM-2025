@@ -9,7 +9,7 @@ VERSEIM-2025 REU @ Tufts University
 
 -- import Mathlib.LinearAlgebra.QuadraticForm.Basic
 -- import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
-import VERSEIM2025.HyperbolicBilinearForms
+import VERSEIM2025.Hyperbolic.HyperbolicBilinearForms
 
 /-
   The main results in this file should hold only for symmetric forms.

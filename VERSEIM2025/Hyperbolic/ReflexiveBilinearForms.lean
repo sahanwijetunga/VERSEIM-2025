@@ -9,7 +9,7 @@ VERSEIM-2025 REU @ Tufts University
 
 import Mathlib.Tactic
 import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
-import VERSEIM2025.BilinearForms
+import VERSEIM2025.Hyperbolic.BilinearForms
 
 /-
   Major results (Completed)

@@ -9,7 +9,7 @@ VERSEIM-2025 REU VERSEIM-2025 REU @ Tufts University
 -/
 
 import Mathlib.Tactic
-import VERSEIM2025.BilinearForms
+import VERSEIM2025.Hyperbolic.BilinearForms
 
 -- the next lemma says that for a vector space over a field k of
 -- characteristic different from 2, for v in V the equation `2v=0`
