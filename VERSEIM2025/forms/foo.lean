@@ -26,3 +26,25 @@ example (β:BilinForm k V) : Module.rank k (range β) =
  unfold Matrix.mulVecLin
  simp
 
+-- example (β:BilinForm k V) : Nondegenerate β → ker β = ⊥ := by --
+--   contrapose
+--   intro h 
+--   unfold Nondegenerate 
+--   unfold SeparatingLeft 
+--   unfold SeparatingRight 
+--   unfold ker 
+  
+
+-- 
+example (β:BilinForm k V) (y:V) : ∀ (x : V), (β x) y = 0 → y ∈ ker (β x) := by
+  simp
+
+
+example (β:BilinForm k V) : (∀ y ,( ∀ x , (β x) y = 0) →y = 0) → (ker β = ⊥) := by 
+  contrapose
+  intro h
+  by_contra
+  
+   
+
+
