@@ -19,7 +19,10 @@ example (β:BilinForm k V) : Matrix.transpose (BilinForm.toMatrix b β) =
   rw [ LinearMap.toMatrix_apply ] 
   simp
 
-example (β:BilinForm k V) : Module.rank (range β) = 
+example (β:BilinForm k V) : Module.rank k (range β) = 
         Matrix.rank (BilinForm.toMatrix b β) := by
-g
+ unfold Matrix.rank
+ unfold BilinForm.toMatrix
+ unfold Matrix.mulVecLin
+ simp
 
