@@ -1,4 +1,5 @@
 import Mathlib.Tactic
+import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
 
 -- Katherine and Clea, I think you can prove various things using the
 -- "basis of internal direct sum" theorem that Katherine finished
@@ -19,7 +20,7 @@ variable {β:BilinForm k V}
 -- looked in his code and in mathlib and didn't see exactly what I
 -- wanted...)
 
-def Nondeg_subspace (W:Submodule k V) : Prop := 
+def Nondeg_subspace (β : BilinForm k V) (W:Submodule k V) : Prop :=
   BilinForm.Nondegenerate (BilinForm.restrict β W)
 
 -- we want to prove: if W is a non-degenerate subspace, then also its
@@ -29,6 +30,18 @@ def Nondeg_subspace (W:Submodule k V) : Prop :=
 -- complement, but it is actually already in Mathlib, as
 -- `LinearMap.BilinForm.orthogonal`
 
-theorem ortho_complement_nondeg (bnd : BilinForm.Nondegenerate β)  
-   (W:Submodule k V) (wnd :Nondeg_subspace W) : 
-   Nondeg_subspace (BilinForm.orthogonal β W) := by sorry
+
+/- need to figure out how to state that we have a basis for W and W orth.compl -/
+theorem ortho_complement_nondeg (bnd : BilinForm.Nondegenerate β)
+  (W:Submodule k V) (wnd : Nondeg_subspace β W) :
+  Nondeg_subspace β (BilinForm.orthogonal β W) := by
+    have k₀ : (BilinForm.orthogonal β W) ⊔ W = ⊤ := by
+      sorry
+    have k₁ : (BilinForm.orthogonal β W) ⊓ W = ⊥ := by
+      sorry
+    --have b : Basis ((Fintype (Module.finrank k W) ) ⊕ (Fintype (Module.finrank k (BilinForm.orthogonal β W))) k V
+
+
+    -- have h₀ :
+    /- need to get thr above have statement working, type errors  -/
+    sorry
