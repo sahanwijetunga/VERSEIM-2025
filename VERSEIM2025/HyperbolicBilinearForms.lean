@@ -1005,7 +1005,78 @@ Hypspace B where
   basis :=
     Basis.reindex (DirectSum.IsInternal.collectedBasis (h.ds) (fun j => (W j).basis)) (hyp_basis_iso (fun j ↦ (W j).I))
   pred := by
-    sorry
+    constructor
+    . intro i j
+      obtain ⟨ia, indi⟩ := i
+      obtain ⟨ja, indj⟩ := j
+      simp[Sigma.map]
+      by_cases h': ia=ja
+      . show (B ((W ia).coe (Sum.inl indi))) ((W ja).coe (Sum.inl indj)) = 0
+        have: ((W ja).coe (Sum.inl indj)) = (W ia).coe (Sum.inl (h' ▸ indj))  := by
+          have: W ja  = W ia := by rw[h']
+          congr
+          simp
+        rw[this]
+        simp
+      . have := h.orthog ia ja
+        simp_all[this]
+    . intro i j
+      obtain ⟨ia, indi⟩ := i
+      obtain ⟨ja, indj⟩ := j
+      simp[Sigma.map]
+      by_cases h': ia=ja
+      . show (B ((W ia).coe (Sum.inr indi))) ((W ja).coe (Sum.inr indj)) = 0
+        have: ((W ja).coe (Sum.inr indj)) = (W ia).coe (Sum.inr (h' ▸ indj))  := by
+          congr
+          . exact h'.symm
+          . exact h'.symm
+          . exact h'.symm
+          . simp
+        rw[this]
+        simp
+      . have := h.orthog ia ja
+        simp_all[this]
+    . intro i j hij
+      obtain ⟨ia, indi⟩ := i
+      obtain ⟨ja, indj⟩ := j
+      simp[Sigma.map]
+      by_cases h': ia=ja
+      . show (B ((W ia).coe (Sum.inl indi))) ((W ja).coe (Sum.inr indj)) = 0
+        have hij': indi ≠ (h' ▸ indj) := by
+          intro hindij
+          simp_all
+        have: ((W ja).coe (Sum.inr indj)) = (W ia).coe (Sum.inr (h' ▸ indj))  := by
+          congr
+          . exact h'.symm
+          . exact h'.symm
+          . exact h'.symm
+          . simp
+        rw[this]
+        simp[hij']
+      . have := h.orthog ia ja
+        simp_all[this]
+    . intro i j hij
+      obtain ⟨ia, indi⟩ := i
+      obtain ⟨ja, indj⟩ := j
+      simp[Sigma.map]
+      by_cases h': ia=ja
+      . show (B ((W ia).coe (Sum.inr indi))) ((W ja).coe (Sum.inl indj)) = 0
+        have hij': indi ≠ (h' ▸ indj) := by
+          intro hindij
+          simp_all
+        have: ((W ja).coe (Sum.inl indj)) = (W ia).coe (Sum.inl (h' ▸ indj))  := by
+          congr
+          . exact h'.symm
+          . exact h'.symm
+          . exact h'.symm
+          . simp
+        rw[this]
+        simp[hij']
+      . have := h.orthog ia ja
+        simp_all[this]
+    . intro i
+      obtain ⟨ia, indi⟩ := i
+      simp[Sigma.map]
 
 -- Specialization of Hypspace_from_orthog_indexed_direct_sum_Hypsubspace'
 @[simp]
