@@ -1,4 +1,5 @@
 import Mathlib.Tactic
+import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
 
 -- Katherine and Clea, I think you can prove various things using the
 -- "basis of internal direct sum" theorem that Katherine finished
@@ -12,7 +13,7 @@ open LinearMap
 
 variable {k V:Type} [Field k] [AddCommGroup V] [Module k V]
 
-variable {β:BilinForm k V}
+variable (β:BilinForm k V)
 
 -- let's make a precidicate for subspaces on which the form is
 -- non-degenerate (I think Sahan must have some version of this, but I
@@ -30,5 +31,5 @@ def Nondeg_subspace (W:Submodule k V) : Prop :=
 -- `LinearMap.BilinForm.orthogonal`
 
 theorem ortho_complement_nondeg (bnd : BilinForm.Nondegenerate β)
-   (W:Submodule k V) (wnd :Nondeg_subspace W) :
-   Nondeg_subspace (BilinForm.orthogonal β W) := by sorry
+   (W:Submodule k V) (wnd :Nondeg_subspace β W) :
+   Nondeg_subspace β (BilinForm.orthogonal β W) := by sorry

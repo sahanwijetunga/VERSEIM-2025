@@ -7,29 +7,12 @@ Released under the Apache 2.0 license as described in the file LICENSE.
 VERSEIM-2025 REU @ Tufts University
 -/
 
-import VERSEIM2025.Hyperbolic.BilinearFormIsomorphisms
+import VERSEIM2025.Forms.Hyperbolic.BilinearFormIsomorphisms
 
 
 /-
-  This file is to state definitions for hyperbolic forms,
-  and prove theorems proving various equivalences.
-
-  Proofs that other forms (symmetric, alternating) are
-  hyperbolic should be included in other files.
-
-  Note: Everything is Type not Type* due to issues with existence statements
-  - As a result, anything relying on the results here must be Type not Type*
-
-  TODO: **Define (and prove results for) Hyperbolic Space** (and prove an equivalence between
-    inductive and non-inductive version)
-    - Basis definition (e₁, ..., eₙ, f₁, ..., fₙ )
-      - Basis → Inductive: If W₁ and W₂ are hyperbolic and
-          is_orthog_direct_sum β W₁ W₂
-        then V is also hyperbolic *Definition created, not proved*
-      - Inductive → Basis: If V is hyperbolic then it can be constructed a direct sum
-          of 2-dimensional hyperbolic spaces. *Theorem created, not proved*
-
-  TODO (LATER): Make definitions computable
+  This file states definitions for Hyperbolic forms and theorems
+  relating the different viewpoints together.
 -/
 
 namespace Hyperbolic
