@@ -7,8 +7,8 @@ Released under the Apache 2.0 license as described in the file LICENSE.
 VERSEIM-2025 REU @ Tufts University
 -/
 
+import VERSEIM2025.Hyperbolic.BilinearForms
 import Mathlib.LinearAlgebra.QuadraticForm.Basic
-import VERSEIM2025.BilinearForms
 
 /-
   The purpose of this file is to define an isomorphism of bilinear formed spaces

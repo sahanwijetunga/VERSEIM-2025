@@ -21,7 +21,7 @@ variable {ι₁ ι₂ : Type} [DecidableEq ι₁] [DecidableEq ι₂]
 -- looked in his code and in mathlib and didn't see exactly what I
 -- wanted...)
 
-def Nondeg_subspace (β : BilinForm k V) (W:Submodule k V) : Prop :=
+def Nondeg_subspace (W:Submodule k V) : Prop :=
   BilinForm.Nondegenerate (BilinForm.restrict β W)
 
 -- we want to prove: if W is a non-degenerate subspace, then also its

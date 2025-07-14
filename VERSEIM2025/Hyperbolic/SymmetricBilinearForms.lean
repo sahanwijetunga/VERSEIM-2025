@@ -9,7 +9,7 @@ VERSEIM-2025 REU @ Tufts University
 
 -- import Mathlib.LinearAlgebra.QuadraticForm.Basic
 -- import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
-import VERSEIM2025.HyperbolicBilinearForms
+import VERSEIM2025.Hyperbolic.HyperbolicBilinearForms
 
 /-
   The main results in this file should hold only for symmetric forms.
@@ -40,7 +40,7 @@ variable {k V V': Type} [AddCommGroup V][AddCommGroup V'] [Field k] [Module k V]
 
 open LinearMap (BilinForm)
 open LinearMap.BilinForm
-open BilinearForms -- This is the namespace in VERSEIM2025.Sahan.BilinearForms
+open BilinearForms -- This is the namespace in VERSEIM2025.BilinearForms
 open Hyperbolic -- This is the namespace in VERSEIM2025.HyperbolicBilinearForms
 open BilinIsomorphisms -- This is the namespace in VERSEIM2025.BilinearFormIsomorphisms
 
@@ -412,5 +412,6 @@ noncomputable def symmetric_is_FooSymm  (p: ℕ)  {B: BilinForm k V} (bsymm: IsS
     FooSymm_of_FooSymmPred <| Symmetric.symmetric_is_FooSymmPred_aux p B bsymm (Module.finrank k V) rfl hd hn2
 
 #print axioms symmetric_is_FooSymm
+
 
 end Symmetric
