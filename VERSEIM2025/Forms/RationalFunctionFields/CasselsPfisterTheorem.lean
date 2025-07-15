@@ -140,7 +140,7 @@ noncomputable def toRatFuncPolynomialModule: PolynomialModule F V →ₗ[F[X]] R
 def PolynomialModule_degree (v: PolynomialModule F V): WithBot ℕ :=  v.support.max
 
 /-- The degree of a polynomial `v : V[X]` with degree of `0` equal to `0`-/
-def PolynomialModule_degreeNat (v: PolynomialModule F V): ℕ :=  WithBot.unbotD 0 (PolynomialModule_degree v)
+def PolynomialModule_natDegree (v: PolynomialModule F V): ℕ :=  WithBot.unbotD 0 (PolynomialModule_degree v)
 
 /-- The degree defined in `PolynomialModule_degree` agrees with Polynomial notion of degree.-/
 example (p: F[X]): p.degree = p.support.max := rfl
@@ -280,8 +280,8 @@ def in_BaseChangePolynomialModule_of_isGoodPair_constant (p: F[X]) (φ: Quadrati
   obtain ⟨w, hw⟩ := prod_poly
   use PolynomialEquiv.toFun (a⁻¹ • w)
   simp
-  have:  (QuadraticForm.baseChange F[X] φ) (a⁻¹ • PolynomialEquiv w) =
-      (a⁻¹)^2 • (QuadraticForm.baseChange F[X] φ) (PolynomialEquiv w) := by
+  have:  (φ.baseChange F[X]) (a⁻¹ • PolynomialEquiv w) =
+      (a⁻¹)^2 • (φ.baseChange F[X]) (PolynomialEquiv w) := by
       have h2 (c: F)(u: F[X]): c^2 • u = (Polynomial.C c)*(Polynomial.C c) • u := by
         rw[pow_two]
         show (c * c) • u = Polynomial.C c • Polynomial.C c • u
@@ -315,12 +315,39 @@ def in_BaseChangePolynomialModule_of_isGoodPair_constant (p: F[X]) (φ: Quadrati
 theorem AnisotropicExtend {φ: QuadraticForm F V} (h: QuadraticMap.Anisotropic φ) [Invertible (2:F)]:
   QuadraticMap.Anisotropic (φ.baseChange F[X]) := sorry
 
+
+lemma DivisionAlgorithm_PolynomialModule (v: PolynomialModule F V) {f: F[X]} (hf: f.natDegree >0):
+  ∃w r, v = f • w + r ∧ PolynomialModule_natDegree w < f.natDegree := sorry
+
+lemma CancellationLemmaExtensionScalars {v w: RatFunc F ⊗[F] V} {f: F[X]} (hvwf: f • v = f • w) (hf: f ≠ 0) : v=w := by
+  sorry
+
 /-- This formalizes the proof of getting (τ_w(v),f') from (v,w) in the
 proof of [Theorem 17.3](https://www.math.ucla.edu/~merkurev/Book/Kniga-final/Kniga.pdf)
 -/
 protected lemma GetSmallerDegree (p: F[X]) (φ: QuadraticForm F V) (f: F[X]) (v: (RatFunc F) ⊗[F] V) (hf: f.natDegree > 0)
-   [Invertible (2: F)] (hvf: isGoodPair p φ v f) (hAnsitropic: QuadraticMap.Anisotropic φ):
-  (∃f' v', (isGoodPair p φ v' f') ∧ (f'.natDegree<f.natDegree)) ∨ p ∈ Set.range ⇑(QuadraticForm.baseChange F[X] φ) := sorry
+  [Invertible (2: F)] (hvf: isGoodPair p φ v f) (hAnsitropic: QuadraticMap.Anisotropic φ):
+  (∃f' v', (isGoodPair p φ v' f') ∧ (f'.natDegree<f.natDegree)) ∨ p ∈ Set.range ⇑(φ.baseChange F[X]) := by
+    have hAnsitropic': QuadraticMap.Anisotropic (φ.baseChange F[X]) :=
+      AnisotropicExtend hAnsitropic
+    obtain ⟨⟨vmulf,h_vmulf⟩,hvp,hf_nonzero⟩ := hvf
+    obtain ⟨u,r,hur⟩ := DivisionAlgorithm_PolynomialModule vmulf hf
+    by_cases hr_eqzero: r=0
+    . rw[hr_eqzero, add_zero] at hur
+      have ⟨hfu_vmulf_eq, degless⟩ := hur
+      right
+      use PolynomialEquiv u
+      suffices (φ.baseChange F[X]) (PolynomialEquiv u) = (p: RatFunc F) from ?_
+      . unfold RatFunc.coePolynomial at *
+        apply IsFractionRing.coe_inj.mp this
+      rw[toRatFuncTensor_CommuteQuadraticForm]
+      rw[hfu_vmulf_eq] at h_vmulf
+      simp at h_vmulf
+      have h_vu_eq: v = toRatFuncPolynomialModule u := CancellationLemmaExtensionScalars h_vmulf hf_nonzero
+      show (QuadraticForm.baseChange (RatFunc F) φ) (toRatFuncPolynomialModule u) = ↑p
+      rw[<- h_vu_eq]
+      exact hvp
+    . sorry
 
 -- We could instead import from `HyperbolicBilinearForms` but I wanted to avoid dependencies
 /-- A pair `e`,`f` is Hyperbolic. Stated assuming `R` is only a commutative ring to allow use of `F[X]`-/
