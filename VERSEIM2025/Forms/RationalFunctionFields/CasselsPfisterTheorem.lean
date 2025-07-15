@@ -332,8 +332,8 @@ protected lemma GetSmallerDegree (p: F[X]) (φ: QuadraticForm F V) (f: F[X]) (v:
       AnisotropicExtend hAnsitropic
     obtain ⟨⟨vmulf,h_vmulf⟩,hvp,hf_nonzero⟩ := hvf
     obtain ⟨u,r,hur⟩ := DivisionAlgorithm_PolynomialModule vmulf hf
-    by_cases hr_eqzero: r=0
-    . rw[hr_eqzero, add_zero] at hur
+    by_cases hr_neqzero: r=0
+    . rw[hr_neqzero, add_zero] at hur
       have ⟨hfu_vmulf_eq, degless⟩ := hur
       right
       use PolynomialEquiv u
@@ -347,7 +347,29 @@ protected lemma GetSmallerDegree (p: F[X]) (φ: QuadraticForm F V) (f: F[X]) (v:
       show (QuadraticForm.baseChange (RatFunc F) φ) (toRatFuncPolynomialModule u) = ↑p
       rw[<- h_vu_eq]
       exact hvp
-    . sorry
+    . left
+      -- We could instead let f' = (φ.baseChange F[X]) (PolynomialEquiv r) / f and do other work,
+      --  but I thought this would be easier
+      have: ∃ g, (φ.baseChange F[X]) (PolynomialEquiv r) = f * g := sorry
+      obtain ⟨f', hff'r⟩ := this
+
+      let w := v- toRatFuncPolynomialModule u
+      let v_reflected: RatFunc F ⊗[F] V := HyperplaneReflection (φ.baseChange (RatFunc F)) w v
+      use f', v_reflected
+      constructor; constructor
+      . sorry
+      . sorry
+      . intro hf'eqzero
+        rw[hf'eqzero] at hff'r
+        have hr_form_eq_zero: (QuadraticForm.baseChange F[X] φ) (PolynomialEquiv r) = 0 := by
+          simp[hff'r ]
+        have hr_eq_zero: r=0 := by
+          suffices PolynomialEquiv r = 0 from ?_
+          . simpa
+          exact AnisotropicExtend hAnsitropic _ hr_form_eq_zero
+        exact hr_neqzero hr_eq_zero
+      . sorry
+
 
 -- We could instead import from `HyperbolicBilinearForms` but I wanted to avoid dependencies
 /-- A pair `e`,`f` is Hyperbolic. Stated assuming `R` is only a commutative ring to allow use of `F[X]`-/
