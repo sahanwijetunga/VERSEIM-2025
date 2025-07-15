@@ -29,6 +29,20 @@ example:= F[X] ⊗[F] V -- Another way to express V[X] (which is not definitiona
 
 example:= (RatFunc F) ⊗[F] V -- F(X) ⊗ V, e.g. V(X)
 
+theorem ExtensionScalarsCommutesWithScalars (v: RatFunc F ⊗[F] V) (p: F[X]): p • v = (p: RatFunc F) • v := by
+  sorry
+
+theorem PolynomialScalarSmul (c: F) (u: F[X]): (Polynomial.C c) * u = c • u := by
+  sorry
+
+theorem TensorPolynomialScalarSmul (c: F) (u: F[X] ⊗[F] V): (Polynomial.C c) • u = c • u := by
+  sorry
+
+theorem RatFunc_coePolynomialMultiplication (f g: F[X]): (f*g: F[X]) = (f: RatFunc F)*(g: RatFunc F) := by
+  sorry
+
+theorem RatFunc_coePolynomialScalarMultiplication (f: F[X]) (g: RatFunc F): f*g = f • g:= by
+  sorry
 
 
 noncomputable def linearmapAux: F[X] →ₗ[F] RatFunc F where
@@ -62,6 +76,20 @@ example (c: F) (v: F[X] ⊗[F] V): (TensorProduct.map linearmapAux LinearMap.id)
 
 /-- The map `toRatFuncTensor` is injective. -/
 theorem toRatFuncTensor_Injective : Function.Injective (@toRatFuncTensor F V _ _ _):= sorry
+
+/-- The map `toRatFuncTensor` commutes with polynomial scalar multiplication -/
+theorem toRatFuncTensor_CommutePolynomialScalars (p: F[X]) (v: (F[X] ⊗[F] V)):
+  toRatFuncTensor (p • v) = p • (toRatFuncTensor v) := sorry
+
+/-- The map `toRatFuncTensor` commutes with scalar multiplication. -/
+theorem toRatFuncTensor_CommuteScalars (a: F) (v: (F[X] ⊗[F] V)):
+  toRatFuncTensor (a • v) = a • (toRatFuncTensor v) := sorry
+
+/-- The map `toRatFuncTensor` commutes with quadratic forms. -/
+theorem toRatFuncTensor_CommuteQuadraticForm (φ: QuadraticForm F V) (v: (F[X] ⊗[F] V)) [Invertible (2:F)]:
+  φ.baseChange F[X] v = (φ.baseChange (RatFunc F)) (toRatFuncTensor v) := sorry
+
+
 
 /-- The map `toRatFuncTensor` is injective, stated elementwise as an iff. -/
 theorem toRatFuncTensor_Injective' (a b: F[X] ⊗[F] V ) : toRatFuncTensor a = toRatFuncTensor b ↔ a=b := by
@@ -191,6 +219,12 @@ structure isGoodPair (p: F[X]) (φ: QuadraticForm F V) (v: (RatFunc F) ⊗[F] V)
 def CollectionPairs (p: F[X]) (φ: QuadraticForm F V) [Invertible (2: F)]: Set ((RatFunc F ⊗[F] V) × F[X]) :=
   { (v,f) | isGoodPair p φ v f }
 
+/-- There exists `(v,f)` in `(RatFunc F ⊗[F] V) × F[X]` with `isGoodPair p φ v f`, i.e.
+- `f • v ∈ V[X]`
+- `φ(v)=p`
+
+Stated as the set of such pairs nonempty for convenience.
+-/
 theorem NonemptyCollectionPairs (φ: QuadraticForm F V) [Invertible (2: F)] (p: F[X]) (hp:
   p ∈ (algebraMap F[X] (RatFunc F))⁻¹' (Set.range (φ.baseChange (RatFunc F)))): (CollectionPairs p φ).Nonempty
    := by sorry
@@ -234,21 +268,58 @@ def OptimalPair_isOptimal (φ: QuadraticForm F V) [Invertible (2: F)] (p: F[X]) 
 -/
 def in_BaseChangePolynomialModule_of_isGoodPair_constant (p: F[X]) (φ: QuadraticForm F V) (v: (RatFunc F) ⊗[F] V)
 (f: F[X]) (hf: f.natDegree=0) [Invertible (2: F)] (hGoodPair: isGoodPair p φ v f)
-: p ∈ Set.range (φ.baseChange F[X]) := sorry
-
-/-- A quadratic form `φ` is `Anisotropic` if `∀ v, φ v = 0 → v = 0`. -/
-abbrev Anisotropic {R M: Type*} [CommRing R] [AddCommGroup M] [Module R M]  (φ: QuadraticForm R M):
-  Prop := ∀v, φ v = 0 → v=0
+: p ∈ Set.range (φ.baseChange F[X]) := by
+  rw[Polynomial.natDegree_eq_zero] at hf
+  obtain ⟨a, haf⟩ := hf
+  obtain ⟨prod_poly, matches_image, fnonzero⟩ := hGoodPair
+  have anonzero: a ≠ 0 := by
+    intro h
+    rw[h] at haf
+    simp at haf
+    exact fnonzero haf.symm
+  obtain ⟨w, hw⟩ := prod_poly
+  use PolynomialEquiv.toFun (a⁻¹ • w)
+  simp
+  have:  (QuadraticForm.baseChange F[X] φ) (a⁻¹ • PolynomialEquiv w) =
+      (a⁻¹)^2 • (QuadraticForm.baseChange F[X] φ) (PolynomialEquiv w) := by
+      have h2 (c: F)(u: F[X]): c^2 • u = (Polynomial.C c)*(Polynomial.C c) • u := by
+        rw[pow_two]
+        show (c * c) • u = Polynomial.C c • Polynomial.C c • u
+        rw[smul_smul, <- Polynomial.C_mul, <-PolynomialScalarSmul]
+        rfl
+      rw[<- TensorPolynomialScalarSmul,h2,QuadraticMap.map_smul,mul_smul]
+      rfl
+  rw[this]
+  have hphiw: (φ.baseChange F[X]) (PolynomialEquiv w) = a^2 • p := by
+    suffices ((φ.baseChange F[X]) (PolynomialEquiv w): RatFunc F) = a^2 • p from ?_
+    . unfold RatFunc.coePolynomial at this
+      have hasf: a ^ 2 • (algebraMap F[X] (RatFunc F)) p = (algebraMap F[X] (RatFunc F)) (a^2 • p) := by
+        exact Eq.symm (algebraMap.coe_smul F F[X] (RatFunc F) (a ^ 2) p)
+      rw[hasf] at this
+      exact IsFractionRing.coe_inj.mp this
+    rw[toRatFuncTensor_CommuteQuadraticForm]
+    have hw:  f • v = toRatFuncTensor (PolynomialEquiv w) := by
+      unfold toRatFuncPolynomialModule  at hw
+      simp at hw
+      exact hw
+    rw[<- hw, ExtensionScalarsCommutesWithScalars, QuadraticMap.map_smul, <- RatFunc_coePolynomialMultiplication,
+      smul_eq_mul, RatFunc_coePolynomialScalarMultiplication, matches_image, <-haf,  sq,← Polynomial.C_mul,
+      ← RatFunc.smul_eq_C_smul]
+  rw[hphiw]
+  nth_rewrite 2[<- one_smul F p]
+  rw[smul_smul]
+  congr
+  field_simp
 
 /--Given `φ: V → F` is Anisotropic, `φ: V[X] → F[X]` is also Anisotropic.-/
-theorem AnisotropicExtend {φ: QuadraticForm F V} (h: Anisotropic φ) [Invertible (2:F)]:
-  Anisotropic (φ.baseChange F[X]) := sorry
+theorem AnisotropicExtend {φ: QuadraticForm F V} (h: QuadraticMap.Anisotropic φ) [Invertible (2:F)]:
+  QuadraticMap.Anisotropic (φ.baseChange F[X]) := sorry
 
 /-- This formalizes the proof of getting (τ_w(v),f') from (v,w) in the
 proof of [Theorem 17.3](https://www.math.ucla.edu/~merkurev/Book/Kniga-final/Kniga.pdf)
 -/
 protected lemma GetSmallerDegree (p: F[X]) (φ: QuadraticForm F V) (f: F[X]) (v: (RatFunc F) ⊗[F] V) (hf: f.natDegree > 0)
-   [Invertible (2: F)] (hvf: isGoodPair p φ v f) (hAnsitropic: Anisotropic φ):
+   [Invertible (2: F)] (hvf: isGoodPair p φ v f) (hAnsitropic: QuadraticMap.Anisotropic φ):
   (∃f' v', (isGoodPair p φ v' f') ∧ (f'.natDegree<f.natDegree)) ∨ p ∈ Set.range ⇑(QuadraticForm.baseChange F[X] φ) := sorry
 
 -- We could instead import from `HyperbolicBilinearForms` but I wanted to avoid dependencies
@@ -347,7 +418,7 @@ protected lemma CasselsPfisterTheorem_NontrivialContainmentExtension (φ: Quadra
   let f := vf.2
   have hvf: isGoodPair p φ v f := OptimalPair_isGoodPair φ p hp
 
-  by_cases hanisotropic: Anisotropic φ
+  by_cases hanisotropic: QuadraticMap.Anisotropic φ
   . by_cases hf_degree: f.natDegree=0
     . apply in_BaseChangePolynomialModule_of_isGoodPair_constant p φ v f hf_degree hvf
     . have: f.natDegree>0 := Nat.zero_lt_of_ne_zero hf_degree
@@ -356,7 +427,7 @@ protected lemma CasselsPfisterTheorem_NontrivialContainmentExtension (φ: Quadra
         apply OptimalPair_isOptimal φ p hp f' v' hIsGoodPair' hdegreeless
       . assumption
   . have hisotropic: ∃ v, φ v = 0 ∧ v ≠ 0 := by
-      unfold Anisotropic at hanisotropic
+      unfold QuadraticMap.Anisotropic at hanisotropic
       push_neg at hanisotropic
       exact hanisotropic
     obtain ⟨v, isotropic_v, hv_neqzero⟩ := hisotropic
