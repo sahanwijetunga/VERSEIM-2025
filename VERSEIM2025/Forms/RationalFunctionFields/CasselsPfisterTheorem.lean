@@ -359,10 +359,8 @@ protected lemma GetSmallerDegree (p: F[X]) (φ: QuadraticForm F V) (f: F[X]) (v:
       let w := v- toRatFuncPolynomialModule u
       let v_reflected: RatFunc F ⊗[F] V := HyperplaneReflection (φ.baseChange (RatFunc F)) w v
       use f', v_reflected
-      constructor; constructor
-      . sorry
-      . sorry
-      . intro hf'eqzero
+      have f'neqzero: f' ≠ 0 := by
+        intro hf'eqzero
         rw[hf'eqzero] at hff'r
         have hr_form_eq_zero: (QuadraticForm.baseChange F[X] φ) (PolynomialEquiv r) = 0 := by
           simp[hff'r ]
@@ -371,9 +369,25 @@ protected lemma GetSmallerDegree (p: F[X]) (φ: QuadraticForm F V) (f: F[X]) (v:
           . simpa
           exact AnisotropicExtend hAnsitropic _ hr_form_eq_zero
         exact hr_neqzero hr_eq_zero
+      constructor; constructor
+      . sorry
+      . unfold v_reflected
+        rw [QuadraticMap.Isometry.map_app]
+        exact hvp
+      . exact f'neqzero
       . have ⟨hfu_vmulf_eq, degless⟩ := hur
         have h1: f'.natDegree+f.natDegree = ((φ.baseChange F[X]) (PolynomialEquiv r)).natDegree := by
-          sorry --
+          have: f'.natDegree+f.natDegree = (f*f').natDegree := by
+            symm
+            rw[Polynomial.natDegree_mul']
+            exact Nat.add_comm f.natDegree f'.natDegree
+            have h1: f.leadingCoeff ≠ 0 := by
+              exact Polynomial.leadingCoeff_ne_zero.mpr hf_nonzero
+            have h2: f'.leadingCoeff ≠ 0 := by
+              exact Polynomial.leadingCoeff_ne_zero.mpr f'neqzero
+            simp[h1,h2]
+          rw[hff'r]
+          omega
         have h2: ((φ.baseChange F[X]) (PolynomialEquiv r)).natDegree =
            2 * PolynomialModule_natDegree r := by
           rw[DegreeQuadraticForm]
