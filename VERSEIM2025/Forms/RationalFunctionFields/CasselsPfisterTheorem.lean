@@ -13,6 +13,8 @@ import Mathlib.LinearAlgebra.QuadraticForm.TensorProduct
 import Mathlib.FieldTheory.RatFunc.AsPolynomial
 import Mathlib.LinearAlgebra.QuadraticForm.Isometry
 import Mathlib.RingTheory.Localization.BaseChange
+import Mathlib.LinearAlgebra.BilinearMap
+
 
 namespace CasselsPfister
 
@@ -171,7 +173,7 @@ def in_polynomial_ring (a: RatFunc F): Prop := Nonempty ((algebraMap F[X] (RatFu
 /-- States that `v` in `V(X)=F(X) ⊗[F] V`is in `V[X]`.
 
   Implementation: `∃ (w : PolynomialModule F V), v = toRatFuncPolynomialModule w`
-  -/
+-/
 def in_polynomial_module (v: (RatFunc F) ⊗[F] V): Prop :=
   ∃ (w : PolynomialModule F V), v = toRatFuncPolynomialModule w
 
@@ -235,18 +237,108 @@ def in_BaseChangePolynomialModule_of_isGoodPair_constant (p: F[X]) (φ: Quadrati
 : p ∈ Set.range (φ.baseChange F[X]) := sorry
 
 /-- A quadratic form `φ` is `Anisotropic` if `∀ v, φ v = 0 → v = 0`. -/
-abbrev Anisotropic (φ: QuadraticForm F V): Prop := ∀ (v: V), φ v = 0 → v=0
+abbrev Anisotropic {R M: Type*} [CommRing R] [AddCommGroup M] [Module R M]  (φ: QuadraticForm R M):
+  Prop := ∀v, φ v = 0 → v=0
 
--- Note: `Anisotropic (φ.baseChange F[X])` wouldn't work as Lean couldn't synthesize the module
+/--Given `φ: V → F` is Anisotropic, `φ: V[X] → F[X]` is also Anisotropic.-/
+theorem AnisotropicExtend {φ: QuadraticForm F V} (h: Anisotropic φ) [Invertible (2:F)]:
+  Anisotropic (φ.baseChange F[X]) := sorry
+
+/-- This formalizes the proof of getting (τ_w(v),f') from (v,w) in the
+proof of [Theorem 17.3](https://www.math.ucla.edu/~merkurev/Book/Kniga-final/Kniga.pdf)
+-/
 protected lemma GetSmallerDegree (p: F[X]) (φ: QuadraticForm F V) (f: F[X]) (v: (RatFunc F) ⊗[F] V) (hf: f.natDegree > 0)
-   [Invertible (2: F)] (hvf: isGoodPair p φ v f) (hAnsitropic: ∀ v, (φ.baseChange F[X]) v = 0 → v=0):
+   [Invertible (2: F)] (hvf: isGoodPair p φ v f) (hAnsitropic: Anisotropic φ):
   ∃f' v', (isGoodPair p φ v' f') ∧ (f'.natDegree<f.natDegree) := sorry
 
+-- We could instead import from `HyperbolicBilinearForms` but I wanted to avoid dependencies
+/-- A pair `e`,`f` is Hyperbolic. Stated assuming `R` is only a commutative ring to allow use of `F[X]`-/
+def hyp_pair {R M: Type*} [CommRing R] [AddCommGroup M] [Module R M]  (β:LinearMap.BilinForm R M) (e f : M) : Prop :=
+  β e e = 0  ∧  β f f = 0  ∧  β e f = 1
+
+lemma exists_bilin_one {e: V} {B: LinearMap.BilinForm F V} (enz: e ≠ 0)
+  (hn: LinearMap.BilinForm.Nondegenerate B): ∃f, B e f =1 := by
+    have: ∃ f, B e f ≠ 0 := by
+      contrapose! enz
+      exact hn e enz
+    have ⟨f, hf⟩ := this
+    let a := B e f
+    use a⁻¹ • f
+    calc
+      (B e) (a⁻¹ • f) = a⁻¹ * (B e f) := by simp only [map_smul, smul_eq_mul]
+      _ = a⁻¹ * a := rfl
+      _ = 1 := inv_mul_cancel₀ hf
 
 
-/-- Lemma for use in CasselsPfisterTheorem. Do not directly use outside. -/
-protected lemma CasselsPfisterTheorem_NonTrivialContainmentExtension (φ: QuadraticForm F V) [Invertible (2: F)]
-  (hn: (QuadraticMap.polarBilin φ).Nondegenerate):
+theorem hyp_pair_exists_symm {e: V} {β:LinearMap.BilinForm F V} (bsymm : β.IsSymm)
+  (hn: LinearMap.BilinForm.Nondegenerate β) (enz : e ≠ 0) (eiso : β e e  = 0) [Invertible (2:F)]:
+  ∃ f, hyp_pair β e f := by
+    have ⟨v, hv⟩ := exists_bilin_one enz hn
+    let c := - 2⁻¹ * β v v
+    let v' := v+c • e
+    use v'
+    constructor
+    . exact eiso
+    constructor
+    . unfold v' c
+      have : β v e = 1 := by
+        rw[<- bsymm]
+        exact hv
+      field_simp[*]
+      ring
+    . unfold v' c
+      simp_all
+
+
+/-- Given `φ: V → F` has a hyperbolic pair, `φ: V[X] → F[X]` does as well (via the inclusion `V → V[X]`)-/
+theorem Extend_hyp_pair {φ: QuadraticForm F V}[Invertible (2:F)] {e f: V} (h: hyp_pair φ.polarBilin e f):
+  ∃ e' f', hyp_pair (φ.baseChange F[X]).polarBilin e' f' := by
+  use 1 ⊗ₜ e
+  use 1 ⊗ₜ f
+  have he: φ e = 0 := by
+      have: (2:F) ≠ 0 := by
+        exact two_ne_zero
+      have := h.1
+      simp_all[h.1,QuadraticMap.polarBilin]
+  have hf: φ f = 0 := by
+      have: (2:F) ≠ 0 := by
+        exact two_ne_zero
+      have := h.2.1
+      simp_all[h.2.1,QuadraticMap.polarBilin]
+
+  constructor
+  . simp[he]
+  constructor
+  . simp[hf]
+  . have: 1 ⊗ₜ[F] e + 1 ⊗ₜ[F] f = (1 ⊗ₜ (e+f): F[X] ⊗[F] V) := by
+      exact Eq.symm (TensorProduct.tmul_add 1 e f)
+    have hef:= h.2.2
+    simp_all[QuadraticMap.polar,QuadraticMap.polarBilin,this]
+
+/-- If `M` has a hyperbolic pair `e`, `f` then `Set.range φ = Set.univ`.
+
+Stated only assuming `R` is a commutative ring so it works over `F[X]`-/
+theorem QuadraticForm_Entire_if_hyp_pair
+{R M: Type*} [CommRing R] [AddCommGroup M] [Module R M]  (φ: QuadraticForm R M) {e f: M}
+  (hef: hyp_pair φ.polarBilin e f):
+  Set.range φ = Set.univ := by sorry
+
+noncomputable instance PolynomialRingInvertible2 (R: Type*) [CommRing R] [Invertible (2: R)]: Invertible (2: R[X]) where
+  invOf := Polynomial.C (⅟2: R)
+  invOf_mul_self := by
+    show Polynomial.C ⅟ 2 * Polynomial.C 2 = Polynomial.C 1
+    rw[<- Polynomial.C_mul]
+    simp
+  mul_invOf_self := by
+    show Polynomial.C 2 * Polynomial.C ⅟ 2 = Polynomial.C 1
+    rw[<- Polynomial.C_mul]
+    simp
+
+
+
+/-- Main lemma for use in CasselsPfisterTheorem. Do not directly use outside. -/
+protected lemma CasselsPfisterTheorem_NontrivialContainmentExtension (φ: QuadraticForm F V) [Invertible (2: F)]
+  (hn: LinearMap.BilinForm.Nondegenerate (QuadraticMap.polarBilin φ)):
   (algebraMap F[X] (RatFunc F))⁻¹' (Set.range (φ.baseChange (RatFunc F)))
   ⊆ Set.range (φ.baseChange F[X]) := by
   intro p hp
@@ -255,18 +347,30 @@ protected lemma CasselsPfisterTheorem_NonTrivialContainmentExtension (φ: Quadra
   let f := vf.2
   have hvf: isGoodPair p φ v f := OptimalPair_isGoodPair φ p hp
 
-  by_cases hanisotropic: ∀v, (φ.baseChange F[X]) v = 0 → v=0
+  by_cases hanisotropic: Anisotropic φ
   . by_cases hf_degree: f.natDegree=0
     . apply in_BaseChangePolynomialModule_of_isGoodPair_constant p φ v f hf_degree hvf
     . have: f.natDegree>0 := Nat.zero_lt_of_ne_zero hf_degree
       have ⟨f',v', hIsGoodPair',hdegreeless⟩ := CasselsPfister.GetSmallerDegree p φ f v this hvf hanisotropic
       exfalso
       apply OptimalPair_isOptimal φ p hp f' v' hIsGoodPair' hdegreeless
-  . have hisotropic: ∃ v, (φ.baseChange F[X]) v = 0 ∧ v ≠ 0 := by
+  . have hisotropic: ∃ v, φ v = 0 ∧ v ≠ 0 := by
+      unfold Anisotropic at hanisotropic
       push_neg at hanisotropic
       exact hanisotropic
     obtain ⟨v, isotropic_v, hv_neqzero⟩ := hisotropic
-    sorry -- finish by extracting a hyperbolic pair
+    have: ∃ e f, hyp_pair φ.polarBilin e f := by
+      use v
+      have isotropic_v' : ((QuadraticMap.polarBilin φ) v) v = 0 := by
+        simp[isotropic_v]
+      apply hyp_pair_exists_symm _ hn hv_neqzero isotropic_v'
+      intro a b
+      simp only [QuadraticMap.polarBilin_apply_apply, QuadraticMap.polar, RingHom.id_apply]
+      abel_nf
+    obtain ⟨e,f,hef⟩ := this
+    obtain ⟨e',f',hef'⟩ := Extend_hyp_pair hef
+    rw[QuadraticForm_Entire_if_hyp_pair (φ.baseChange F[X]) hef']
+    trivial
 
 
 /-- Lemma for use in CasselsPfisterTheorem. Do not directly use outside. -/
@@ -276,11 +380,11 @@ protected lemma CasselsPfisterTheorem_TrivialContainmentExtension (φ: Quadratic
 
 /-- Auxillary version of `CasselsPfisterTheorem` which requires `QuadraticMap.polarBilin φ` is `Nondegenerate`
 -/
-protected theorem CasselsPfisterTheoremAux (φ: QuadraticForm F V) [Invertible (2: F)] (hn: (QuadraticMap.polarBilin φ).Nondegenerate):
+protected theorem CasselsPfisterTheoremAux (φ: QuadraticForm F V) [Invertible (2: F)] (hn: LinearMap.BilinForm.Nondegenerate (QuadraticMap.polarBilin φ)):
   (algebraMap F[X] (RatFunc F))⁻¹' (Set.range (φ.baseChange (RatFunc F)))
    = Set.range (φ.baseChange F[X]) := by
   apply le_antisymm
-  . apply CasselsPfister.CasselsPfisterTheorem_NonTrivialContainmentExtension φ hn
+  . apply CasselsPfister.CasselsPfisterTheorem_NontrivialContainmentExtension φ hn
   . apply CasselsPfister.CasselsPfisterTheorem_TrivialContainmentExtension
 
 /-- The values taken by the extension of a quadratic map `φ: V → F` to `V(X) → F(X)`
