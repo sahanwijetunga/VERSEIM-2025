@@ -1,5 +1,6 @@
 import Mathlib.Tactic
 import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
+
 import VERSEIM2025.Subspaces
 
 -- Katherine and Clea, I think you can prove various things using the
@@ -13,15 +14,17 @@ open LinearMap (BilinForm)
 open LinearMap
 
 variable {k V:Type} [Field k] [AddCommGroup V] [Module k V]
+
 variable {β:BilinForm k V}
 variable {ι₁ ι₂ : Type} [DecidableEq ι₁] [DecidableEq ι₂]
+
 
 -- let's make a precidicate for subspaces on which the form is
 -- non-degenerate (I think Sahan must have some version of this, but I
 -- looked in his code and in mathlib and didn't see exactly what I
 -- wanted...)
 
-def Nondeg_subspace (β: BilinForm k V) (W:Submodule k V) : Prop :=
+def Nondeg_subspace (β : BilinForm k V) (W:Submodule k V) : Prop :=
   BilinForm.Nondegenerate (BilinForm.restrict β W)
 
 -- we want to prove: if W is a non-degenerate subspace, then also its
@@ -31,6 +34,11 @@ def Nondeg_subspace (β: BilinForm k V) (W:Submodule k V) : Prop :=
 -- complement, but it is actually already in Mathlib, as
 -- `LinearMap.BilinForm.orthogonal`
 
+<<<<<<<<< Temporary merge branch 1
+theorem ortho_complement_nondeg (bnd : BilinForm.Nondegenerate β)
+   (W:Submodule k V) (wnd :Nondeg_subspace W) :
+   Nondeg_subspace (BilinForm.orthogonal β W) := by sorry
+=========
 
 
 def zero_mat : Matrix ι₁ ι₂ k := fun _ _ => (0 : k)
