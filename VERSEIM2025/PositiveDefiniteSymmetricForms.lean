@@ -8,6 +8,7 @@ VERSEIM-2025 REU VERSEIM-2025 REU @ Tufts University
 -/
 
 import VERSEIM2025.Subspaces
+import VERSEIM2025.Forms.Hyperbolic.BilinearForms
 
 open BilinearForms
 open LinearMap (BilinForm)

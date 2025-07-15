@@ -7,7 +7,7 @@ Released under the Apache 2.0 license as described in the file LICENSE.
 VERSEIM-2025 REU @ Tufts University
 -/
 
-import VERSEIM2025.Hyperbolic.HyperbolicBilinearForms
+import VERSEIM2025.Forms.Hyperbolic.HyperbolicBilinearForms
 
 /-
   Major results (Completed)
@@ -15,15 +15,6 @@ import VERSEIM2025.Hyperbolic.HyperbolicBilinearForms
     - Corollary: Nondegenerate alternating bilinear form is dimension 2n (`alternate_is_even_dimension`)
   - - Corollary: Nondegenerate alternating bilinear forms of equal (finite) dimension
       are isomorphic (as bilinear form spaces)  (`alternate_iso`)
-
-  Major results (Planned - Aspirational):
-  - Remove the [FiniteDimensional k V] requirement from `alternating_is_hyperbolic` (if possible).
-    - Proof Sketch:
-      - Increasing limit of hyperbolic spaces is hyperbolic *(May be wrong)*
-        - This would require (at minimum) that if W is a finite dimensional subspace
-          which V is Nondegenerate on then W + Wᗮ = V.
-      - Any maximal hyperbolic space must be the entire space
-    - Hence also generalize `alternate_iso` to not require finite dimensional
 -/
 
 namespace Alternating
@@ -34,9 +25,9 @@ variable {k V V': Type} [AddCommGroup V][AddCommGroup V'] [Field k] [Module k V]
 
 open LinearMap (BilinForm)
 open LinearMap.BilinForm
-open BilinearForms -- This is the namespace in VERSEIM2025.BilinearForms
-open Hyperbolic -- This is the namespace in VERSEIM2025.HyperbolicBilinearForms
-open BilinIsomorphisms -- This is the namespace in VERSEIM2025.BilinearFormIsomorphisms
+open BilinearForms -- This is the namespace in VERSEIM2025.Forms.Hyperbolic.BilinearForms
+open Hyperbolic -- This is the namespace in VERSEIM2025.Forms.Hyperbolic.BilinearForms
+open BilinIsomorphisms -- This is the namespace in VERSEIM2025.Forms.Hyperbolic.BilinearFormIsomorphisms
 
 
 lemma ex_nonzero (h: Module.finrank k V > 0) : ∃(v: V), v ≠ 0  := by
