@@ -9,7 +9,7 @@ VERSEIM-2025 REU @ Tufts University
 
 import Mathlib.Tactic
 import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
-import VERSEIM2025.Hyperbolic.BilinearForms
+import VERSEIM2025.Forms.Hyperbolic.BilinearForms
 
 /-
   Major results (Completed)
@@ -24,7 +24,7 @@ import VERSEIM2025.Hyperbolic.BilinearForms
   TODO: Clean up definitions (radForm/radForm' excessive amount of theorems?)
 -/
 
-open BilinearForms -- This is the namespace in VERSEIM2025.BilinearForms
+open BilinearForms -- This is the namespace in VERSEIM2025.Forms.Hyperbolic.BilinearForms
 open LinearMap.BilinForm
 open LinearMap (BilinForm)
 

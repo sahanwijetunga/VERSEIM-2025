@@ -184,6 +184,11 @@ theorem lin_indep_by_transverse_subspaces
     · simp
     · simp
 
+
+
+
+
+
     -- a is coefficients, b1 (x) is the vectors, b2 (x) is the other vectors
     -- step zero: make a hypothesis that b1a1 = -b2a2 and then show =>
     -- step one: show its in the intersection
