@@ -21,7 +21,7 @@ variable {ι₁ ι₂ : Type} [DecidableEq ι₁] [DecidableEq ι₂]
 -- looked in his code and in mathlib and didn't see exactly what I
 -- wanted...)
 
-def Nondeg_subspace (W:Submodule k V) : Prop :=
+def Nondeg_subspace (β: BilinForm k V) (W:Submodule k V) : Prop :=
   BilinForm.Nondegenerate (BilinForm.restrict β W)
 
 -- we want to prove: if W is a non-degenerate subspace, then also its
@@ -102,7 +102,8 @@ theorem ortho_complement_nondeg  [FiniteDimensional k V] (bnd : BilinForm.Nondeg
     have k₃ : M.det = M₁.det * M₂.det := by
       sorry
     -- i need to make a linear map for beta i think ... but a composition with W₁ isnt working
-    have k₄ : M₂ = (BilinForm.toMatrix b₂ β) := by
+    have k₄ : M₂ = (BilinForm.toMatrix b₂ (β.restrict W₁)) := by
+
       sorry
     have k₅ : M₂.det ≠ 0 := by
       intro h
@@ -113,6 +114,10 @@ theorem ortho_complement_nondeg  [FiniteDimensional k V] (bnd : BilinForm.Nondeg
       sorry
     unfold Nondeg_subspace
     -- need to fix k₄ for the below statements to work properly
-    /- rw[k₄] at k₅
-    apply Matrix.nondegenerate_of_det_ne_zero at k₅ -/
-    sorry
+    rw[k₄] at k₅
+    apply Matrix.nondegenerate_of_det_ne_zero at k₅
+    /- have hw: Disjoint W (BilinForm.orthogonal β W) := by
+      sorry -/
+    apply LinearMap.BilinForm.nondegenerate_restrict_of_disjoint_orthogonal
+    · sorry
+    · sorry
