@@ -249,7 +249,7 @@ proof of [Theorem 17.3](https://www.math.ucla.edu/~merkurev/Book/Kniga-final/Kni
 -/
 protected lemma GetSmallerDegree (p: F[X]) (φ: QuadraticForm F V) (f: F[X]) (v: (RatFunc F) ⊗[F] V) (hf: f.natDegree > 0)
    [Invertible (2: F)] (hvf: isGoodPair p φ v f) (hAnsitropic: Anisotropic φ):
-  ∃f' v', (isGoodPair p φ v' f') ∧ (f'.natDegree<f.natDegree) := sorry
+  (∃f' v', (isGoodPair p φ v' f') ∧ (f'.natDegree<f.natDegree)) ∨ p ∈ Set.range ⇑(QuadraticForm.baseChange F[X] φ) := sorry
 
 -- We could instead import from `HyperbolicBilinearForms` but I wanted to avoid dependencies
 /-- A pair `e`,`f` is Hyperbolic. Stated assuming `R` is only a commutative ring to allow use of `F[X]`-/
@@ -351,9 +351,10 @@ protected lemma CasselsPfisterTheorem_NontrivialContainmentExtension (φ: Quadra
   . by_cases hf_degree: f.natDegree=0
     . apply in_BaseChangePolynomialModule_of_isGoodPair_constant p φ v f hf_degree hvf
     . have: f.natDegree>0 := Nat.zero_lt_of_ne_zero hf_degree
-      have ⟨f',v', hIsGoodPair',hdegreeless⟩ := CasselsPfister.GetSmallerDegree p φ f v this hvf hanisotropic
-      exfalso
-      apply OptimalPair_isOptimal φ p hp f' v' hIsGoodPair' hdegreeless
+      obtain ⟨f',v', hIsGoodPair',hdegreeless⟩ | _ := CasselsPfister.GetSmallerDegree p φ f v this hvf hanisotropic
+      . exfalso
+        apply OptimalPair_isOptimal φ p hp f' v' hIsGoodPair' hdegreeless
+      . assumption
   . have hisotropic: ∃ v, φ v = 0 ∧ v ≠ 0 := by
       unfold Anisotropic at hanisotropic
       push_neg at hanisotropic
