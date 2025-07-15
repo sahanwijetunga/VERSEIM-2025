@@ -317,9 +317,12 @@ theorem AnisotropicExtend {φ: QuadraticForm F V} (h: QuadraticMap.Anisotropic �
 
 
 lemma DivisionAlgorithm_PolynomialModule (v: PolynomialModule F V) {f: F[X]} (hf: f.natDegree >0):
-  ∃w r, v = f • w + r ∧ PolynomialModule_natDegree w < f.natDegree := sorry
+  ∃w r, v = f • w + r ∧ PolynomialModule_natDegree r < f.natDegree := sorry
 
 lemma CancellationLemmaExtensionScalars {v w: RatFunc F ⊗[F] V} {f: F[X]} (hvwf: f • v = f • w) (hf: f ≠ 0) : v=w := by
+  sorry
+
+lemma DegreeQuadraticForm (φ: QuadraticForm F V) (v: PolynomialModule F V)[Invertible (2:F)]: 2*PolynomialModule_natDegree v = (φ.baseChange F[X] (PolynomialEquiv v)).natDegree := by
   sorry
 
 /-- This formalizes the proof of getting (τ_w(v),f') from (v,w) in the
@@ -350,7 +353,7 @@ protected lemma GetSmallerDegree (p: F[X]) (φ: QuadraticForm F V) (f: F[X]) (v:
     . left
       -- We could instead let f' = (φ.baseChange F[X]) (PolynomialEquiv r) / f and do other work,
       --  but I thought this would be easier
-      have: ∃ g, (φ.baseChange F[X]) (PolynomialEquiv r) = f * g := sorry
+      have: ∃ f', (φ.baseChange F[X]) (PolynomialEquiv r) = f * f' := sorry
       obtain ⟨f', hff'r⟩ := this
 
       let w := v- toRatFuncPolynomialModule u
@@ -368,7 +371,17 @@ protected lemma GetSmallerDegree (p: F[X]) (φ: QuadraticForm F V) (f: F[X]) (v:
           . simpa
           exact AnisotropicExtend hAnsitropic _ hr_form_eq_zero
         exact hr_neqzero hr_eq_zero
-      . sorry
+      . have ⟨hfu_vmulf_eq, degless⟩ := hur
+        have h1: f'.natDegree+f.natDegree = ((φ.baseChange F[X]) (PolynomialEquiv r)).natDegree := by
+          sorry --
+        have h2: ((φ.baseChange F[X]) (PolynomialEquiv r)).natDegree =
+           2 * PolynomialModule_natDegree r := by
+          rw[DegreeQuadraticForm]
+        have h3:2 * PolynomialModule_natDegree r - f.natDegree  < 2 * f.natDegree - f.natDegree := by
+            omega
+        have h4:2 * f.natDegree - f.natDegree  = f.natDegree := by
+            omega
+        omega
 
 
 -- We could instead import from `HyperbolicBilinearForms` but I wanted to avoid dependencies
