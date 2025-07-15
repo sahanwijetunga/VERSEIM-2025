@@ -161,43 +161,7 @@ theorem lin_indep_by_transverse_subspaces
 #check lin_indep_by_transverse_subspaces
 #check Basis
 
-/- noncomputable
-example (W₁ W₂ : Submodule k V)
-        (ι₁ ι₂ : Type) [Fintype ι₁] [Fintype ι₂]
-        (B₁ : Basis ι₁ k W₁)
-        (B₂ : Basis ι₂ k W₂)
 
-        (f₁:ι₁ → V) (f₂:ι₂ → V)
-        (hi₁:LinearIndependent k f₁) (hi₂:LinearIndependent k f₂)
-        [DecidableEq ι₁] [DecidableEq ι₂]
-
-        (hspan : W₁ ⊔ W₂ = (⊤:Set V))
-        (hindep : W₁ ⊓ W₂ = (⊥:Set V)) :
-      Basis (ι₁ ⊕ ι₂) k V := by
-      have hli: LinearIndependent k (disjointUnion_funs f₁ f₂) := by
-        apply lin_indep_by_transverse_subspaces
-        · exact hi₁
-        · exact hi₂
-        · sorry
-        · sorry
-        ·
-          sorry
-        · exact W₁
-        · exact W₂
-
-        /- rw[linearIndependent_iff'']
-        intro S g h₀ h₁ y
-        by_cases y ∈ S
-        · sorry
-        · sorry -/
-      have hsp: ⊤ ≤ Submodule.span k (Set.range (disjointUnion_funs f₁ f₂)) := by
-        simp
-        -- have k₀: Set.range (disjointUnion_funs f₁ f₂) = s ∪
-        sorry
-
-
-      exact Basis.mk hli hsp
--/
 
 def disjointUnion_funs' {ι₁ ι₂ : Type} {k V : Type} [Field k] [AddCommGroup V]
 [Module k V]  {W₁ W₂ : Submodule k V} (f₁ : ι₁ → W₁ ) (f₂ : ι₂ → W₂) (u: ι₁ ⊕ ι₂) : V :=
