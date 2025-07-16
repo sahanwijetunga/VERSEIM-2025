@@ -14,6 +14,7 @@ import Mathlib.FieldTheory.RatFunc.AsPolynomial
 import Mathlib.LinearAlgebra.QuadraticForm.Isometry
 import Mathlib.RingTheory.Localization.BaseChange
 import Mathlib.LinearAlgebra.BilinearMap
+import Mathlib.LinearAlgebra.TensorProduct.Basic
 
 namespace CasselsPfister
 
@@ -34,7 +35,7 @@ theorem ConversionIff (a b: F[X]): (a: RatFunc F)=b ↔ a=b := by
   . intro h
     rw[h]
 
-theorem ExtensionScalarsCommutesWithScalars (v: RatFunc F ⊗[F] V) (p: F[X]): p • v = (p: RatFunc F) • v := by
+theorem ExtensionScalarsCommutesWithScalars (p: F[X]) (v: RatFunc F ⊗[F] V) : p • v = (p: RatFunc F) • v := by
   sorry
 
 theorem PolynomialScalarSmul (c: F) (u: F[X]): (Polynomial.C c) * u = c • u := by
@@ -107,7 +108,7 @@ noncomputable def PolynomialEquiv: PolynomialModule F V ≃ₗ[F[X]] F[X] ⊗[F]
   left_inv := sorry
   right_inv := sorry
 
-
+theorem PolynomialEquivSingle (v: V): PolynomialEquiv ((PolynomialModule.single F 0) v) = 1 ⊗ₜ v := sorry
 
 
 theorem FooSummWork {α}(v w: α →₀ V) (g : α → V →+ V):
@@ -192,19 +193,77 @@ def in_polynomial_ring (a: RatFunc F): Prop := Nonempty ((algebraMap F[X] (RatFu
 def in_polynomial_module (v: (RatFunc F) ⊗[F] V): Prop :=
   ∃ (w : PolynomialModule F V), v = toRatFuncPolynomialModule w
 
+theorem in_polynomial_module_add {v w: (RatFunc F) ⊗[F] V} (hv: in_polynomial_module v)
+  (hw: in_polynomial_module w): in_polynomial_module (v+w) := sorry
+
+theorem in_polynomial_module_smul {v: (RatFunc F) ⊗[F] V} (p: F[X]) (hv: in_polynomial_module v):
+   in_polynomial_module (p • v) := sorry
+
 /-- Each `v` in `V(X)` has non-zero `f: F[X]` with `f • v` in `V[X]`-/
 theorem exists_denominator  (v: (RatFunc F) ⊗[F] V): ∃ (f: F[X]), in_polynomial_module (f • v) ∧ f ≠ 0 := by
-  have b := Basis.ofVectorSpace F V
-  have ⟨l, hlv⟩ := TensorProduct.eq_repr_basis_right b v
-  let α := l.support
+  apply TensorProduct.induction_on (
+    motive := fun v => ∃ f, in_polynomial_module (f • v) ∧ f ≠ 0
+  )
+  case zero =>
+    use Polynomial.C 1
+    constructor
+    . use 0
+      simp only [map_one, map_zero]
+      rfl
+    . intro h
+      rw[map_one] at h
+      exact one_ne_zero h
+  case tmul =>
+    intro f v
+    use f.denom
+    constructor
+    . use f.num • (PolynomialModule.single F 0 v)
+      simp[toRatFuncPolynomialModule]
+      rw[PolynomialEquivSingle]
+      rw[ExtensionScalarsCommutesWithScalars]
+      have: ↑f.denom • f ⊗ₜ[F] v  = (↑f.denom • f) ⊗ₜ[F] v  := by
+        exact rfl
+      simp only [toRatFuncTensor, linearmapAux, TensorProduct.AlgebraTensorModule.map_tmul,
+        Algebra.linearMap_apply, map_one, LinearMap.id_coe, id_eq]
+      rw[TensorProduct.smul_tmul' ]
+      rw[TensorProduct.smul_tmul' ]
+      rw[<- RatFunc_coePolynomialScalarMultiplication]
+      have : (((↑f.denom): RatFunc F) * f) = (↑f.num * 1)  := by
+        rw[mul_one]
+        have := RatFunc.num_div_denom f
+        symm
+        rw[mul_comm, <- div_eq_iff ]
+        . exact this
+        . intro h
+          apply RatFunc.denom_ne_zero f
+          have:  (f.denom: RatFunc F) = (0: F[X]) := by
+            rw[h]
+            simp[RatFunc.coePolynomial]
+          exact (ConversionIff f.denom 0).mp this
+      rw[<- this]
+      rfl
+    . exact RatFunc.denom_ne_zero f
 
-  have hlv: ∑ i ∈ α, (l i) ⊗ₜ[F] b i = v := hlv
-  let f := ∏ i ∈ α, (l i).denom
-  use f
-  have: ∀ i, (l i).denom ≠ 0 := fun _ => RatFunc.denom_ne_zero _
-  have hf_nonzero: f ≠ 0 := sorry
-  constructor; case right => exact hf_nonzero
-  sorry
+  case add =>
+    intro v w ⟨f, hfv⟩ ⟨g, hgw⟩
+    use f*g
+    constructor
+    . have: (f * g) • (v + w) = f • g • v + f • g • w := by
+        rw[ExtensionScalarsCommutesWithScalars, smul_add]
+        repeat rw[ExtensionScalarsCommutesWithScalars]
+        repeat rw[smul_smul]
+        congr
+        repeat exact RatFunc_coePolynomialMultiplication f g
+      rw[this]
+      apply in_polynomial_module_add
+      . rw[smul_comm]
+        apply in_polynomial_module_smul
+        exact hfv.1
+      . apply in_polynomial_module_smul
+        exact hgw.1
+    . exact (mul_ne_zero_iff_right hgw.2 ).mpr hfv.2
+
+
 
 /-- `isGoodPair p φ v f` means `f • v` in `V[X]` and `φ(v)=p`-/
 structure isGoodPair (p: F[X]) (φ: QuadraticForm F V) (v: (RatFunc F) ⊗[F] V)(f: F[X]) [Invertible (2: F)]: Prop where
