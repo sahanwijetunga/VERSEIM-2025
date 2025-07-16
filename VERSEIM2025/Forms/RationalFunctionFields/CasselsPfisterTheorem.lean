@@ -15,11 +15,9 @@ import Mathlib.LinearAlgebra.QuadraticForm.Isometry
 import Mathlib.RingTheory.Localization.BaseChange
 import Mathlib.LinearAlgebra.BilinearMap
 
-
 namespace CasselsPfister
 
 open scoped Polynomial
--- open scoped RatFunc
 open scoped TensorProduct
 
 variable {F V: Type*} [Field F] [AddCommGroup V] [Module F V]
@@ -48,21 +46,15 @@ theorem TensorPolynomialScalarSmul (c: F) (u: F[X] ⊗[F] V): (Polynomial.C c) �
 theorem RatFunc_coePolynomialMultiplication (f g: F[X]): (f*g: F[X]) = (f: RatFunc F)*(g: RatFunc F) := by
   sorry
 
-theorem RatFunc_coePolynomialScalarMultiplication (f: F[X]) (g: RatFunc F): f*g = f • g:= by
-  sorry
+theorem RatFunc_coePolynomialScalarMultiplication (f: F[X]) (g: RatFunc F): ↑f * g = f • g:= by
+  rw [@Algebra.smul_def',@mul_eq_mul_right_iff]; left
+  rfl
 
-noncomputable def linearmapAux: F[X] →ₗ[F[X]] RatFunc F where
-  toFun := fun v => v
-  map_add' := algebraMap.coe_add
-  map_smul' := by
-    intro a b
-    simp
-    show (↑(a • b) : RatFunc F) = a • ↑b
-    rw [← RatFunc_coePolynomialScalarMultiplication]
-    rw [Algebra.id.smul_eq_mul]
-    rw [RatFunc_coePolynomialMultiplication]
+/-- Maps `F[X] → RatFunc F` linearly in `F[X]`-/
+noncomputable def linearmapAux: F[X] →ₗ[F[X]] RatFunc F := by
+  exact Algebra.linearMap F[X] (RatFunc F)
 
-
+/-- Maps `V[X] → V(X)` in the sense of extension by scalars using tensor products-/
 noncomputable def toRatFuncTensor: F[X] ⊗[F] V →ₗ[F[X]] RatFunc F ⊗[F] V :=
   TensorProduct.AlgebraTensorModule.map linearmapAux LinearMap.id
 
@@ -105,6 +97,8 @@ noncomputable def FooFunPolynomial: ℕ → V →ₗ[F] F[X] ⊗[F] V := fun n =
 
 -- https://leanprover-community.github.io/mathlib4_docs/Mathlib/RingTheory/TensorProduct/MvPolynomial.html#MvPolynomial.rTensor
 --  is relevant (but does things in multivariable polynomials)
+
+/-- An isomorphism between the two notions of `V[X]`-/
 noncomputable def PolynomialEquiv: PolynomialModule F V ≃ₗ[F[X]] F[X] ⊗[F] V where
   toFun := fun f => f.sum (fun n => fun v => FooFunPolynomial n v)
   map_add' := sorry
@@ -120,10 +114,11 @@ theorem FooSummWork {α}(v w: α →₀ V) (g : α → V →+ V):
   (v+w).sum (fun a => fun v => g a v) = (v.sum (fun a => fun v => g a v)) + (w.sum (fun a => fun v => g a v)) := by
     exact Finsupp.sum_hom_add_index g
 
-/-- The inclusion `V[X] →ₗ[F[X]] RatFunc F ⊗[F] V` defined as a composition of
+/-- The inclusion `V[X] → V(X)` where `V[X]` is the `PolynomialModule` version.
+
+Defined as a composition of
 `PolynomialModule F V →ₗ[F[X]] F[X] ⊗[F] V` (`PolynomialEquiv.toLinearMap`) and
 `F[X] ⊗[F] V →ₗ[F[X]] RatFunc F ⊗[F] V` (`toRatFuncTensor`)
-but `PolynomialEquiv` is not yet defined in this file.
  -/
 -- f.sum (fun n => fun v => algebraMap (Polynomial F) _ (Polynomial.monomial n 1) ⊗ₜ v)
 noncomputable def toRatFuncPolynomialModule: PolynomialModule F V →ₗ[F[X]] RatFunc F ⊗[F] V :=
@@ -139,7 +134,7 @@ def PolynomialModule_natDegree (v: PolynomialModule F V): ℕ :=  WithBot.unbotD
 example (p: F[X]): p.degree = p.support.max := rfl
 
 /-- Ports over degree notion from `PolynomialModule_degree` via `PolynomialEquiv` isomorphism. -/
-noncomputable abbrev TensorPolynomialModule_degree (v: F[X] ⊗[F] V):
+noncomputable def TensorPolynomialModule_degree (v: F[X] ⊗[F] V):
   WithBot ℕ :=PolynomialModule_degree (PolynomialEquiv.invFun v)
 
 /-- Constant polynomial a: F in F[X]-/
@@ -181,41 +176,42 @@ def HyperplaneReflection (φ: QuadraticForm F V) (v: V) : QuadraticMap.Isometry 
     _ = φ w := by
       simp
 
-
+/-- Extending a quadratic form by scalars-/
 noncomputable example (Q: QuadraticForm F V) [Invertible (2: F)]:
   QuadraticForm F[X] (F[X] ⊗[F] V) := QuadraticForm.baseChange F[X] Q
-
 noncomputable example (Q: QuadraticForm F V) [Invertible (2: F)]:
   QuadraticForm (RatFunc F) ((RatFunc F) ⊗[F] V) := QuadraticForm.baseChange (RatFunc F)  Q
 
 /-- States that a in F(X) is in F[X]. Implementation details could be worth modifying. -/
 def in_polynomial_ring (a: RatFunc F): Prop := Nonempty ((algebraMap F[X] (RatFunc F))⁻¹' {a})
 
-/-- States that `v` in `V(X)=F(X) ⊗[F] V`is in `V[X]`.
+/-- `in_polynomial_module v` means that `v` in `V(X)`is in `V[X]`.
 
   Implementation: `∃ (w : PolynomialModule F V), v = toRatFuncPolynomialModule w`
 -/
 def in_polynomial_module (v: (RatFunc F) ⊗[F] V): Prop :=
   ∃ (w : PolynomialModule F V), v = toRatFuncPolynomialModule w
 
+/-- Each `v` in `V(X)` has non-zero `f: F[X]` with `f • v` in `V[X]`-/
 theorem exists_denominator  (v: (RatFunc F) ⊗[F] V): ∃ (f: F[X]), in_polynomial_module (f • v) ∧ f ≠ 0 := sorry
 
-/-- v in V(X) and f in F[x] has `f • v ∈ V[X]` and `φ(v)=p`-/
+/-- `isGoodPair p φ v f` means `f • v` in `V[X]` and `φ(v)=p`-/
 structure isGoodPair (p: F[X]) (φ: QuadraticForm F V) (v: (RatFunc F) ⊗[F] V)(f: F[X]) [Invertible (2: F)]: Prop where
   prod_poly: in_polynomial_module (f • v)
   matches_image : (φ.baseChange (RatFunc F)) v = p
   nonzero: f ≠ 0
 
-/-- The set of `(v,f)` in `(RatFunc F ⊗[F] V) × F[X]` with `isGoodPair p φ v f`, i.e.
+/-- The set of `(v,f)` in `V(X) × F[X]` with `isGoodPair p φ v f`, i.e.
 - `f • v ∈ V[X]`
 - `φ(v)=p`
 -/
 def CollectionPairs (p: F[X]) (φ: QuadraticForm F V) [Invertible (2: F)]: Set ((RatFunc F ⊗[F] V) × F[X]) :=
   { (v,f) | isGoodPair p φ v f }
 
-/-- There exists `(v,f)` in `(RatFunc F ⊗[F] V) × F[X]` with `isGoodPair p φ v f`, i.e.
-- `f • v ∈ V[X]`
-- `φ(v)=p`
+
+/-- There exists `(v,f)` in `V(X) × F[X]` with `(v,f)` satisfying `isGoodPair p φ v f`,
+i.e. `f • v` in `V[X]` and `φ(v)=p`.
+
 Stated as the set of such pairs nonempty for convenience.
 -/
 theorem NonemptyCollectionPairs (φ: QuadraticForm F V) [Invertible (2: F)] (p: F[X]) (hp:
@@ -232,11 +228,10 @@ theorem NonemptyCollectionPairs (φ: QuadraticForm F V) [Invertible (2: F)] (p: 
   . exact nonzero
 
 @[simp]
-abbrev degree_pair: ((RatFunc F ⊗[F] V) × F[X]) → ℕ := fun (_,f) => f.natDegree
+def degree_pair: ((RatFunc F ⊗[F] V) × F[X]) → ℕ := fun (_,f) => f.natDegree
 
-/-- Picks `(v,f)` in `(RatFunc F ⊗[F] V) × F[X]` such that `f.natDegree` is minimized and
-- `f • v ∈ V[X]`
-- `φ(v)=p`
+/-- Picks `(v,f)` in `V(X) × F[X]` such that `f.natDegree` is minimized with `(v,f)` satisfying
+`isGoodPair p φ v f`, i.e. `f • v` in `V[X]` and `φ(v)=p`.
 
 See `OptimalPair_isGoodPair` and `OptimalPair_isOptimal` for witnesses to this.
 -/
@@ -316,9 +311,11 @@ def in_BaseChangePolynomialModule_of_isGoodPair_constant (p: F[X]) (φ: Quadrati
 theorem AnisotropicExtend {φ: QuadraticForm F V} (h: QuadraticMap.Anisotropic φ) [Invertible (2:F)]:
   QuadraticMap.Anisotropic (φ.baseChange F[X]) := sorry
 
-
+/-- The division algorithm holds in `V[X]` dividing by elements of `F[X]` -/
+-- TODO: Reformulate in way more similar to mathlib style (i.e. with v/f and v%f defined and a theorem about them)
 lemma DivisionAlgorithm_PolynomialModule (v: PolynomialModule F V) {f: F[X]} (hf: f.natDegree >0):
   ∃w r, v = f • w + r ∧ PolynomialModule_natDegree r < f.natDegree := sorry
+
 
 lemma CancellationLemmaExtensionScalars' {v w: RatFunc F ⊗[F] V} {f: RatFunc F} (hvwf: f • v = f • w) (hf: f ≠ 0) : v=w := by
   rw[<- one_smul (RatFunc F) v]
@@ -341,15 +338,18 @@ lemma CancellationLemmaExtensionScalars {v w: RatFunc F ⊗[F] V} {f: F[X]} (hvw
   rw[ExtensionScalarsCommutesWithScalars, ExtensionScalarsCommutesWithScalars] at hvwf
   exact CancellationLemmaExtensionScalars' hvwf hf'
 
-
+/-- The degree of `φ(v): F[X]` is at most twice of the degree of `v: V[X]`-/
 lemma DegreeQuadraticForm (φ: QuadraticForm F V) (v: PolynomialModule F V)[Invertible (2:F)]: (φ.baseChange F[X] (PolynomialEquiv v)).natDegree ≤ 2*PolynomialModule_natDegree v := by
   sorry
 
 -- We could instead import from `HyperbolicBilinearForms` but I wanted to avoid dependencies
-/-- A pair `e`,`f` is Hyperbolic. Stated assuming `R` is only a commutative ring to allow use of `F[X]`-/
+/-- A pair `e`,`f` is Hyperbolic.
+
+Stated assuming `R` is only a commutative ring to allow use of `F[X]`-/
 def hyp_pair {R M: Type*} [CommRing R] [AddCommGroup M] [Module R M]  (β:LinearMap.BilinForm R M) (e f : M) : Prop :=
   β e e = 0  ∧  β f f = 0  ∧  β e f = 1
 
+/-- A hyperbolic pair for the polar form of a quadratic form satisfies nice properties. -/
 theorem QuadraticForm_hyp_pair  {R M: Type*} [CommRing R] [AddCommGroup M] [Module R M]
  {φ: QuadraticForm R M} {e f : M} (h: hyp_pair φ.polarBilin e f) [Invertible (2:R)]:
   φ e = 0 ∧ φ f = 0 ∧ QuadraticMap.polar φ e f = 1 ∧ φ (e+f)=1 := by
@@ -476,18 +476,14 @@ protected lemma GetSmallerDegree (p: F[X]) (φ: QuadraticForm F V) (f: F[X]) (v:
     obtain ⟨⟨vmulf,h_vmulf⟩,hvp,hf_nonzero⟩ := hvf
     obtain ⟨u,r,hur⟩ := DivisionAlgorithm_PolynomialModule vmulf hf
     by_cases hr_neqzero: r=0
-    . rw[hr_neqzero, add_zero] at hur
-      have ⟨hfu_vmulf_eq, degless⟩ := hur
+    .
+      rw[hr_neqzero, add_zero] at hur
+      obtain ⟨hfu_vmulf_eq, degless⟩ := hur
       right
       use PolynomialEquiv u
-      suffices (φ.baseChange F[X]) (PolynomialEquiv u) = (p: RatFunc F) from ?_
-      . rw[<- ConversionIff]
-        exact this
-      rw[toRatFuncTensor_CommuteQuadraticForm]
-      rw[hfu_vmulf_eq] at h_vmulf
-      simp at h_vmulf
-      have h_vu_eq: v = toRatFuncPolynomialModule u := CancellationLemmaExtensionScalars h_vmulf hf_nonzero
-      show (QuadraticForm.baseChange (RatFunc F) φ) (toRatFuncPolynomialModule u) = ↑p
+      rw[<- ConversionIff, toRatFuncTensor_CommuteQuadraticForm]
+      rw[hfu_vmulf_eq,map_smul] at h_vmulf
+      have h_vu_eq: v = toRatFuncTensor (PolynomialEquiv u) := CancellationLemmaExtensionScalars h_vmulf hf_nonzero
       rw[<- h_vu_eq]
       exact hvp
     . left
@@ -618,9 +614,12 @@ protected lemma CasselsPfisterTheorem_TrivialContainmentExtension (φ: Quadratic
   rw[<- toRatFuncTensor_CommuteQuadraticForm]
   rfl
 
-/-- Auxillary version of `CasselsPfisterTheorem` which requires `QuadraticMap.polarBilin φ` is `Nondegenerate`
+/-- The values taken by the extension of a quadratic map `φ: V → F` to `V(X) → F(X)`
+    that are in `F[X]` are taken by the extension `V[X] → F[X]` as well.
+
+    *Auxillary version of `CasselsPfisterTheorem` which requires `φ` is `Nondegenerate`*
 -/
-protected theorem CasselsPfisterTheoremAux (φ: QuadraticForm F V) [Invertible (2: F)] (hn: LinearMap.BilinForm.Nondegenerate (QuadraticMap.polarBilin φ)):
+theorem CasselsPfisterTheoremAux (φ: QuadraticForm F V) [Invertible (2: F)] (hn: LinearMap.BilinForm.Nondegenerate (QuadraticMap.polarBilin φ)):
   (algebraMap F[X] (RatFunc F))⁻¹' (Set.range (φ.baseChange (RatFunc F)))
    = Set.range (φ.baseChange F[X]) := by
   apply le_antisymm
