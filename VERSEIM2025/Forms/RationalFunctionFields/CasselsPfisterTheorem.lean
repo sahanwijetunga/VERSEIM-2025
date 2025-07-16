@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 /-
-Copyright (c) 2025 Clea Bergsman, Katherine Buesing,  , Sahan Wijetunga. All rights reserved.
+Copyright (c) 2025 Clea Bergsman, Katherine Buesing, George McNinch, Sahan Wijetunga. All rights reserved.
 
 Released under the Apache 2.0 license as described in the file LICENSE.
 
