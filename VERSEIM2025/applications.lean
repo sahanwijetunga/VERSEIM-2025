@@ -34,7 +34,6 @@ def Nondeg_subspace (β : BilinForm k V) (W:Submodule k V) : Prop :=
 -- complement, but it is actually already in Mathlib, as
 -- `LinearMap.BilinForm.orthogonal`
 
-
 def zero_mat : Matrix ι₁ ι₂ k := fun _ _ => (0 : k)
 
 def Matrix.IsBlockDiagonal (M : Matrix (ι₁ ⊕ ι₂) (ι₁ ⊕ ι₂) k) : Prop :=
@@ -68,44 +67,103 @@ def extractBlockDiagonal
         | inr j' => rfl
   }
 
+/- theorem det_of_block_matrix  [FiniteDimensional k V] (ι₁ ι₂: Type) (M: Matrix (ι₁ ⊕ ι₂) (ι₁ ⊕ ι₂) k)
+  (bm: Matrix.IsBlockDiagonal M) {Mblock : extractBlockDiagonal bm} : M.extractBlockDiagonal.det = (Mblock.A).det * (Mblock.B).det := by
+    sorry -/
 
-theorem ortho_complement_nondeg  [FiniteDimensional k V] (bnd : BilinForm.Nondegenerate β)
-  (W W₁ :Submodule k V) (h : W₁ = BilinForm.orthogonal β W) (wnd : Nondeg_subspace β W) [ DecidableEq ↑(Basis.ofVectorSpaceIndex k ↥(W₁))]
-  [DecidableEq ↑(Basis.ofVectorSpaceIndex k ↥W)]:
+#check LinearMap.BilinForm.finrank_orthogonal
+theorem ortho_complement_nondeg  (β:BilinForm k V) [FiniteDimensional k V]
+  (bnd : BilinForm.Nondegenerate β)
+  (W W₁ :Submodule k V) (h : W₁ = BilinForm.orthogonal β W) (wnd : Nondeg_subspace β W)
+  [ DecidableEq ↑(Basis.ofVectorSpaceIndex k ↥(W₁))]
+  [DecidableEq ↑(Basis.ofVectorSpaceIndex k ↥W)] [DecidableEq (BilinForm.orthogonal β W)]
+  {brefl : LinearMap.BilinForm.IsRefl β }:
   Nondeg_subspace β W₁ := by
-    have k₀ : W ⊔ W₁ = ⊤ := by
-      rw[h]
-      rw[IsCompl.sup_eq_top]
-      exact BilinearForms.isCompl_orthogonal_of_restrict_nondegenerate β W wnd
-    have k₁ : W ⊓ W₁ = ⊥ := by
+    have k₀ : W ⊓ W₁ = ⊥ := by
       rw[h]
       rw[IsCompl.inf_eq_bot]
-      exact BilinearForms.isCompl_orthogonal_of_restrict_nondegenerate β W wnd
+      exact (BilinForm.restrict_nondegenerate_iff_isCompl_orthogonal brefl).mp wnd
+    have k₁ : W ⊔ W₁ = ⊤ := by
+      rw[h]
+      ext x
+      constructor
+      · simp
+      · simp
+        /- intro s h
+        simp at h -/
+
+        have k₁₀ : Module.finrank k (⊤ : Submodule (W ⊔ β.orthogonal W)) = Module.finrank k V := by
+          sorry
+        sorry
+      /- rw[IsCompl.sup_eq_top]
+      refine IsCompl.symm (IsCompl.symm ?_) -/
+      --rw[LinearMap.BilinForm.isCompl_orthogonal_iff_disjoint]
+      --rw[LinearMap.BilinForm.restrict_nondegenerate_iff_isCompl_orthogonal]
+      /- · exact wnd
+      · sorry -/
+            /- rw[← LinearMap.BilinForm.restrict_nondegenerate_iff_isCompl_orthogonal]
+      · exact wnd
+      · sorry -/
     let b₁ : Basis (Basis.ofVectorSpaceIndex k W) k W := Basis.ofVectorSpace k W
     let b₂ : Basis (Basis.ofVectorSpaceIndex k W₁) k W₁ := Basis.ofVectorSpace k W₁
     let B : Basis ((Basis.ofVectorSpaceIndex k W) ⊕ (Basis.ofVectorSpaceIndex k W₁)) k V := by
       apply basis_of_direct_sum
       · exact b₁
       · exact b₂
-      · exact k₀
       · exact k₁
+      · exact k₀
     let M : Matrix ((Basis.ofVectorSpaceIndex k W) ⊕ (Basis.ofVectorSpaceIndex k W₁)) ((Basis.ofVectorSpaceIndex k W) ⊕ (Basis.ofVectorSpaceIndex k W₁)) k := BilinForm.toMatrix B β
     have k₂ : Matrix.IsBlockDiagonal M := by
       unfold Matrix.IsBlockDiagonal
       constructor
+      · intro i j
+        unfold M
+        simp
+        unfold B
+        unfold basis_of_direct_sum
+        simp
+        refine mem_ker.mp ?_
+
+        /- refine BilinForm.isOrtho_def.mp ?_
+        have k₂₀ : (b₂ j) ∈ (⊤:Submodule k β) := by
+          exact trivial
+        have k₂₁ : (b₁ i) ∈ (⊤:Submodule k W) := by
+          exact trivial
+        apply LinearMap.BilinForm.mem_orthogonal_iff at k₂₀
+        -- apply this above theorem to k₂₀ -/
+        sorry
       · intro b₃ b₄
         unfold M
         simp
+        -- i'm not sure if this is the right "direction" to be headed in
+        refine BilinForm.isOrtho_def.mp ?_
+        rw[h] at b₃
+        unfold B
+        unfold basis_of_direct_sum
+        simp
+        rw[h] at b₂
+
         sorry
-      · sorry
     let Mdiag := extractBlockDiagonal k₂
     let M₁ := Mdiag.A
     let M₂ := Mdiag.B
     have k₃ : M.det = M₁.det * M₂.det := by
+    -- we may want to create a separate theorem or lemma for this
       sorry
-    -- i need to make a linear map for beta i think ... but a composition with W₁ isnt working
-    have k₄ : M₂ = (BilinForm.toMatrix b₂ β) := by
-      sorry
+    have k₄ : M₂ = (BilinForm.toMatrix b₂ (β.restrict W₁)) := by
+      ext x₀ y₀
+      unfold M₂
+      unfold Mdiag
+      unfold extractBlockDiagonal
+      unfold M
+      simp
+      refine DFunLike.congr ?_ ?_
+      ·
+        refine LinearMap.congr_arg ?_
+
+        sorry
+      ·
+        sorry
     have k₅ : M₂.det ≠ 0 := by
       intro h
       rw[h] at k₃
@@ -114,7 +172,6 @@ theorem ortho_complement_nondeg  [FiniteDimensional k V] (bnd : BilinForm.Nondeg
       -- why do we know it's not zero again?? ?
       sorry
     unfold Nondeg_subspace
-    -- need to fix k₄ for the below statements to work properly
-    /- rw[k₄] at k₅
-    apply Matrix.nondegenerate_of_det_ne_zero at k₅ -/
-    sorry
+    rw[k₄] at k₅
+    apply Matrix.nondegenerate_of_det_ne_zero at k₅
+    exact (BilinForm.nondegenerate_toMatrix_iff b₂).mp k₅
