@@ -29,8 +29,12 @@ example:= F[X] ⊗[F] V -- Another way to express V[X] (which is not definitiona
 
 example:= (RatFunc F) ⊗[F] V -- F(X) ⊗ V, e.g. V(X)
 
-
-theorem ConversionIff (a b: F[X]): (a: RatFunc F)=b ↔ a=b := sorry
+theorem ConversionIff (a b: F[X]): (a: RatFunc F)=b ↔ a=b := by
+  constructor
+  . intro h
+    apply IsFractionRing.coe_inj.mp h
+  . intro h
+    rw[h]
 
 theorem ExtensionScalarsCommutesWithScalars (v: RatFunc F ⊗[F] V) (p: F[X]): p • v = (p: RatFunc F) • v := by
   sorry
@@ -304,11 +308,10 @@ def in_BaseChangePolynomialModule_of_isGoodPair_constant (p: F[X]) (φ: Quadrati
   rw[this]
   have hphiw: (φ.baseChange F[X]) (PolynomialEquiv w) = a^2 • p := by
     suffices ((φ.baseChange F[X]) (PolynomialEquiv w): RatFunc F) = a^2 • p from ?_
-    . unfold RatFunc.coePolynomial at this
-      have hasf: a ^ 2 • (algebraMap F[X] (RatFunc F)) p = (algebraMap F[X] (RatFunc F)) (a^2 • p) := by
+    . have hasf: a ^ 2 • (p: RatFunc F) = (((a^2 • p): F[X]): RatFunc F) := by
         exact Eq.symm (algebraMap.coe_smul F F[X] (RatFunc F) (a ^ 2) p)
       rw[hasf] at this
-      exact IsFractionRing.coe_inj.mp this
+      rw[<- ConversionIff, this]
     rw[toRatFuncTensor_CommuteQuadraticForm]
     have hw:  f • v = toRatFuncTensor (PolynomialEquiv w) := by
       unfold toRatFuncPolynomialModule  at hw
@@ -344,10 +347,10 @@ lemma CancellationLemmaExtensionScalars' {v w: RatFunc F ⊗[F] V} {f: RatFunc F
 lemma CancellationLemmaExtensionScalars {v w: RatFunc F ⊗[F] V} {f: F[X]} (hvwf: f • v = f • w) (hf: f ≠ 0) : v=w := by
   have hf': (f: RatFunc F) ≠ 0 := by
     intro h
-    unfold RatFunc.coePolynomial at h
-    have: (algebraMap F[X] (RatFunc F)) f =  (algebraMap F[X] (RatFunc F)) 0 := by
-      simp[h]
-    rw[IsFractionRing.coe_inj] at this
+    have: (f: RatFunc F)  =  ((0:F[X]): RatFunc F) := by
+      rw[h]
+      simp[RatFunc.coePolynomial]
+    rw[ConversionIff] at this
     exact hf this
   rw[ExtensionScalarsCommutesWithScalars, ExtensionScalarsCommutesWithScalars] at hvwf
   exact CancellationLemmaExtensionScalars' hvwf hf'
@@ -492,8 +495,8 @@ protected lemma GetSmallerDegree (p: F[X]) (φ: QuadraticForm F V) (f: F[X]) (v:
       right
       use PolynomialEquiv u
       suffices (φ.baseChange F[X]) (PolynomialEquiv u) = (p: RatFunc F) from ?_
-      . unfold RatFunc.coePolynomial at *
-        apply IsFractionRing.coe_inj.mp this
+      . rw[<- ConversionIff]
+        exact this
       rw[toRatFuncTensor_CommuteQuadraticForm]
       rw[hfu_vmulf_eq] at h_vmulf
       simp at h_vmulf
