@@ -194,10 +194,17 @@ def in_polynomial_module (v: (RatFunc F) ⊗[F] V): Prop :=
   ∃ (w : PolynomialModule F V), v = toRatFuncPolynomialModule w
 
 theorem in_polynomial_module_add {v w: (RatFunc F) ⊗[F] V} (hv: in_polynomial_module v)
-  (hw: in_polynomial_module w): in_polynomial_module (v+w) := sorry
+  (hw: in_polynomial_module w): in_polynomial_module (v+w) := by
+  obtain ⟨v', hv⟩ := hv
+  obtain ⟨w', hw⟩ := hw
+  use v'+w'
+  rw[map_add,hv,hw]
 
 theorem in_polynomial_module_smul {v: (RatFunc F) ⊗[F] V} (p: F[X]) (hv: in_polynomial_module v):
-   in_polynomial_module (p • v) := sorry
+   in_polynomial_module (p • v) := by
+  obtain ⟨v', hv⟩ := hv
+  use p • v'
+  rw[map_smul,hv]
 
 /-- Each `v` in `V(X)` has non-zero `f: F[X]` with `f • v` in `V[X]`-/
 theorem exists_denominator  (v: (RatFunc F) ⊗[F] V): ∃ (f: F[X]), in_polynomial_module (f • v) ∧ f ≠ 0 := by
@@ -381,10 +388,24 @@ def in_BaseChangePolynomialModule_of_isGoodPair_constant (p: F[X]) (φ: Quadrati
 theorem AnisotropicExtend {φ: QuadraticForm F V} (h: QuadraticMap.Anisotropic φ) [Invertible (2:F)]:
   QuadraticMap.Anisotropic (φ.baseChange F[X]) := sorry
 
+/-- See `DivisionAlgorithm_PolynomialModule`-/
+protected lemma DivisionAlgorithm_PolynomialModuleAux (v: PolynomialModule F V) {f: F[X]}
+  (n: ℕ) (hnv: PolynomialModule_natDegree v =n) (hf: f.natDegree >0):  ∃w r, v = f • w + r ∧ PolynomialModule_natDegree r < f.natDegree := by
+  induction' n using Nat.strong_induction_on with n h generalizing v
+  by_cases hnf: n < f.natDegree
+  . use 0, v
+    constructor
+    . simp
+    . rw[hnv]
+      exact hnf
+  . have hnf: n ≥ f.natDegree := by exact Nat.le_of_not_lt hnf
+    sorry
+
 /-- The division algorithm holds in `V[X]` dividing by elements of `F[X]` -/
 -- TODO: Reformulate in way more similar to mathlib style (i.e. with v/f and v%f defined and a theorem about them)
 lemma DivisionAlgorithm_PolynomialModule (v: PolynomialModule F V) {f: F[X]} (hf: f.natDegree >0):
-  ∃w r, v = f • w + r ∧ PolynomialModule_natDegree r < f.natDegree := sorry
+  ∃w r, v = f • w + r ∧ PolynomialModule_natDegree r < f.natDegree :=
+    CasselsPfister.DivisionAlgorithm_PolynomialModuleAux v (PolynomialModule_natDegree v) rfl hf
 
 
 lemma CancellationLemmaExtensionScalars' {v w: RatFunc F ⊗[F] V} {f: RatFunc F} (hvwf: f • v = f • w) (hf: f ≠ 0) : v=w := by
