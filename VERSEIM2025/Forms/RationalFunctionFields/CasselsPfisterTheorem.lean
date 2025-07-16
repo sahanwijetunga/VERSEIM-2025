@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 /-
-Copyright (c) 2025 Clea Bergsman, Katherine Buesing, George McNinch, Sahan Wijetunga. All rights reserved.
+Copyright (c) 2025 Clea Bergsman, Katherine Buesing,  , Sahan Wijetunga. All rights reserved.
 
 Released under the Apache 2.0 license as described in the file LICENSE.
 
@@ -130,6 +130,18 @@ def PolynomialModule_degree (v: PolynomialModule F V): WithBot ℕ :=  v.support
 
 /-- The degree of a polynomial `v : V[X]` with degree of `0` equal to `0`-/
 def PolynomialModule_natDegree (v: PolynomialModule F V): ℕ :=  WithBot.unbotD 0 (PolynomialModule_degree v)
+
+def PolynomialModule_natDegree_zero:
+  PolynomialModule_natDegree (0: PolynomialModule F V) = 0 := sorry
+
+def PolynomialModule_natDegree_single {v: V} (n: ℕ) (hv: v ≠ 0):
+  PolynomialModule_natDegree (PolynomialModule.single F n v) = n := sorry
+
+def PolynomialModule_natDegree_smul {v: PolynomialModule F V} {p: F[X]} (n: ℕ) (hv: v ≠ 0) (hp: p≠ 0):
+  PolynomialModule_natDegree (p • v) = p.natDegree + PolynomialModule_natDegree v := sorry
+
+def PolynomialModule_natDegree_le (v w: PolynomialModule F V):
+  PolynomialModule_natDegree (v+w) ≤ PolynomialModule_natDegree v + PolynomialModule_natDegree w := sorry
 
 /-- The degree defined in `PolynomialModule_degree` agrees with Polynomial notion of degree.-/
 example (p: F[X]): p.degree = p.support.max := rfl
@@ -399,7 +411,16 @@ protected lemma DivisionAlgorithm_PolynomialModuleAux (v: PolynomialModule F V) 
     . rw[hnv]
       exact hnf
   . have hnf: n ≥ f.natDegree := by exact Nat.le_of_not_lt hnf
-    sorry
+    let v' := v + f • PolynomialModule.single F (n-f.natDegree) (- f.leadingCoeff⁻¹ • (v n))
+    have hv'_dglt: PolynomialModule_natDegree v' < n := sorry
+    obtain ⟨w',r, hw'rv',degless'⟩ := h (PolynomialModule_natDegree v') hv'_dglt v' rfl
+    use w'+PolynomialModule.single F (n-f.natDegree) (- f.leadingCoeff⁻¹ • (v n))
+    use r
+    constructor
+    . rw[smul_add]
+      sorry
+    . exact degless'
+
 
 /-- The division algorithm holds in `V[X]` dividing by elements of `F[X]` -/
 -- TODO: Reformulate in way more similar to mathlib style (i.e. with v/f and v%f defined and a theorem about them)
@@ -567,8 +588,7 @@ protected lemma GetSmallerDegree (p: F[X]) (φ: QuadraticForm F V) (f: F[X]) (v:
     obtain ⟨⟨vmulf,h_vmulf⟩,hvp,hf_nonzero⟩ := hvf
     obtain ⟨u,r,hur⟩ := DivisionAlgorithm_PolynomialModule vmulf hf
     by_cases hr_neqzero: r=0
-    .
-      rw[hr_neqzero, add_zero] at hur
+    . rw[hr_neqzero, add_zero] at hur
       obtain ⟨hfu_vmulf_eq, degless⟩ := hur
       right
       use PolynomialEquiv u
@@ -577,85 +597,85 @@ protected lemma GetSmallerDegree (p: F[X]) (φ: QuadraticForm F V) (f: F[X]) (v:
       have h_vu_eq: v = toRatFuncTensor (PolynomialEquiv u) := CancellationLemmaExtensionScalars h_vmulf hf_nonzero
       rw[<- h_vu_eq]
       exact hvp
-    . left
-      -- We could instead let f' = (φ.baseChange F[X]) (PolynomialEquiv r) / f and do other work,
-      --  but I thought this would be easier
-      have: ∃ f', (φ.baseChange F[X]) (PolynomialEquiv r) = f * f' := by
-        use f*p-f* (φ.baseChange F[X] (PolynomialEquiv u))-QuadraticMap.polar (φ.baseChange F[X]) (PolynomialEquiv u) (PolynomialEquiv r)
-        rw[mul_sub, mul_sub]
-        have : f * QuadraticMap.polar (⇑(QuadraticForm.baseChange F[X] φ)) (PolynomialEquiv u) (PolynomialEquiv r)
-          = (QuadraticForm.baseChange F[X] φ) (PolynomialEquiv (f• u+r)) - f*f*(QuadraticForm.baseChange F[X] φ) (PolynomialEquiv u) - (QuadraticForm.baseChange F[X] φ) (PolynomialEquiv r)
-             :=
-          calc
-            f * QuadraticMap.polar (⇑(QuadraticForm.baseChange F[X] φ)) (PolynomialEquiv u) (PolynomialEquiv r)
-              = QuadraticMap.polar (⇑(QuadraticForm.baseChange F[X] φ)) (f • PolynomialEquiv u) (PolynomialEquiv r)
-               := by
-               rw[QuadraticMap.polar_smul_left]
-               rfl
-            _ = (⇑(QuadraticForm.baseChange F[X] φ)) (f• PolynomialEquiv.toFun u+PolynomialEquiv.toFun r )
-                - (⇑(QuadraticForm.baseChange F[X] φ)) (f• PolynomialEquiv u) - (⇑(QuadraticForm.baseChange F[X] φ)) (PolynomialEquiv r)
-                := rfl
-            _ = (QuadraticForm.baseChange F[X] φ) (PolynomialEquiv.toFun (f• u+r)) - f*f*(QuadraticForm.baseChange F[X] φ) (PolynomialEquiv u) - (QuadraticForm.baseChange F[X] φ) (PolynomialEquiv r)
+    left
+    -- We could instead let f' = (φ.baseChange F[X]) (PolynomialEquiv r) / f and do other work,
+    --  but I thought this would be easier
+    have: ∃ f', (φ.baseChange F[X]) (PolynomialEquiv r) = f * f' := by
+      use f*p-f* (φ.baseChange F[X] (PolynomialEquiv u))-QuadraticMap.polar (φ.baseChange F[X]) (PolynomialEquiv u) (PolynomialEquiv r)
+      rw[mul_sub, mul_sub]
+      have : f * QuadraticMap.polar (⇑(QuadraticForm.baseChange F[X] φ)) (PolynomialEquiv u) (PolynomialEquiv r)
+        = (QuadraticForm.baseChange F[X] φ) (PolynomialEquiv (f• u+r)) - f*f*(QuadraticForm.baseChange F[X] φ) (PolynomialEquiv u) - (QuadraticForm.baseChange F[X] φ) (PolynomialEquiv r)
+            :=
+        calc
+          f * QuadraticMap.polar (⇑(QuadraticForm.baseChange F[X] φ)) (PolynomialEquiv u) (PolynomialEquiv r)
+            = QuadraticMap.polar (⇑(QuadraticForm.baseChange F[X] φ)) (f • PolynomialEquiv u) (PolynomialEquiv r)
               := by
-              rw[QuadraticMap.map_smul]
-              rw[PolynomialEquiv.map_add']
-              rw[PolynomialEquiv.map_smul']
-              simp
-            _ = (QuadraticForm.baseChange F[X] φ) (PolynomialEquiv (f• u+r)) - f*f*(QuadraticForm.baseChange F[X] φ) (PolynomialEquiv u) - (QuadraticForm.baseChange F[X] φ) (PolynomialEquiv r)
+              rw[QuadraticMap.polar_smul_left]
+              rfl
+          _ = (⇑(QuadraticForm.baseChange F[X] φ)) (f• PolynomialEquiv.toFun u+PolynomialEquiv.toFun r )
+              - (⇑(QuadraticForm.baseChange F[X] φ)) (f• PolynomialEquiv u) - (⇑(QuadraticForm.baseChange F[X] φ)) (PolynomialEquiv r)
               := rfl
-        rw[this]
-        have: (QuadraticForm.baseChange F[X] φ) (PolynomialEquiv (f • u + r)) = f*f*p := by
-          rw[<- hur.1, <- ConversionIff, toRatFuncTensor_CommuteQuadraticForm (F := F) (φ := φ)]
-          show  (QuadraticForm.baseChange (RatFunc F) φ) (toRatFuncPolynomialModule vmulf) = ↑(f * f * p)
-          rw[<- h_vmulf, ExtensionScalarsCommutesWithScalars,QuadraticMap.map_smul, hvp,
-            RatFunc_coePolynomialMultiplication, RatFunc_coePolynomialMultiplication]
-          rfl
-        rw[this]
-        ring
-      obtain ⟨f', hff'r⟩ := this
+          _ = (QuadraticForm.baseChange F[X] φ) (PolynomialEquiv.toFun (f• u+r)) - f*f*(QuadraticForm.baseChange F[X] φ) (PolynomialEquiv u) - (QuadraticForm.baseChange F[X] φ) (PolynomialEquiv r)
+            := by
+            rw[QuadraticMap.map_smul]
+            rw[PolynomialEquiv.map_add']
+            rw[PolynomialEquiv.map_smul']
+            simp
+          _ = (QuadraticForm.baseChange F[X] φ) (PolynomialEquiv (f• u+r)) - f*f*(QuadraticForm.baseChange F[X] φ) (PolynomialEquiv u) - (QuadraticForm.baseChange F[X] φ) (PolynomialEquiv r)
+            := rfl
+      rw[this]
+      have: (QuadraticForm.baseChange F[X] φ) (PolynomialEquiv (f • u + r)) = f*f*p := by
+        rw[<- hur.1, <- ConversionIff, toRatFuncTensor_CommuteQuadraticForm (F := F) (φ := φ)]
+        show  (QuadraticForm.baseChange (RatFunc F) φ) (toRatFuncPolynomialModule vmulf) = ↑(f * f * p)
+        rw[<- h_vmulf, ExtensionScalarsCommutesWithScalars,QuadraticMap.map_smul, hvp,
+          RatFunc_coePolynomialMultiplication, RatFunc_coePolynomialMultiplication]
+        rfl
+      rw[this]
+      ring
+    obtain ⟨f', hff'r⟩ := this
 
-      let w := v- toRatFuncPolynomialModule u
-      let v_reflected: RatFunc F ⊗[F] V := HyperplaneReflection (φ.baseChange (RatFunc F)) w v
-      use f', v_reflected
-      have f'neqzero: f' ≠ 0 := by
-        intro hf'eqzero
-        rw[hf'eqzero] at hff'r
-        have hr_form_eq_zero: (QuadraticForm.baseChange F[X] φ) (PolynomialEquiv r) = 0 := by
-          simp[hff'r ]
-        have hr_eq_zero: r=0 := by
-          suffices PolynomialEquiv r = 0 from ?_
-          . simpa
-          exact AnisotropicExtend hAnsitropic _ hr_form_eq_zero
-        exact hr_neqzero hr_eq_zero
-      constructor; constructor
-      . use f'• u + ((φ.baseChange F[X]) (PolynomialEquiv.toFun u) - p) • r
+    let w := v- toRatFuncPolynomialModule u
+    let v_reflected: RatFunc F ⊗[F] V := HyperplaneReflection (φ.baseChange (RatFunc F)) w v
+    use f', v_reflected
+    have f'neqzero: f' ≠ 0 := by
+      intro hf'eqzero
+      rw[hf'eqzero] at hff'r
+      have hr_form_eq_zero: (QuadraticForm.baseChange F[X] φ) (PolynomialEquiv r) = 0 := by
+        simp[hff'r ]
+      have hr_eq_zero: r=0 := by
+        suffices PolynomialEquiv r = 0 from ?_
+        . simpa
+        exact AnisotropicExtend hAnsitropic _ hr_form_eq_zero
+      exact hr_neqzero hr_eq_zero
+    constructor; constructor
+    . use f'• u + ((φ.baseChange F[X]) (PolynomialEquiv.toFun u) - p) • r
 
-        simp[v_reflected]
-        simp only [HyperplaneReflection,QuadraticMap.Isometry.instFunLike]
-        simp only [LinearMap.coe_mk, AddHom.coe_mk, v_reflected]
-        simp [w]
-        sorry
+      simp[v_reflected]
+      simp only [HyperplaneReflection,QuadraticMap.Isometry.instFunLike]
+      simp only [LinearMap.coe_mk, AddHom.coe_mk, v_reflected]
+      simp [w]
+      sorry
 
-      . unfold v_reflected
-        rw [QuadraticMap.Isometry.map_app]
-        exact hvp
-      . exact f'neqzero
-      . have ⟨hfu_vmulf_eq, degless⟩ := hur
-        have h1: f'.natDegree+f.natDegree = ((φ.baseChange F[X]) (PolynomialEquiv r)).natDegree := by
-          have: f'.natDegree+f.natDegree = (f*f').natDegree := by
-            symm
-            rw[Polynomial.natDegree_mul']
-            exact Nat.add_comm f.natDegree f'.natDegree
-            have h1: f.leadingCoeff ≠ 0 := by
-              exact Polynomial.leadingCoeff_ne_zero.mpr hf_nonzero
-            have h2: f'.leadingCoeff ≠ 0 := by
-              exact Polynomial.leadingCoeff_ne_zero.mpr f'neqzero
-            simp[h1,h2]
-          rw[hff'r]
-          omega
-        have h2: ((φ.baseChange F[X]) (PolynomialEquiv r)).natDegree ≤ 2 * PolynomialModule_natDegree r := by
-          exact DegreeQuadraticForm φ r
+    . unfold v_reflected
+      rw [QuadraticMap.Isometry.map_app]
+      exact hvp
+    . exact f'neqzero
+    . have ⟨hfu_vmulf_eq, degless⟩ := hur
+      have h1: f'.natDegree+f.natDegree = ((φ.baseChange F[X]) (PolynomialEquiv r)).natDegree := by
+        have: f'.natDegree+f.natDegree = (f*f').natDegree := by
+          symm
+          rw[Polynomial.natDegree_mul']
+          exact Nat.add_comm f.natDegree f'.natDegree
+          have h1: f.leadingCoeff ≠ 0 := by
+            exact Polynomial.leadingCoeff_ne_zero.mpr hf_nonzero
+          have h2: f'.leadingCoeff ≠ 0 := by
+            exact Polynomial.leadingCoeff_ne_zero.mpr f'neqzero
+          simp[h1,h2]
+        rw[hff'r]
         omega
+      have h2: ((φ.baseChange F[X]) (PolynomialEquiv r)).natDegree ≤ 2 * PolynomialModule_natDegree r := by
+        exact DegreeQuadraticForm φ r
+      omega
 
 /-- Main lemma for use in CasselsPfisterTheorem. Do not directly use outside. -/
 protected lemma CasselsPfisterTheorem_NontrivialContainmentExtension (φ: QuadraticForm F V) [Invertible (2: F)]
