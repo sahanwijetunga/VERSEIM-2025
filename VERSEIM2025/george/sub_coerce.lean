@@ -132,3 +132,6 @@ example (W:Fin 2 → Type)
     [(i:Fin 2) → Module k (W i)]
  : Module k ((W 0) × (W 1))  := inferInstance
 
+
+
+example (X:Type) (x:X) : x ∈ (⊤:Set X) := by simp
