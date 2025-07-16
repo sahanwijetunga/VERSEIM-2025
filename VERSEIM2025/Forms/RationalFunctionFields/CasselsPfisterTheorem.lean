@@ -51,35 +51,21 @@ theorem RatFunc_coePolynomialMultiplication (f g: F[X]): (f*g: F[X]) = (f: RatFu
 theorem RatFunc_coePolynomialScalarMultiplication (f: F[X]) (g: RatFunc F): f*g = f • g:= by
   sorry
 
-
-noncomputable def linearmapAux: F[X] →ₗ[F] RatFunc F where
+noncomputable def linearmapAux: F[X] →ₗ[F[X]] RatFunc F where
   toFun := fun v => v
   map_add' := algebraMap.coe_add
-  map_smul' := algebraMap.coe_smul F F[X] (RatFunc F)
-
-/--
-Auxillary map `F[X] ⊗[F] V →ₗ[F] RatFunc F ⊗[F] V`. Use `toRatFuncTensor` instead.
--/
-protected noncomputable def toRatFuncTensorAux : (F[X] ⊗[F] V) →ₗ[F] (RatFunc F ⊗[F] V) :=
-  TensorProduct.map linearmapAux LinearMap.id
-
-/-- The inclusion `F[X] ⊗[F] V →ₗ[F[X]] RatFunc F ⊗[F] V`. -/
-noncomputable def toRatFuncTensor: F[X] ⊗[F] V →ₗ[F[X]] RatFunc F ⊗[F] V where
-  toFun := CasselsPfister.toRatFuncTensorAux
-  map_add' := by
-    intro v w
-    simp
   map_smul' := by
-    intro c v
-    dsimp[CasselsPfister.toRatFuncTensorAux]
-    sorry
-    /- See below result (example) that it commutes if we just want with F; the difficulty is
-        extending to F[X]
-    -/
+    intro a b
+    simp
+    show (↑(a • b) : RatFunc F) = a • ↑b
+    rw [← RatFunc_coePolynomialScalarMultiplication]
+    rw [Algebra.id.smul_eq_mul]
+    rw [RatFunc_coePolynomialMultiplication]
 
-example (c: F) (v: F[X] ⊗[F] V): (TensorProduct.map linearmapAux LinearMap.id) (c • v) =
-   c • (TensorProduct.map linearmapAux LinearMap.id) v := by
-   simp -- exact LinearMap.CompatibleSMul.map_smul (TensorProduct.map linearmapAux LinearMap.id) c v
+
+noncomputable def toRatFuncTensor: F[X] ⊗[F] V →ₗ[F[X]] RatFunc F ⊗[F] V :=
+  TensorProduct.AlgebraTensorModule.map linearmapAux LinearMap.id
+
 
 /-- The map `toRatFuncTensor` is injective. -/
 theorem toRatFuncTensor_Injective : Function.Injective (@toRatFuncTensor F V _ _ _):= sorry
