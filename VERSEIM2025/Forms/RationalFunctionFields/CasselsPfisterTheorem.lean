@@ -193,7 +193,18 @@ def in_polynomial_module (v: (RatFunc F) ⊗[F] V): Prop :=
   ∃ (w : PolynomialModule F V), v = toRatFuncPolynomialModule w
 
 /-- Each `v` in `V(X)` has non-zero `f: F[X]` with `f • v` in `V[X]`-/
-theorem exists_denominator  (v: (RatFunc F) ⊗[F] V): ∃ (f: F[X]), in_polynomial_module (f • v) ∧ f ≠ 0 := sorry
+theorem exists_denominator  (v: (RatFunc F) ⊗[F] V): ∃ (f: F[X]), in_polynomial_module (f • v) ∧ f ≠ 0 := by
+  have b := Basis.ofVectorSpace F V
+  have ⟨l, hlv⟩ := TensorProduct.eq_repr_basis_right b v
+  let α := l.support
+
+  have hlv: ∑ i ∈ α, (l i) ⊗ₜ[F] b i = v := hlv
+  let f := ∏ i ∈ α, (l i).denom
+  use f
+  have: ∀ i, (l i).denom ≠ 0 := fun _ => RatFunc.denom_ne_zero _
+  have hf_nonzero: f ≠ 0 := sorry
+  constructor; case right => exact hf_nonzero
+  sorry
 
 /-- `isGoodPair p φ v f` means `f • v` in `V[X]` and `φ(v)=p`-/
 structure isGoodPair (p: F[X]) (φ: QuadraticForm F V) (v: (RatFunc F) ⊗[F] V)(f: F[X]) [Invertible (2: F)]: Prop where
