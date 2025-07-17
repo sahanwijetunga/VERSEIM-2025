@@ -1,5 +1,6 @@
 import Mathlib.Tactic
 import Mathlib.Algebra.Polynomial.Module.Basic
+import Mathlib.Algebra.Category.ModuleCat.ChangeOfRings
 
 open Polynomial 
 open TensorProduct
@@ -8,7 +9,8 @@ noncomputable section
 
 variable {R M: Type*} [CommRing R] [AddCommGroup M] [Module R M]
 
-def poly_map (N:Type*) [AddCommGroup N] [Module R[X] N] (f:M →ₗ[R] N) : 
+def poly_map (N:Type*) [AddCommGroup N] [Module R[X] N] 
+   (f:M →ₗ[R] (ModuleCat.restrictScalars _ N)) : 
    PolynomialModule R M →ₗ[R[X]] N := by sorry
 
 example (N:Type*) [AddCommGroup N] [Module R[X] N] : Module (R:Subring R[X]) N := inferInstance
