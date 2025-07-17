@@ -8,7 +8,13 @@ noncomputable section
 
 variable {R M: Type*} [CommRing R] [AddCommGroup M] [Module R M]
 
-def bilinear_map : 
+def poly_map (N:Type*) [AddCommGroup N] [Module R[X] N] (f:M →ₗ[R] N) : 
+   PolynomialModule R M →ₗ[R[X]] N := by sorry
+
+example (N:Type*) [AddCommGroup N] [Module R[X] N] : Module (R:Subring R[X]) N := inferInstance
+
+example : Algebra R R[X] := inferInstance
+
 
 def poly_mod_equiv_tensor_product  : PolynomialModule R M ≃ₗ[R[X]] R[X] ⊗[R] M  where
   toFun := by 
