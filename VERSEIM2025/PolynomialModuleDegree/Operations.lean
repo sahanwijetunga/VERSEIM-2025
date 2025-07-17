@@ -10,9 +10,11 @@ import VERSEIM2025.PolynomialModuleDegree.Definitions
 # Lemmas for calculating the degree of univariate polynomials
 
 ## Main results
-- `degree_mul` : The degree of the product is the sum of degrees
+- `degree_smul'` : The degree of the scalar product is the sum of degrees
 - `leadingCoeff_add_of_degree_eq` and `leadingCoeff_add_of_degree_lt` :
     The leading coefficient of a sum is determined by the leading coefficients and degrees
+
+## These results were mostly copied from Polynomial.Degree.Operations with some modifications.
 -/
 
 noncomputable section
@@ -24,11 +26,9 @@ open PolynomialModule
 
 namespace PolynomialModule
 
-universe u v
-
 variable {F V: Type*} {a b c d : F} {n m : ℕ} {u v w : V}
 
-variable [Field F] [AddCommGroup V] [Module F V] {vp: F[X]} {vp wp up : PolynomialModule F V}
+variable [Field F] [AddCommGroup V] [Module F V] {p: F[X]} {vp wp up : PolynomialModule F V}
 
 theorem degree_lt_wf : WellFounded fun vp wp : PolynomialModule F V => degree vp < degree wp :=
   InvImage.wf degree wellFounded_lt
@@ -250,7 +250,7 @@ theorem leadingCoeff_add_of_degree_eq (h : degree vp = degree wp)
   simp only [leadingCoeff, this, natDegree_eq_of_degree_eq h, add_apply]
 
 @[simp]
-theorem coeff_mul_degree_add_degree (p: F[X]) (vp : PolynomialModule F V) :
+theorem coeff_smul_degree_add_degree (p: F[X]) (vp : PolynomialModule F V) :
     (p • vp) (p.natDegree + natDegree wp) = p.leadingCoeff • leadingCoeff vp :=
   -- calc
   --   coeff (vp * wp) (natDegree vp + natDegree wp) =
@@ -281,36 +281,36 @@ theorem coeff_mul_degree_add_degree (p: F[X]) (vp : PolynomialModule F V) :
   --       rw [mem_antidiagonal]
   sorry
 
-theorem degree_mul' {p: F[X]} (h : p.leadingCoeff • leadingCoeff vp ≠ 0):
+theorem degree_smul' (h : p.leadingCoeff • leadingCoeff vp ≠ 0):
     degree (p • vp) = p.degree + degree vp :=
   have hp : vp ≠ 0 := by refine mt ?_ h; exact fun hp => by rw [hp, leadingCoeff_zero, smul_zero]
   have hq : p ≠ 0 := by refine mt ?_ h; exact fun hq => by rw [hq, Polynomial.leadingCoeff_zero, zero_smul]
-  le_antisymm (degree_mul_le p vp)
+  le_antisymm (degree_smul_le p vp)
     (by
       rw [degree_eq_natDegree hp, Polynomial.degree_eq_natDegree hq]
       refine le_degree_of_ne_zero (n := p.natDegree + natDegree vp) ?_
-      rwa [coeff_mul_degree_add_degree])
+      rwa [coeff_smul_degree_add_degree])
 
-theorem natDegree_mul' {p: F[X]}  (h :  p.leadingCoeff • leadingCoeff vp ≠ 0) :
+theorem natDegree_smul' (h :  p.leadingCoeff • leadingCoeff vp ≠ 0) :
     natDegree (p • vp) = p.natDegree + natDegree vp :=
   have hv : vp ≠ 0 := mt leadingCoeff_eq_zero.2 fun h₁ => h <| by rw [h₁, smul_zero]
   have hp : p ≠ 0 := mt Polynomial.leadingCoeff_eq_zero.2 fun h₁ => h <| by rw [h₁, zero_smul]
   natDegree_eq_of_degree_eq_some <| by
-    rw [degree_mul' h, Nat.cast_add, degree_eq_natDegree hv, Polynomial.degree_eq_natDegree hp]
+    rw [degree_smul' h, Nat.cast_add, degree_eq_natDegree hv, Polynomial.degree_eq_natDegree hp]
 
-theorem leadingCoeff_mul' {p: F[X]}  (h : p.leadingCoeff • leadingCoeff vp ≠ 0) :
+theorem leadingCoeff_smul' (h : p.leadingCoeff • leadingCoeff vp ≠ 0) :
     leadingCoeff (p • vp) = p.leadingCoeff • leadingCoeff vp := by
   unfold leadingCoeff
-  rw [natDegree_mul' h, coeff_mul_degree_add_degree]
+  rw [natDegree_smul' h, coeff_smul_degree_add_degree]
   rfl
 
 
 @[simp]
-theorem leadingCoeff_mul_X_pow {vp : PolynomialModule F V} {n : ℕ} : leadingCoeff ((Polynomial.X^n: F[X]) • vp) = leadingCoeff vp := by
+theorem leadingCoeff_X_pow_smul {vp : PolynomialModule F V} {n : ℕ} : leadingCoeff ((Polynomial.X^n: F[X]) • vp) = leadingCoeff vp := by
   by_cases hvp: vp=0
   . rw[hvp]
     simp
-  rw[leadingCoeff_mul' _]
+  rw[leadingCoeff_smul' _]
   . rw [Polynomial.leadingCoeff_X_pow, one_smul]
   refine smul_ne_zero ?_ ?_
   . rw [@Polynomial.leadingCoeff_X_pow]
@@ -318,8 +318,35 @@ theorem leadingCoeff_mul_X_pow {vp : PolynomialModule F V} {n : ℕ} : leadingCo
   exact leadingCoeff_ne_zero.mpr hvp
 
 @[simp]
-theorem leadingCoeff_mul_X {vp : PolynomialModule F V} : leadingCoeff ((Polynomial.X: F[X]) • vp) = leadingCoeff vp := by
-  rw[<- leadingCoeff_mul_X_pow (vp := vp) (n := 1)]
+theorem leadingCoeff_X_smul {vp : PolynomialModule F V} : leadingCoeff ((Polynomial.X: F[X]) • vp) = leadingCoeff vp := by
+  rw[<- leadingCoeff_X_pow_smul (vp := vp) (n := 1)]
   rw[pow_one]
+
+variable (p) (vp) in
+@[simp]
+lemma leadingCoeff_smul : leadingCoeff (p • vp) = p.leadingCoeff • leadingCoeff vp := by
+  by_cases hp : p = 0
+  · simp only [hp, zero_smul, Polynomial.leadingCoeff_zero,leadingCoeff_zero]
+  · by_cases hv : vp = 0
+    · simp only [hv, smul_zero, leadingCoeff_zero]
+    · rw [leadingCoeff_smul']
+      exact smul_ne_zero (mt Polynomial.leadingCoeff_eq_zero.1 hp) (mt leadingCoeff_eq_zero.1 hv)
+
+instance: NoZeroSMulDivisors F[X] (PolynomialModule F V) := by
+  rw[noZeroSMulDivisors_iff]
+  intro c v h
+  by_contra h'
+  push_neg at h'
+  have: leadingCoeff (c • v) = c.leadingCoeff • leadingCoeff v := by
+    rw[leadingCoeff_smul]
+  rw[h] at this
+  simp only [leadingCoeff_zero] at this
+  symm at this
+  have: c.leadingCoeff =0 ∨ v.leadingCoeff = 0 := by exact eq_zero_or_eq_zero_of_smul_eq_zero this
+  obtain hc | hv := this
+  . apply h'.1
+    exact Polynomial.leadingCoeff_eq_zero.mp hc
+  . apply h'.2
+    exact leadingCoeff_eq_zero.mp hv
 
 end PolynomialModule

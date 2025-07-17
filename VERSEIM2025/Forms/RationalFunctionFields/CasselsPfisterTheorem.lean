@@ -15,11 +15,13 @@ import Mathlib.LinearAlgebra.QuadraticForm.Isometry
 import Mathlib.RingTheory.Localization.BaseChange
 import Mathlib.LinearAlgebra.BilinearMap
 import Mathlib.LinearAlgebra.TensorProduct.Basic
+import VERSEIM2025.PolynomialModuleDegree.Operations
 
 namespace CasselsPfister
 
 open scoped Polynomial
 open scoped TensorProduct
+open scoped PolynomialModule
 
 variable {F V: Type*} [Field F] [AddCommGroup V] [Module F V]
 
@@ -108,8 +110,15 @@ noncomputable def PolynomialEquiv: PolynomialModule F V ≃ₗ[F[X]] F[X] ⊗[F]
   left_inv := sorry
   right_inv := sorry
 
-theorem PolynomialEquivSingle (v: V): PolynomialEquiv ((PolynomialModule.single F 0) v) = 1 ⊗ₜ v := sorry
-
+theorem PolynomialEquivSingle (v: V): PolynomialEquiv ((PolynomialModule.single F 0) v) = 1 ⊗ₜ v := by
+  simp only [PolynomialEquiv,FooFunPolynomial,DFunLike.coe,
+    EquivLike.coe,PolynomialModule.single,Finsupp.singleAddHom, Mathlib.Tactic.Module.NF.eval,]
+  rw[Finsupp.sum ]
+  by_cases h:v=0
+  . rw[h]
+    simp
+  . rw [Finsupp.support_single_ne_zero 0 h]
+    simp
 
 theorem FooSummWork {α}(v w: α →₀ V) (g : α → V →+ V):
   (v+w).sum (fun a => fun v => g a v) = (v.sum (fun a => fun v => g a v)) + (w.sum (fun a => fun v => g a v)) := by
@@ -124,83 +133,6 @@ Defined as a composition of
 -- f.sum (fun n => fun v => algebraMap (Polynomial F) _ (Polynomial.monomial n 1) ⊗ₜ v)
 noncomputable def toRatFuncPolynomialModule: PolynomialModule F V →ₗ[F[X]] RatFunc F ⊗[F] V :=
   toRatFuncTensor ∘ₗ PolynomialEquiv.toLinearMap
-
-/-- The degree of a polynomial `v : V[X]` in `WithBot ℕ` with degree of `0` equal to `⊥`-/
-def PolynomialModule_degree (v: PolynomialModule F V): WithBot ℕ :=  v.support.max
-
-/-- The degree of a polynomial `v : V[X]` with degree of `0` equal to `0`-/
-def PolynomialModule_natDegree (v: PolynomialModule F V): ℕ :=  WithBot.unbotD 0 (PolynomialModule_degree v)
-
-def PolynomialModule_leadingCoefficient (v: PolynomialModule F V): V := v (PolynomialModule_natDegree v)
-
-@[simp]
-theorem PolynomialModule_natDegree_zero:
-  PolynomialModule_natDegree (0: PolynomialModule F V) = 0 := by
-  simp[PolynomialModule_natDegree,PolynomialModule_degree]
-
-theorem PolynomialModule_natDegree_iff {v: PolynomialModule F V} (n: ℕ):
-  PolynomialModule_natDegree v=n ↔ ((v = 0 ∧ n=0) ∨ (v n ≠ 0 ∧ ∀ k>n, v k = 0)) := by
-  sorry
-
-@[simp]
-theorem PolynomialModule_natDegree_single {v: V} (n: ℕ) (hv: v ≠ 0):
-  PolynomialModule_natDegree (PolynomialModule.single F n v) = n := by
-  rw[PolynomialModule_natDegree_iff]
-  right
-  constructor
-  . simp[PolynomialModule.single_apply, hv]
-  . intro k hk
-    rw[PolynomialModule.single_apply]
-    have  : n ≠ k := Nat.ne_of_lt hk
-    simp[this]
-
-theorem PolynomialModule_natDegree_smul {v: PolynomialModule F V} {p: F[X]} (hv: v ≠ 0) (hp: p≠ 0):
-  PolynomialModule_natDegree (p • v) = p.natDegree + PolynomialModule_natDegree v := sorry
-
-theorem PolynomialModule_natDegree_constant_smul {v: PolynomialModule F V} (c: F) (hv: v ≠ 0) (hc: c≠ 0):
-  PolynomialModule_natDegree (c • v) = PolynomialModule_natDegree v := sorry
-
-@[simp]
-theorem PolynomialModule_natDegree_neg (v: PolynomialModule F V):
-  PolynomialModule_natDegree (-v) = PolynomialModule_natDegree v := by
-  by_cases h: v=0
-  . simp[h]
-  . have: -v = (-1: F) • v := by simp
-    rw[this]
-    rw[PolynomialModule_natDegree_constant_smul (-1) h ?_]
-    simp
-
-
-theorem PolynomialModule_natDegree_smul_le (v: PolynomialModule F V) (p: F[X]):
-  PolynomialModule_natDegree (p • v) ≤ p.natDegree + PolynomialModule_natDegree v := sorry
-
-theorem PolynomialModule_natDegree_constant_smul_le (v: PolynomialModule F V) (c: F):
-  PolynomialModule_natDegree (c • v) ≤ PolynomialModule_natDegree v := sorry
-
-theorem PolynomialModule_natDegree_add_le_max (v w: PolynomialModule F V):
-  PolynomialModule_natDegree (v+w) ≤ max (PolynomialModule_natDegree v) (PolynomialModule_natDegree w) := sorry
-
-theorem PolynomialModule_natDegree_add_le (u v w: PolynomialModule F V) (hu: PolynomialModule_natDegree u ≤
-  PolynomialModule_natDegree w) (hw: PolynomialModule_natDegree v ≤ PolynomialModule_natDegree w):
-  PolynomialModule_natDegree (u+v) ≤ PolynomialModule_natDegree w := sorry
-
-theorem PolynomialModule_natDegree_lt_if_le {v w: PolynomialModule F V}
-  (h: PolynomialModule_natDegree v ≤ PolynomialModule_natDegree w) (hw: v (PolynomialModule_natDegree w)=0)
-  (hv: v ≠ 0): PolynomialModule_natDegree v < PolynomialModule_natDegree w := sorry
-
-theorem PolynomialModule_natDegree_lt_if_le' {v w: PolynomialModule F V}
-  (h: PolynomialModule_natDegree v ≤ PolynomialModule_natDegree w) (hw: v (PolynomialModule_natDegree w)=0)
-  (hv: PolynomialModule_natDegree w > 0): PolynomialModule_natDegree v < PolynomialModule_natDegree w := sorry
-
-@[simp]
-theorem PolynomialModule_natDegree_term (v: PolynomialModule F V): v (PolynomialModule_natDegree v) = 0 ↔ v=0 := by
-  sorry
-
-/-- The degree defined in `PolynomialModule_degree` agrees with Polynomial notion of degree.-/
-example (p: F[X]): p.degree = p.support.max := rfl
-
-/-- Constant polynomial a: F in F[X]-/
-noncomputable example (a: F): F[X] := Polynomial.C a
 
 /-- Reflects vectors across v.-/
 def HyperplaneReflection (φ: QuadraticForm F V) (v: V) : QuadraticMap.Isometry φ φ where
@@ -286,9 +218,9 @@ theorem exists_denominator  (v: (RatFunc F) ⊗[F] V): ∃ (f: F[X]), in_polynom
     use f.denom
     constructor
     . use f.num • (PolynomialModule.single F 0 v)
-      simp[toRatFuncPolynomialModule]
-      rw[PolynomialEquivSingle]
-      rw[ExtensionScalarsCommutesWithScalars]
+      simp only [toRatFuncPolynomialModule, map_smul, LinearMap.coe_comp, LinearEquiv.coe_coe,
+        Function.comp_apply]
+      rw[PolynomialEquivSingle, ExtensionScalarsCommutesWithScalars]
       have: ↑f.denom • f ⊗ₜ[F] v  = (↑f.denom • f) ⊗ₜ[F] v  := by
         exact rfl
       simp only [toRatFuncTensor, linearmapAux, TensorProduct.AlgebraTensorModule.map_tmul,
@@ -451,7 +383,7 @@ theorem AnisotropicExtend {φ: QuadraticForm F V} (h: QuadraticMap.Anisotropic �
 
 /-- See `DivisionAlgorithm_PolynomialModule`-/
 protected lemma DivisionAlgorithm_PolynomialModuleAux (v: PolynomialModule F V) {f: F[X]}
-  (n: ℕ) (hnv: PolynomialModule_natDegree v =n) (hf: f.natDegree >0):  ∃w r, v = f • w + r ∧ PolynomialModule_natDegree r < f.natDegree := by
+  (n: ℕ) (hnv: v.natDegree =n) (hf: f.natDegree >0):  ∃w r, v = f • w + r ∧ r.natDegree < f.natDegree := by
   induction' n using Nat.strong_induction_on with n h generalizing v
   by_cases hnf: n < f.natDegree
   . use 0, v
@@ -461,47 +393,56 @@ protected lemma DivisionAlgorithm_PolynomialModuleAux (v: PolynomialModule F V) 
       exact hnf
   . have hnf: n ≥ f.natDegree := by exact Nat.le_of_not_lt hnf
     let v' := v + f • PolynomialModule.single F (n-f.natDegree) (- f.leadingCoeff⁻¹ • (v n))
-    have hv'_dglt: PolynomialModule_natDegree v' < n := by
+    have hv'_dglt: v'.natDegree < n := by
       rw[<- hnv]
-      have hv_deg_positive :  PolynomialModule_natDegree v > 0 := by omega
+      have hv_deg_positive :  v.natDegree > 0 := by omega
       have hv_nonzero : v ≠ 0 := by
         contrapose! hv_deg_positive
-        rw[Nat.le_zero,hv_deg_positive,PolynomialModule_natDegree_zero]
-      apply PolynomialModule_natDegree_lt_if_le'
-      . unfold v'
-        -- The proof here could maybe be shortened by using the inequality verison of degree lemmas instead of equality
-        apply PolynomialModule_natDegree_add_le
-        . exact Nat.le_refl _
-        . suffices f.natDegree + PolynomialModule_natDegree ((PolynomialModule.single F (n - f.natDegree)) (-f.leadingCoeff⁻¹ • v n)) ≤
-            PolynomialModule_natDegree v from ?_
-          . suffices PolynomialModule_natDegree (f • (PolynomialModule.single F (n - f.natDegree)) (-f.leadingCoeff⁻¹ • v n)) ≤
-             f.natDegree + PolynomialModule_natDegree ((PolynomialModule.single F (n - f.natDegree)) (-f.leadingCoeff⁻¹ • v n))
-                from ?_
-            . omega
-            apply PolynomialModule_natDegree_smul_le
-          simp only [neg_smul, map_neg, PolynomialModule_natDegree_neg]
-          rw[PolynomialModule_natDegree_single, hnv, ← Nat.Simproc.add_le_add_ge f.natDegree n hnf, add_comm]
-          simp [Polynomial.ne_zero_of_natDegree_gt hf, <- hnv,hv_nonzero  ]
-      . unfold v'
-        simp only [neg_smul, map_neg, smul_neg, hnv]
-        show v n + -(f • (PolynomialModule.single F
-          (n - f.natDegree)) (f.leadingCoeff⁻¹ • v n)) n  = 0
-        suffices v n = (f • (PolynomialModule.single F (n - f.natDegree)) (f.leadingCoeff⁻¹ • v n)) n from ?_
-        . rw[<- this]
-          rw [add_neg_eq_zero]
-        simp only [PolynomialModule.smul_single_apply, tsub_le_iff_right, le_add_iff_nonneg_right,
-          zero_le, ↓reduceIte]
-        have: n - (n - f.natDegree) = f.natDegree := by
-          rw [Nat.sub_sub_self hnf]
-        rw[this]
-        have: f.leadingCoeff ≠ 0 := by
-          suffices f ≠ 0 from ?_
-          . exact Polynomial.leadingCoeff_ne_zero.mpr this
+        rw[Nat.le_zero,hv_deg_positive, PolynomialModule.natDegree_zero]
+      unfold v'
+      simp only [neg_smul, PolynomialModule.toFinsupp_single, Finsupp.single_neg, smul_neg,
+        gt_iff_lt]
+      rw[<- SubNegMonoid.sub_eq_add_neg]
+      have leadingCoeff_eq:  v.leadingCoeff = f.leadingCoeff • f.leadingCoeff⁻¹ • v n := by
+        rw [@smul_smul]
+        suffices f.leadingCoeff * f.leadingCoeff⁻¹=1 from ?_
+        . rw[this]
+          rw[<- hnv, one_smul]
+          rfl
+        have: f ≠ 0 := by
           exact Polynomial.ne_zero_of_natDegree_gt hf
-        show v n = f.leadingCoeff • f.leadingCoeff⁻¹ • v n
-        rw[smul_smul, CommGroupWithZero.mul_inv_cancel _ this, one_smul]
+        have: f.leadingCoeff ≠ 0 := by
+          exact Polynomial.leadingCoeff_ne_zero.mpr this
+        rw[mul_inv_cancel₀ this]
+      have leadingCoeff_neq: f.leadingCoeff⁻¹ • v n ≠ 0 := by
+            intro h
+            rw[h, smul_zero] at leadingCoeff_eq
+            exact hv_nonzero (PolynomialModule.leadingCoeff_eq_zero.mp leadingCoeff_eq)
+      rw[<- PolynomialModule.toFinsupp_single]
+      refine PolynomialModule.natDegree_sub_lt ?_ ?_ ?_ ?_
+      . rw[PolynomialModule.natDegree_smul']
+        . have : DecidableEq V := Classical.decEq _
+          rw[PolynomialModule.natDegree_single]
+          simp only [leadingCoeff_neq, ↓reduceIte]
+          rw[hnv]
+          exact Eq.symm (Nat.add_sub_of_le hnf)
+        . rw[PolynomialModule.leadingCoeff_single]
+          simp only [ne_eq, smul_eq_zero, Polynomial.leadingCoeff_eq_zero, leadingCoeff_neq,
+            or_false]
+          exact Polynomial.ne_zero_of_natDegree_gt hf
+      . intro h
+        rw[smul_eq_zero] at h
+        contrapose! h
+        constructor
+        . exact Polynomial.ne_zero_of_natDegree_gt hf
+        . rw[<- PolynomialModule.leadingCoeff_ne_zero]
+          rw[PolynomialModule.leadingCoeff_single]
+          simp only [ne_eq, leadingCoeff_neq, not_false_eq_true]
       . exact hv_deg_positive
-    obtain ⟨w',r, hw'rv',degless'⟩ := h (PolynomialModule_natDegree v') hv'_dglt v' rfl
+      . rw[PolynomialModule.leadingCoeff_smul]
+        rw[PolynomialModule.leadingCoeff_single]
+        exact leadingCoeff_eq
+    obtain ⟨w',r, hw'rv',degless'⟩ := h (v'.natDegree) hv'_dglt v' rfl
     use w'+PolynomialModule.single F (n-f.natDegree) (f.leadingCoeff⁻¹ • (v n))
     use r
     constructor
@@ -518,8 +459,8 @@ protected lemma DivisionAlgorithm_PolynomialModuleAux (v: PolynomialModule F V) 
 /-- The division algorithm holds in `V[X]` dividing by elements of `F[X]` -/
 -- TODO: Reformulate in way more similar to mathlib style (i.e. with v/f and v%f defined and a theorem about them)
 lemma DivisionAlgorithm_PolynomialModule (v: PolynomialModule F V) {f: F[X]} (hf: f.natDegree >0):
-  ∃w r, v = f • w + r ∧ PolynomialModule_natDegree r < f.natDegree :=
-    CasselsPfister.DivisionAlgorithm_PolynomialModuleAux v (PolynomialModule_natDegree v) rfl hf
+  ∃w r, v = f • w + r ∧ r.natDegree < f.natDegree :=
+    CasselsPfister.DivisionAlgorithm_PolynomialModuleAux v v.natDegree rfl hf
 
 
 lemma CancellationLemmaExtensionScalars' {v w: RatFunc F ⊗[F] V} {f: RatFunc F} (hvwf: f • v = f • w) (hf: f ≠ 0) : v=w := by
@@ -544,7 +485,8 @@ lemma CancellationLemmaExtensionScalars {v w: RatFunc F ⊗[F] V} {f: F[X]} (hvw
   exact CancellationLemmaExtensionScalars' hvwf hf'
 
 /-- The degree of `φ(v): F[X]` is at most twice of the degree of `v: V[X]`-/
-lemma DegreeQuadraticForm (φ: QuadraticForm F V) (v: PolynomialModule F V)[Invertible (2:F)]: (φ.baseChange F[X] (PolynomialEquiv v)).natDegree ≤ 2*PolynomialModule_natDegree v := by
+lemma DegreeQuadraticForm (φ: QuadraticForm F V) (v: PolynomialModule F V)
+[Invertible (2:F)]: (φ.baseChange F[X] (PolynomialEquiv v)).natDegree ≤ 2*v.natDegree := by
   sorry
 
 -- We could instead import from `HyperbolicBilinearForms` but I wanted to avoid dependencies
@@ -766,7 +708,7 @@ protected lemma GetSmallerDegree (p: F[X]) (φ: QuadraticForm F V) (f: F[X]) (v:
           simp[h1,h2]
         rw[hff'r]
         omega
-      have h2: ((φ.baseChange F[X]) (PolynomialEquiv r)).natDegree ≤ 2 * PolynomialModule_natDegree r := by
+      have h2: ((φ.baseChange F[X]) (PolynomialEquiv r)).natDegree ≤ 2 * r.natDegree := by
         exact DegreeQuadraticForm φ r
       omega
 
