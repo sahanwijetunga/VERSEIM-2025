@@ -52,7 +52,7 @@ example (M:Matrix ι ι k)
 -- there is of course a similar determinant product result for lower
 -- triangular matrices, mysteriously named `Matrix.twoBlockTriangular_det'`
 
-example (M:Matrix ι ι k) 
+xsexample (M:Matrix ι ι k) 
   (h : ∀ (i : ι), p i → ∀ (j : ι), ¬ p j → M i j = 0)
   : M.det = (Matrix.toSquareBlockProp M p).det * 
             (Matrix.toSquareBlockProp M (fun i => ¬ p i)).det := 
@@ -74,13 +74,14 @@ def upper_block (M:Matrix ι ι k) (p:ι → Prop) [DecidablePred p]: Matrix { i
 -- we could rephrase the assumptions of the determinant result as follows:
 
 example (M:Matrix ι ι k) 
-  (h : upper_block M p = 0)
+  (h : lower_block M p = 0)
   : M.det = (Matrix.toSquareBlockProp M p).det * 
             (Matrix.toSquareBlockProp M (fun i => ¬ p i)).det := by
   have hh : ∀ (i : ι), p i → ∀ (j : ι), ¬ p j → M i j = 0 := by
-   unfold upper_block at h
-   intro i hi j hj
-   rw [ ← Matrix.of_apply h i j ]  
+    intro i hi j hj
+    unfold lower_block at h
+    rw [ ← Matrix.ext_iff ] at h  
+    simp at h
+    apply h i hi j hj 
   exact Matrix.twoBlockTriangular_det' M p hh
 
-example (M:Matrix ι ι k ) : Matrix ι ι k := 0
