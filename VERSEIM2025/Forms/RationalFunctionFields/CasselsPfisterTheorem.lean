@@ -131,24 +131,73 @@ def PolynomialModule_degree (v: PolynomialModule F V): WithBot ℕ :=  v.support
 /-- The degree of a polynomial `v : V[X]` with degree of `0` equal to `0`-/
 def PolynomialModule_natDegree (v: PolynomialModule F V): ℕ :=  WithBot.unbotD 0 (PolynomialModule_degree v)
 
-def PolynomialModule_natDegree_zero:
-  PolynomialModule_natDegree (0: PolynomialModule F V) = 0 := sorry
+def PolynomialModule_leadingCoefficient (v: PolynomialModule F V): V := v (PolynomialModule_natDegree v)
 
-def PolynomialModule_natDegree_single {v: V} (n: ℕ) (hv: v ≠ 0):
-  PolynomialModule_natDegree (PolynomialModule.single F n v) = n := sorry
+@[simp]
+theorem PolynomialModule_natDegree_zero:
+  PolynomialModule_natDegree (0: PolynomialModule F V) = 0 := by
+  simp[PolynomialModule_natDegree,PolynomialModule_degree]
 
-def PolynomialModule_natDegree_smul {v: PolynomialModule F V} {p: F[X]} (n: ℕ) (hv: v ≠ 0) (hp: p≠ 0):
+theorem PolynomialModule_natDegree_iff {v: PolynomialModule F V} (n: ℕ):
+  PolynomialModule_natDegree v=n ↔ ((v = 0 ∧ n=0) ∨ (v n ≠ 0 ∧ ∀ k>n, v k = 0)) := by
+  sorry
+
+@[simp]
+theorem PolynomialModule_natDegree_single {v: V} (n: ℕ) (hv: v ≠ 0):
+  PolynomialModule_natDegree (PolynomialModule.single F n v) = n := by
+  rw[PolynomialModule_natDegree_iff]
+  right
+  constructor
+  . simp[PolynomialModule.single_apply, hv]
+  . intro k hk
+    rw[PolynomialModule.single_apply]
+    have  : n ≠ k := Nat.ne_of_lt hk
+    simp[this]
+
+theorem PolynomialModule_natDegree_smul {v: PolynomialModule F V} {p: F[X]} (hv: v ≠ 0) (hp: p≠ 0):
   PolynomialModule_natDegree (p • v) = p.natDegree + PolynomialModule_natDegree v := sorry
 
-def PolynomialModule_natDegree_le (v w: PolynomialModule F V):
-  PolynomialModule_natDegree (v+w) ≤ PolynomialModule_natDegree v + PolynomialModule_natDegree w := sorry
+theorem PolynomialModule_natDegree_constant_smul {v: PolynomialModule F V} (c: F) (hv: v ≠ 0) (hc: c≠ 0):
+  PolynomialModule_natDegree (c • v) = PolynomialModule_natDegree v := sorry
+
+@[simp]
+theorem PolynomialModule_natDegree_neg (v: PolynomialModule F V):
+  PolynomialModule_natDegree (-v) = PolynomialModule_natDegree v := by
+  by_cases h: v=0
+  . simp[h]
+  . have: -v = (-1: F) • v := by simp
+    rw[this]
+    rw[PolynomialModule_natDegree_constant_smul (-1) h ?_]
+    simp
+
+
+theorem PolynomialModule_natDegree_smul_le (v: PolynomialModule F V) (p: F[X]):
+  PolynomialModule_natDegree (p • v) ≤ p.natDegree + PolynomialModule_natDegree v := sorry
+
+theorem PolynomialModule_natDegree_constant_smul_le (v: PolynomialModule F V) (c: F):
+  PolynomialModule_natDegree (c • v) ≤ PolynomialModule_natDegree v := sorry
+
+theorem PolynomialModule_natDegree_add_le_max (v w: PolynomialModule F V):
+  PolynomialModule_natDegree (v+w) ≤ max (PolynomialModule_natDegree v) (PolynomialModule_natDegree w) := sorry
+
+theorem PolynomialModule_natDegree_add_le (u v w: PolynomialModule F V) (hu: PolynomialModule_natDegree u ≤
+  PolynomialModule_natDegree w) (hw: PolynomialModule_natDegree v ≤ PolynomialModule_natDegree w):
+  PolynomialModule_natDegree (u+v) ≤ PolynomialModule_natDegree w := sorry
+
+theorem PolynomialModule_natDegree_lt_if_le {v w: PolynomialModule F V}
+  (h: PolynomialModule_natDegree v ≤ PolynomialModule_natDegree w) (hw: v (PolynomialModule_natDegree w)=0)
+  (hv: v ≠ 0): PolynomialModule_natDegree v < PolynomialModule_natDegree w := sorry
+
+theorem PolynomialModule_natDegree_lt_if_le' {v w: PolynomialModule F V}
+  (h: PolynomialModule_natDegree v ≤ PolynomialModule_natDegree w) (hw: v (PolynomialModule_natDegree w)=0)
+  (hv: PolynomialModule_natDegree w > 0): PolynomialModule_natDegree v < PolynomialModule_natDegree w := sorry
+
+@[simp]
+theorem PolynomialModule_natDegree_term (v: PolynomialModule F V): v (PolynomialModule_natDegree v) = 0 ↔ v=0 := by
+  sorry
 
 /-- The degree defined in `PolynomialModule_degree` agrees with Polynomial notion of degree.-/
 example (p: F[X]): p.degree = p.support.max := rfl
-
-/-- Ports over degree notion from `PolynomialModule_degree` via `PolynomialEquiv` isomorphism. -/
-noncomputable def TensorPolynomialModule_degree (v: F[X] ⊗[F] V):
-  WithBot ℕ :=PolynomialModule_degree (PolynomialEquiv.invFun v)
 
 /-- Constant polynomial a: F in F[X]-/
 noncomputable example (a: F): F[X] := Polynomial.C a
@@ -412,13 +461,57 @@ protected lemma DivisionAlgorithm_PolynomialModuleAux (v: PolynomialModule F V) 
       exact hnf
   . have hnf: n ≥ f.natDegree := by exact Nat.le_of_not_lt hnf
     let v' := v + f • PolynomialModule.single F (n-f.natDegree) (- f.leadingCoeff⁻¹ • (v n))
-    have hv'_dglt: PolynomialModule_natDegree v' < n := sorry
+    have hv'_dglt: PolynomialModule_natDegree v' < n := by
+      rw[<- hnv]
+      have hv_deg_positive :  PolynomialModule_natDegree v > 0 := by omega
+      have hv_nonzero : v ≠ 0 := by
+        contrapose! hv_deg_positive
+        rw[Nat.le_zero,hv_deg_positive,PolynomialModule_natDegree_zero]
+      apply PolynomialModule_natDegree_lt_if_le'
+      . unfold v'
+        -- The proof here could maybe be shortened by using the inequality verison of degree lemmas instead of equality
+        apply PolynomialModule_natDegree_add_le
+        . exact Nat.le_refl _
+        . suffices f.natDegree + PolynomialModule_natDegree ((PolynomialModule.single F (n - f.natDegree)) (-f.leadingCoeff⁻¹ • v n)) ≤
+            PolynomialModule_natDegree v from ?_
+          . suffices PolynomialModule_natDegree (f • (PolynomialModule.single F (n - f.natDegree)) (-f.leadingCoeff⁻¹ • v n)) ≤
+             f.natDegree + PolynomialModule_natDegree ((PolynomialModule.single F (n - f.natDegree)) (-f.leadingCoeff⁻¹ • v n))
+                from ?_
+            . omega
+            apply PolynomialModule_natDegree_smul_le
+          simp only [neg_smul, map_neg, PolynomialModule_natDegree_neg]
+          rw[PolynomialModule_natDegree_single, hnv, ← Nat.Simproc.add_le_add_ge f.natDegree n hnf, add_comm]
+          simp [Polynomial.ne_zero_of_natDegree_gt hf, <- hnv,hv_nonzero  ]
+      . unfold v'
+        simp only [neg_smul, map_neg, smul_neg, hnv]
+        show v n + -(f • (PolynomialModule.single F
+          (n - f.natDegree)) (f.leadingCoeff⁻¹ • v n)) n  = 0
+        suffices v n = (f • (PolynomialModule.single F (n - f.natDegree)) (f.leadingCoeff⁻¹ • v n)) n from ?_
+        . rw[<- this]
+          rw [add_neg_eq_zero]
+        simp only [PolynomialModule.smul_single_apply, tsub_le_iff_right, le_add_iff_nonneg_right,
+          zero_le, ↓reduceIte]
+        have: n - (n - f.natDegree) = f.natDegree := by
+          rw [Nat.sub_sub_self hnf]
+        rw[this]
+        have: f.leadingCoeff ≠ 0 := by
+          suffices f ≠ 0 from ?_
+          . exact Polynomial.leadingCoeff_ne_zero.mpr this
+          exact Polynomial.ne_zero_of_natDegree_gt hf
+        show v n = f.leadingCoeff • f.leadingCoeff⁻¹ • v n
+        rw[smul_smul, CommGroupWithZero.mul_inv_cancel _ this, one_smul]
+      . exact hv_deg_positive
     obtain ⟨w',r, hw'rv',degless'⟩ := h (PolynomialModule_natDegree v') hv'_dglt v' rfl
-    use w'+PolynomialModule.single F (n-f.natDegree) (- f.leadingCoeff⁻¹ • (v n))
+    use w'+PolynomialModule.single F (n-f.natDegree) (f.leadingCoeff⁻¹ • (v n))
     use r
     constructor
     . rw[smul_add]
-      sorry
+      unfold v' at hw'rv'
+      rw[add_assoc]
+      nth_rewrite 2[add_comm]
+      rw[<- add_assoc, <- sub_eq_iff_eq_add, <- hw'rv']
+      simp only [neg_smul, map_neg, smul_neg]
+      abel
     . exact degless'
 
 
