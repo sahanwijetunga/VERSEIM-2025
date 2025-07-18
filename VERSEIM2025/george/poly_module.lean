@@ -14,21 +14,29 @@ variable {N:Type*} [AddCommGroup N] [Module R[X] N] [Module R N]
 
 def poly_map (f:M →ₗ[R] N) : PolynomialModule R M →ₗ[R[X]] N where
   toFun :=  fun v => 
-    v.sum  fun (n:ℕ) _ => (Polynomial.monomial n (1:R)) • f (v n)
+    v.sum  fun (n:ℕ) x => (Polynomial.monomial n (1:R)) • f x
   map_add' := by 
     intro x y
-    have (x y : PolynomialModule R M) (n:ℕ): f ((x + y) n) = f (x n) + f (y n) := by
-      rw [PolynomialModule.add_apply R x y n]
-      simp
-    rw [ this x y ]
+    rw [PolynomialModule.add_apply R x y _]
+
+    -- have (x y : PolynomialModule R M) : (fun (n:ℕ) =>  f ((x + y) n)) 
+    --                                   = (fun (n:ℕ) =>  f (x n) + f (y n)) := by
+    --   ext n
+    --   
+    --   simp
+    -- apply Finsupp.sum_congr
     --sorry
   map_smul' := by
     intro m x
     sorry
 
+#check LinearMap.map_add
+
 example (f:ℕ →₀ ℤ) (g:ℕ →₀ ℤ) (h:(n:ℕ) → f n = g n) :
-  Finsupp.sum f (fun n _ => f n) = Finsupp.sum g (fun n _ => g n)  := by 
-  rw [h]
+  Finsupp.sum f (fun n _ => f n) = Finsupp.sum g (fun n _ => g n)  :=   
+  by            
+   have hh : f = g := by ext; exact h _
+   rw [hh]
 
 
 
