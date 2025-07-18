@@ -332,21 +332,4 @@ lemma leadingCoeff_smul : leadingCoeff (p • vp) = p.leadingCoeff • leadingCo
     · rw [leadingCoeff_smul']
       exact smul_ne_zero (mt Polynomial.leadingCoeff_eq_zero.1 hp) (mt leadingCoeff_eq_zero.1 hv)
 
-instance: NoZeroSMulDivisors F[X] (PolynomialModule F V) := by
-  rw[noZeroSMulDivisors_iff]
-  intro c v h
-  by_contra h'
-  push_neg at h'
-  have: leadingCoeff (c • v) = c.leadingCoeff • leadingCoeff v := by
-    rw[leadingCoeff_smul]
-  rw[h] at this
-  simp only [leadingCoeff_zero] at this
-  symm at this
-  have: c.leadingCoeff =0 ∨ v.leadingCoeff = 0 := by exact eq_zero_or_eq_zero_of_smul_eq_zero this
-  obtain hc | hv := this
-  . apply h'.1
-    exact Polynomial.leadingCoeff_eq_zero.mp hc
-  . apply h'.2
-    exact leadingCoeff_eq_zero.mp hv
-
 end PolynomialModule
