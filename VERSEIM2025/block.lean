@@ -52,7 +52,7 @@ example (M:Matrix ι ι k)
 -- there is of course a similar determinant product result for lower
 -- triangular matrices, mysteriously named `Matrix.twoBlockTriangular_det'`
 
-xsexample (M:Matrix ι ι k) 
+example (M:Matrix ι ι k) 
   (h : ∀ (i : ι), p i → ∀ (j : ι), ¬ p j → M i j = 0)
   : M.det = (Matrix.toSquareBlockProp M p).det * 
             (Matrix.toSquareBlockProp M (fun i => ¬ p i)).det := 
