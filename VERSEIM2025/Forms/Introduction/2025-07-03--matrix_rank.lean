@@ -69,6 +69,7 @@ lemma rank_eq_linmap_rank  {m n :ℕ} (M:Matrix (Fin m) (Fin n) k) :
    unfold Matrix.rank 
    rw [ mulVecLin_eq_toLin_sbv M ]
 
+
 -- --------------------------------------------------------------------------------
 -- 
 -- now the rank-nullity theory compares these numbers!
