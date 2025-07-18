@@ -24,9 +24,9 @@ open scoped TensorProduct
 open scoped PolynomialModule
 
 
-scoped[CasselsPfister] notation:10000 F "(X)" => RatFunc F
-scoped[CasselsPfister] notation:100 V "[" F:100 "]" => F[X] ⊗[F] V
-scoped[CasselsPfister] notation:100 V "(" F:100 ")"  => F(X) ⊗[F] V
+scoped[CasselsPfister] notation:9000 F "(X)" => RatFunc F
+scoped[CasselsPfister] notation:1000 V "[" F:1000 "]" => F[X] ⊗[F] V
+scoped[CasselsPfister] notation:1000 V "(" F:1000 ")"  => F(X) ⊗[F] V
 
 variable {F V: Type*} [Field F] [AddCommGroup V] [Module F V]
 
@@ -62,7 +62,10 @@ theorem RatFunc_coePolynomialScalarMultiplication (f: F[X]) (g: F(X)): ↑f * g 
 noncomputable def toRatFuncTensor: V[F] →ₗ[F[X]] V(F) :=
   TensorProduct.AlgebraTensorModule.map (Algebra.linearMap F[X] (F(X))) LinearMap.id
 
-noncomputable scoped instance : Coe (V[F]) (V(F)) := ⟨toRatFuncTensor⟩
+@[coe]
+noncomputable def coeRatFunc: V[F] → V(F) := toRatFuncTensor
+
+noncomputable scoped instance : Coe (V[F]) (V(F)) := ⟨coeRatFunc⟩
 
 /-- The map `toRatFuncTensor` is injective. -/
 theorem toRatFuncTensor_Injective : Function.Injective (@toRatFuncTensor F V _ _ _):= sorry
@@ -112,10 +115,13 @@ noncomputable def PolynomialEquiv: PolynomialModule F V ≃ₗ[F[X]] V[F] where
   left_inv := sorry
   right_inv := sorry
 
-noncomputable scoped instance : Coe (PolynomialModule F V) (V[F]) := ⟨PolynomialEquiv⟩
+@[coe]
+noncomputable abbrev coePolynomialModule: PolynomialModule F V → V[F] := PolynomialEquiv
+
+noncomputable scoped instance : Coe (PolynomialModule F V) (V[F]) := ⟨coePolynomialModule⟩
 
 theorem PolynomialEquivSingle (v: V): (PolynomialModule.single F 0) v = (1 ⊗ₜ v: V[F]) := by
-  simp only [PolynomialEquiv,FooFunPolynomial,DFunLike.coe,
+  simp only [coePolynomialModule,PolynomialEquiv,FooFunPolynomial,DFunLike.coe,
     EquivLike.coe,PolynomialModule.single,Finsupp.singleAddHom, Mathlib.Tactic.Module.NF.eval,]
   rw[Finsupp.sum ]
   by_cases h:v=0
@@ -184,17 +190,17 @@ theorem in_polynomial_module_add {v w: V(F)} (hv: in_polynomial_module v)
   obtain ⟨v', hv⟩ := hv
   obtain ⟨w', hw⟩ := hw
   use v'+w'
-  dsimp only [AddHom.toFun_eq_coe, LinearMap.coe_toAddHom, LinearEquiv.coe_coe]
+  dsimp only [AddHom.toFun_eq_coe, LinearMap.coe_toAddHom, LinearEquiv.coe_coe,coeRatFunc,coePolynomialModule ]
   rw[map_add,hv,hw]
-  simp
+  simp[coeRatFunc,coePolynomialModule]
 
 theorem in_polynomial_module_smul {v: V(F)} (p: F[X]) (hv: in_polynomial_module v):
    in_polynomial_module (p • v) := by
   obtain ⟨v', hv⟩ := hv
   use p • v'
-  dsimp only [AddHom.toFun_eq_coe, LinearMap.coe_toAddHom, LinearEquiv.coe_coe]
+  dsimp only [AddHom.toFun_eq_coe, LinearMap.coe_toAddHom, LinearEquiv.coe_coe,coeRatFunc,coePolynomialModule]
   rw[map_smul,hv]
-  simp
+  simp[coeRatFunc,coePolynomialModule]
 
 /-- Each `v` in `V(X)` has non-zero `f: F[X]` with `f • v` in `V[X]`-/
 theorem exists_denominator  (v: V(F)): ∃ (f: F[X]), in_polynomial_module (f • v) ∧ f ≠ 0 := by
@@ -217,15 +223,14 @@ theorem exists_denominator  (v: V(F)): ∃ (f: F[X]), in_polynomial_module (f �
     . use f.num • (PolynomialModule.single F 0 v)
       simp only [AddHom.toFun_eq_coe,
         LinearMap.coe_toAddHom, map_smul, LinearEquiv.coe_coe]
+      show f.denom • f ⊗ₜ[F] v = ↑(f.num • ((PolynomialModule.single F 0) v): V[F])
       rw[PolynomialEquivSingle, ExtensionScalarsCommutesWithScalars]
       have: ↑f.denom • f ⊗ₜ[F] v  = (↑f.denom • f) ⊗ₜ[F] v  := by
         exact rfl
-      simp only [toRatFuncTensor, TensorProduct.AlgebraTensorModule.map_tmul,
-        Algebra.linearMap_apply, map_one, LinearMap.id_coe, id_eq]
       rw[TensorProduct.smul_tmul' ]
       rw[TensorProduct.smul_tmul' ]
-      rw[<- RatFunc_coePolynomialScalarMultiplication]
-      have : (((↑f.denom): F(X)) * f) = (↑f.num * 1)  := by
+      show ((f.denom: F(X)) * f) ⊗ₜ[F] v = ↑((f.num • (1: F[X])) ⊗ₜ[F] v)
+      have : (↑f.denom * f) = ((f.num) * 1: F[X])  := by
         rw[mul_one]
         have := RatFunc.num_div_denom f
         symm
@@ -237,7 +242,7 @@ theorem exists_denominator  (v: V(F)): ∃ (f: F[X]), in_polynomial_module (f �
             rw[h]
             simp[RatFunc.coePolynomial]
           exact (ConversionIff f.denom 0).mp this
-      rw[<- this]
+      rw[this]
       rfl
     . exact RatFunc.denom_ne_zero f
 
@@ -535,8 +540,8 @@ protected lemma GetSmallerDegree (p: F[X]) (φ: QuadraticForm F V) (f: F[X]) (v:
       rw[<- ConversionIff, toRatFuncTensor_CommuteQuadraticForm]
       have h_vmulf: f • v = f • u := by
         rw[h_vmulf]
-        rw[hfu_vmulf_eq,map_smul]
-        simp
+        rw[hfu_vmulf_eq,coePolynomialModule,map_smul]
+        simp[coeRatFunc]
       have h_vu_eq: v = u := CancellationLemmaExtensionScalars h_vmulf hf_nonzero
       rw[<- h_vu_eq]
       exact hvp
