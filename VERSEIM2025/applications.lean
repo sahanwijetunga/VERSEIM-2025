@@ -49,7 +49,7 @@ structure Matrix.BlockDiagonal (M : Matrix (ι₁ ⊕ ι₂) (ι₁ ⊕ ι₂) k
 (h: ) -/
 
 def extractBlockDiagonal
-  {M : Matrix (ι₁ ⊕ ι₂) (ι₁ ⊕ ι₂) k}
+  (M : Matrix (ι₁ ⊕ ι₂) (ι₁ ⊕ ι₂) k)
   (h : Matrix.IsBlockDiagonal M) : Matrix.BlockDiagonal M :=
   {
     A := λ i j => M (Sum.inl i) (Sum.inl j),
@@ -67,15 +67,30 @@ def extractBlockDiagonal
         | inr j' => rfl
   }
 
-/- theorem det_of_block_matrix  [FiniteDimensional k V] (ι₁ ι₂: Type) (M: Matrix (ι₁ ⊕ ι₂) (ι₁ ⊕ ι₂) k)
-  (bm: Matrix.IsBlockDiagonal M) {Mblock : extractBlockDiagonal bm} : M.extractBlockDiagonal.det = (Mblock.A).det * (Mblock.B).det := by
-    sorry -/
+theorem det_of_block_matrix  [FiniteDimensional k V] {ι₁ ι₂ : Type} [Fintype  ι₁] [Fintype ι₂] (M: Matrix (ι₁ ⊕ ι₂) (ι₁ ⊕ ι₂) k)
+  (bm: Matrix.IsBlockDiagonal M) {Mblock : Matrix.BlockDiagonal M} [DecidableEq ι₁] [DecidableEq ι₂]
+  {h : Mblock = extractBlockDiagonal M bm}: M.det = (Mblock.A).det * (Mblock.B).det := by
+  unfold Matrix.det
+  rw[h]
+  unfold extractBlockDiagonal
+  simp
+
+  sorry
+
+theorem Submodule.finrank_sup_eq_neg_finrank_inf_add {u v : Type} {K : Type u} {V : Type v} [DivisionRing K] [AddCommGroup V] [Module K V]
+  (s t : Submodule K V) [FiniteDimensional K ↥s] [FiniteDimensional K ↥t] :
+  Module.finrank K ↥(s ⊔ t) = Module.finrank K ↥s + Module.finrank K ↥t - (Module.finrank K ↥(s ⊓ t)) := by
+    rw[Nat.sub_eq_of_eq_add']
+    rw[← Submodule.finrank_sup_add_finrank_inf_eq]
+    rw[add_comm]
 
 #check LinearMap.BilinForm.finrank_orthogonal
-theorem ortho_complement_nondeg  (β:BilinForm k V) [FiniteDimensional k V]
+#check  Submodule.finrank_sup_add_finrank_inf_eq
+
+theorem ortho_complement_nondeg (β:BilinForm k V) [FiniteDimensional k V]
   (bnd : BilinForm.Nondegenerate β)
-  (W W₁ :Submodule k V) (h : W₁ = BilinForm.orthogonal β W) (wnd : Nondeg_subspace β W)
-  [ DecidableEq ↑(Basis.ofVectorSpaceIndex k ↥(W₁))]
+  (W W₁ :Submodule k V) (h : W₁ = BilinForm.orthogonal β W) (wnd : Nondeg_subspace β W) (href : β.IsRefl)
+  [DecidableEq ↑(Basis.ofVectorSpaceIndex k ↥(W₁))]
   [DecidableEq ↑(Basis.ofVectorSpaceIndex k ↥W)] [DecidableEq (BilinForm.orthogonal β W)]
   {brefl : LinearMap.BilinForm.IsRefl β }:
   Nondeg_subspace β W₁ := by
@@ -89,21 +104,27 @@ theorem ortho_complement_nondeg  (β:BilinForm k V) [FiniteDimensional k V]
       constructor
       · simp
       · simp
-        /- intro s h
-        simp at h -/
-
-        have k₁₀ : Module.finrank k (⊤ : Submodule (W ⊔ β.orthogonal W)) = Module.finrank k V := by
-          sorry
-        sorry
-      /- rw[IsCompl.sup_eq_top]
-      refine IsCompl.symm (IsCompl.symm ?_) -/
-      --rw[LinearMap.BilinForm.isCompl_orthogonal_iff_disjoint]
-      --rw[LinearMap.BilinForm.restrict_nondegenerate_iff_isCompl_orthogonal]
-      /- · exact wnd
-      · sorry -/
-            /- rw[← LinearMap.BilinForm.restrict_nondegenerate_iff_isCompl_orthogonal]
-      · exact wnd
-      · sorry -/
+        let Wplus := W ⊔ β.orthogonal W
+        have k₁₀ : Wplus = W ⊔ β.orthogonal W := by
+            rfl
+        have k₁₁ : Module.finrank k (Wplus) = Module.finrank k V := by
+          rw[k₁₀]
+          rw[Submodule.finrank_sup_eq_neg_finrank_inf_add]
+          rw[h] at k₀
+          rw[k₀]
+          simp
+          rw[LinearMap.BilinForm.finrank_orthogonal]
+          · rw[← add_comm]
+            refine Nat.sub_add_cancel ?_
+            apply Submodule.finrank_le
+          · exact bnd
+          · exact href
+          · exact V
+          · exact k
+        apply Submodule.eq_top_of_finrank_eq at k₁₁
+        rw[← k₁₀]
+        rw[k₁₁]
+        simp
     let b₁ : Basis (Basis.ofVectorSpaceIndex k W) k W := Basis.ofVectorSpace k W
     let b₂ : Basis (Basis.ofVectorSpaceIndex k W₁) k W₁ := Basis.ofVectorSpace k W₁
     let B : Basis ((Basis.ofVectorSpaceIndex k W) ⊕ (Basis.ofVectorSpaceIndex k W₁)) k V := by
@@ -122,34 +143,38 @@ theorem ortho_complement_nondeg  (β:BilinForm k V) [FiniteDimensional k V]
         unfold B
         unfold basis_of_direct_sum
         simp
-        refine mem_ker.mp ?_
+        unfold b₁
+        unfold b₂
 
-        /- refine BilinForm.isOrtho_def.mp ?_
-        have k₂₀ : (b₂ j) ∈ (⊤:Submodule k β) := by
+
+
+
+       /-  refine BilinForm.isOrtho_def.mp ?_
+        have k₂₀ : (b₂ j) ∈ (⊤:Submodule k W₁) := by
           exact trivial
         have k₂₁ : (b₁ i) ∈ (⊤:Submodule k W) := by
           exact trivial
-        apply LinearMap.BilinForm.mem_orthogonal_iff at k₂₀
+        rw[LinearMap.BilinForm.mem_orthogonal_iff] at k₂₀
         -- apply this above theorem to k₂₀ -/
         sorry
-      · intro b₃ b₄
+      · intro i j
+        rw[h] at b₂
+        rw[h] at i
         unfold M
         simp
+
         -- i'm not sure if this is the right "direction" to be headed in
-        refine BilinForm.isOrtho_def.mp ?_
-        rw[h] at b₃
-        unfold B
+        --refine BilinForm.isOrtho_def.mp ?_
+        /- unfold B
         unfold basis_of_direct_sum
-        simp
-        rw[h] at b₂
+        simp -/
 
         sorry
-    let Mdiag := extractBlockDiagonal k₂
+    let Mdiag := extractBlockDiagonal M k₂
     let M₁ := Mdiag.A
     let M₂ := Mdiag.B
     have k₃ : M.det = M₁.det * M₂.det := by
-    -- we may want to create a separate theorem or lemma for this
-      sorry
+      exact det_of_block_matrix M k₂
     have k₄ : M₂ = (BilinForm.toMatrix b₂ (β.restrict W₁)) := by
       ext x₀ y₀
       unfold M₂
@@ -158,19 +183,19 @@ theorem ortho_complement_nondeg  (β:BilinForm k V) [FiniteDimensional k V]
       unfold M
       simp
       refine DFunLike.congr ?_ ?_
-      ·
-        refine LinearMap.congr_arg ?_
-
-        sorry
-      ·
-        sorry
+      · unfold B
+        unfold basis_of_direct_sum
+        simp
+      · unfold B
+        unfold basis_of_direct_sum
+        simp
     have k₅ : M₂.det ≠ 0 := by
       intro h
       rw[h] at k₃
       rw[mul_zero] at k₃
-      -- i need to have a theorem that says M.det doesnt equal zero so that I can get a contradiction
-      -- why do we know it's not zero again?? ?
-      sorry
+      have k₅₀ : M.det ≠ 0 := by
+        exact (BilinForm.nondegenerate_iff_det_ne_zero B).mp bnd
+      exact k₅₀ k₃
     unfold Nondeg_subspace
     rw[k₄] at k₅
     apply Matrix.nondegenerate_of_det_ne_zero at k₅
