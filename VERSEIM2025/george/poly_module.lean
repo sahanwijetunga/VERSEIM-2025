@@ -23,17 +23,18 @@ def poly_map (f:M →ₗ[R] N) : PolynomialModule R M →ₗ[R[X]] N where
     intro m x
     sorry
 
+-- inclusion of `M` into `PolynomialModule R M` is an R-module homomorphism
 
 def const_incl : M →ₗ[R] PolynomialModule R M where
-  toFun := _
-  map_add' := _
-  map_smul' := _
+  toFun := fun m => Finsupp.single 0 m
+  map_add' := by simp
+  map_smul' := by sorry
 
 
 def poly_mod_equiv_tensor_product  : PolynomialModule R M ≃ₗ[R[X]] R[X] ⊗[R] M  where
-  toFun := (poly_map _).toFun
-  map_add' := (poly_map _).map_add
-  map_smul' := (poly_map _).map_smul
+  toFun := (poly_map const_incl).toFun
+  map_add' := (poly_map const_incl).map_add
+  map_smul' := (poly_map const_incl).map_smul
   invFun := by sorry
   left_inv := by sorry
   right_inv := by sorry
