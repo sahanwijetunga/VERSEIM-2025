@@ -136,17 +136,21 @@ def poly_mod_equiv_tensor_product  : (R[X] ⊗[R] M) ≃ₗ[R[X]] (PolynomialMod
            unfold ψ; simp only [AddMonoidHom.coe_mk, ZeroHom.coe_mk] 
            rw [ pm_sum_single_index ( hg := by apply tmul_zero ) ]
            simp [ incl ]
-           sorry
-           -- rw [ Polynomial.smul_monomial t m 1 ]
-           -- rw [ ←TensorProduct.smul_tmul ]
-           -- simp only [smul_eq_C_mul t, C_mul_monomial, mul_one]
+           rw [ TensorProduct.smul_tmul' ]
+           rw [ Polynomial.smul_monomial t m 1 ]
+           rw [ smul_eq_mul, mul_one ]
      
      | add w₁ w₂ hw₁ hw₂ => 
         rw [ (tensor_map R M).map_add' w₁ w₂ ]
         rw [ ψ.map_add ]
         rw [ hw₁, hw₂ ]
        
-   right_inv := by sorry
+   right_inv := by 
+     unfold Function.RightInverse
+     unfold Function.LeftInverse
+     intro v
+     unfold ψ
+     
    }
 
 example (f:ℕ →₀ ℝ) (g:ℕ →₀ ℝ) (h:f = g) : 
