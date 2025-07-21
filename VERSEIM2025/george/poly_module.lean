@@ -75,14 +75,21 @@ def tensor_map (R M:Type) [CommRing R] [AddCommGroup M] [Module R M]  :
     }
 
 
-example : IsScalarTower R R[X] (PolynomialModule R M) := inferInstance
 
+/-- apply `Finsupp.sum_single_index` on PolynomialModule.single
+--/
 lemma pm_sum_single_index {N:Type} [AddCommGroup N] [Module R N] {m:ℕ} {y:M} 
   {g:ℕ → M → N} (hg : g m 0 = 0): 
   Finsupp.sum ((PolynomialModule.single R m) y) g = g m y :=  by
   apply Finsupp.sum_single_index
   · exact hg
 
+/-- There is an `R[X]` linear equivalence `(R[X] ⊗[R] M) ≃ₗ[R[X]]
+   (PolynomialModule R M)` The `toFun` construction comes from
+   `tensor_map`. The `left_inv` and `right_inv` conditions are proved
+   using `TensorProduct.induction_on`, `Polynomial.induction_on` and
+   `PolynomialModule.induction_on` 
+--/
 def poly_mod_equiv_tensor_product  : (R[X] ⊗[R] M) ≃ₗ[R[X]] (PolynomialModule R M) := by
  let incl : ℕ → M →+ R[X] ⊗[R] M := by
    intro n
@@ -134,7 +141,7 @@ def poly_mod_equiv_tensor_product  : (R[X] ⊗[R] M) ≃ₗ[R[X]] (PolynomialMod
            rw [add_zero]
            unfold ψ; simp only [AddMonoidHom.coe_mk, ZeroHom.coe_mk] 
            rw [ pm_sum_single_index ( hg := by apply tmul_zero ) ]
-           simp [ incl ]
+           simp only [ tmul_smul, incl ]
            rw [ TensorProduct.smul_tmul' ]
            rw [ Polynomial.smul_monomial t m 1 ]
            rw [ smul_eq_mul, mul_one ]
@@ -154,18 +161,13 @@ def poly_mod_equiv_tensor_product  : (R[X] ⊗[R] M) ≃ₗ[R[X]] (PolynomialMod
        rw [ hw₁, hw₂ ]
      | single m t => 
        unfold ψ
-       simp
-       -- unfold PolynomialModule.single
+       simp only [tensor_map, bmap, AddHom.toFun_eq_coe, LinearMap.coe_toAddHom,
+         ZeroHom.toFun_eq_coe, AddMonoidHom.toZeroHom_coe, AddMonoidHom.coe_mk, ZeroHom.coe_mk,
+         AddHom.coe_mk]
        rw [ pm_sum_single_index  ]
        unfold mul_by_poly
-       --unfold incl 
        simp only [incl, AddMonoidHom.coe_mk, ZeroHom.coe_mk, lift.tmul, LinearMap.coe_mk, AddHom.coe_mk,
          PolynomialModule.monomial_smul_single, add_zero, one_smul] 
        apply map_zero
    }
-
-example (f:ℕ →₀ ℝ) (g:ℕ →₀ ℝ) (h:f = g) : 
-  Finsupp.sum f (fun _ r => r) = Finsupp.sum g (fun _ r => r) :=
-  by rw [ h]
-
 
