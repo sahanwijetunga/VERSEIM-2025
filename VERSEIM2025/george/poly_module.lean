@@ -110,7 +110,6 @@ def poly_mod_equiv_tensor_product  : (R[X] ⊗[R] M) ≃ₗ[R[X]] (PolynomialMod
    invFun := ψ
 
    left_inv := by 
-     unfold Function.LeftInverse
      intro x
      induction x using TensorProduct.induction_on with
      | zero => simp
@@ -146,11 +145,23 @@ def poly_mod_equiv_tensor_product  : (R[X] ⊗[R] M) ≃ₗ[R[X]] (PolynomialMod
         rw [ hw₁, hw₂ ]
        
    right_inv := by 
-     unfold Function.RightInverse
-     unfold Function.LeftInverse
      intro v
-     unfold ψ
-     
+     induction v using PolynomialModule.induction_linear with
+     | zero => simp
+     | add w₁ w₂ hw₁ hw₂ => 
+       rw [ ψ.map_add ]
+       rw [ (tensor_map R M).map_add' ]
+       rw [ hw₁, hw₂ ]
+     | single m t => 
+       unfold ψ
+       simp
+       -- unfold PolynomialModule.single
+       rw [ pm_sum_single_index  ]
+       unfold mul_by_poly
+       --unfold incl 
+       simp only [incl, AddMonoidHom.coe_mk, ZeroHom.coe_mk, lift.tmul, LinearMap.coe_mk, AddHom.coe_mk,
+         PolynomialModule.monomial_smul_single, add_zero, one_smul] 
+       apply map_zero
    }
 
 example (f:ℕ →₀ ℝ) (g:ℕ →₀ ℝ) (h:f = g) : 
