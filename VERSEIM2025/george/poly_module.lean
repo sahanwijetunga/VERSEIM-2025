@@ -13,8 +13,7 @@ variable {R M:Type} [CommRing R] [AddCommGroup M] [Module R M]
 For a polynomial `f:R[X]`, and an R-module M, multiplication
 by f determines an R-module homomorphism `M →ₗ[R] PolynomialModule R M`
 --/
-@[simp]
-def mul_by_poly (f:R[X]) : M →ₗ[R] PolynomialModule R M where
+def MulByPoly (f:R[X]) : M →ₗ[R] PolynomialModule R M where
   toFun := fun m => f • (PolynomialModule.single R 0 m)
   map_add' := by simp
   map_smul' := by 
@@ -23,37 +22,34 @@ def mul_by_poly (f:R[X]) : M →ₗ[R] PolynomialModule R M where
        , smul_comm
        , RingHom.id_apply ]
     
-/--
-There is a bilinear mapping `R[X] →ₗ[R] M →ₗ[R] PolynomialModule R M`
-given by the rule `f ↦ m ↦ (mul_by_poly f) m`
+/-- The bilinear mapping `R[X] →ₗ[R] M →ₗ[R] PolynomialModule R M`
+given by the rule `f ↦ m ↦ (MulByPoly f) m`
 --/
-@[simp]
-def bmap (R M:Type) [CommRing R] [AddCommGroup M] [Module R M] : 
+def BilinToPolyMod (R M:Type) [CommRing R] [AddCommGroup M] [Module R M] : 
    R[X] →ₗ[R] M →ₗ[R] PolynomialModule R M where
-   toFun :=  mul_by_poly 
+   toFun :=  MulByPoly 
    map_add' f g := by 
      ext
-     rw [mul_by_poly, LinearMap.coe_mk, AddHom.coe_mk, LinearMap.add_apply]
+     rw [MulByPoly, LinearMap.coe_mk, AddHom.coe_mk, LinearMap.add_apply]
      exact  add_smul f g _
    map_smul' t f := by 
      rw [ RingHom.id_apply ]
      ext
-     unfold mul_by_poly
+     unfold MulByPoly
      simp only [ LinearMap.coe_mk, AddHom.coe_mk,
                  smul_assoc,  LinearMap.smul_apply ]
 
 /-- 
 There is a `R[X]`-linear mapping `R[X] ⊗[R] M → PolynomialModule R M`
-determined (via `TensorProduct.lift`) by the bilinear mapping `bmap`
+determined (via `TensorProduct.lift`) by the bilinear mapping `BilinToPolyMod`
 
 The mapping property of the tensor product gives the underyling
 `R`-linear mapping, which is then confirmed (using
 `TensorProduct.induction_on`) to be `R[X]`-linear.
 --/
-@[simp]
-def tensor_map (R M:Type) [CommRing R] [AddCommGroup M] [Module R M]  : 
+def TensorMap (R M:Type) [CommRing R] [AddCommGroup M] [Module R M]  : 
   R[X] ⊗[R] M →ₗ[R[X]] PolynomialModule R M := by
-  let φ : R[X] ⊗[R] M →ₗ[R] PolynomialModule R M := lift (bmap R M)
+  let φ : R[X] ⊗[R] M →ₗ[R] PolynomialModule R M := lift (BilinToPolyMod R M)
   exact 
     { toFun := φ.toFun,
       map_add' := φ.map_add,
@@ -67,7 +63,7 @@ def tensor_map (R M:Type) [CommRing R] [AddCommGroup M] [Module R M]  :
         | tmul h y => 
             unfold φ
             rw [ smul_tmul', lift.tmul, lift.tmul , smul_eq_mul ]
-            simp only [bmap, mul_by_poly, LinearMap.coe_mk, AddHom.coe_mk ]
+            simp only [BilinToPolyMod, MulByPoly, LinearMap.coe_mk, AddHom.coe_mk ]
             rw [ ←smul_eq_mul, smul_assoc]
         | add x y hx hy => 
             rw [ smul_add, map_add, map_add, smul_add ]
@@ -86,11 +82,12 @@ lemma pm_sum_single_index {N:Type} [AddCommGroup N] [Module R N] {m:ℕ} {y:M}
 
 /-- There is an `R[X]` linear equivalence `(R[X] ⊗[R] M) ≃ₗ[R[X]]
    (PolynomialModule R M)` The `toFun` construction comes from
-   `tensor_map`. The `left_inv` and `right_inv` conditions are proved
+   `TensorMap`. The `left_inv` and `right_inv` conditions are proved
    using `TensorProduct.induction_on`, `Polynomial.induction_on` and
    `PolynomialModule.induction_on` 
 --/
-def poly_mod_equiv_tensor_product  : (R[X] ⊗[R] M) ≃ₗ[R[X]] (PolynomialModule R M) := by
+def PolynomialModuleEquivTensorProduct  : 
+ (R[X] ⊗[R] M) ≃ₗ[R[X]] (PolynomialModule R M) := by
  let incl : ℕ → M →+ R[X] ⊗[R] M := by
    intro n
    exact 
@@ -108,11 +105,11 @@ def poly_mod_equiv_tensor_product  : (R[X] ⊗[R] M) ≃ₗ[R[X]] (PolynomialMod
     }
 
  exact
- { toFun := (tensor_map R M).toFun
+ { toFun := (TensorMap R M).toFun
 
-   map_add' := (tensor_map R M).map_add
+   map_add' := (TensorMap R M).map_add
 
-   map_smul' := (tensor_map R M).map_smul
+   map_smul' := (TensorMap R M).map_smul
 
    invFun := ψ
 
@@ -121,7 +118,7 @@ def poly_mod_equiv_tensor_product  : (R[X] ⊗[R] M) ≃ₗ[R[X]] (PolynomialMod
      induction x using TensorProduct.induction_on with
      | zero => simp
      | tmul h y  => 
-        simp only [tensor_map, bmap, mul_by_poly, 
+        simp only [TensorMap, BilinToPolyMod, MulByPoly, 
                    AddHom.toFun_eq_coe, LinearMap.coe_toAddHom,
                    AddHom.coe_mk, lift.tmul, LinearMap.coe_mk
                    ] 
@@ -147,7 +144,7 @@ def poly_mod_equiv_tensor_product  : (R[X] ⊗[R] M) ≃ₗ[R[X]] (PolynomialMod
            rw [ smul_eq_mul, mul_one ]
      
      | add w₁ w₂ hw₁ hw₂ => 
-        rw [ (tensor_map R M).map_add' w₁ w₂ ]
+        rw [ (TensorMap R M).map_add' w₁ w₂ ]
         rw [ ψ.map_add ]
         rw [ hw₁, hw₂ ]
        
@@ -157,15 +154,15 @@ def poly_mod_equiv_tensor_product  : (R[X] ⊗[R] M) ≃ₗ[R[X]] (PolynomialMod
      | zero => simp
      | add w₁ w₂ hw₁ hw₂ => 
        rw [ ψ.map_add ]
-       rw [ (tensor_map R M).map_add' ]
+       rw [ (TensorMap R M).map_add' ]
        rw [ hw₁, hw₂ ]
      | single m t => 
        unfold ψ
-       simp only [tensor_map, bmap, AddHom.toFun_eq_coe, LinearMap.coe_toAddHom,
+       simp only [TensorMap, BilinToPolyMod, AddHom.toFun_eq_coe, LinearMap.coe_toAddHom,
          ZeroHom.toFun_eq_coe, AddMonoidHom.toZeroHom_coe, AddMonoidHom.coe_mk, ZeroHom.coe_mk,
          AddHom.coe_mk]
        rw [ pm_sum_single_index  ]
-       unfold mul_by_poly
+       unfold MulByPoly
        simp only [incl, AddMonoidHom.coe_mk, ZeroHom.coe_mk, lift.tmul, LinearMap.coe_mk, AddHom.coe_mk,
          PolynomialModule.monomial_smul_single, add_zero, one_smul] 
        apply map_zero
