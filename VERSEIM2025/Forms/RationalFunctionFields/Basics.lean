@@ -15,7 +15,9 @@ import Mathlib.LinearAlgebra.QuadraticForm.Isometry
 import Mathlib.RingTheory.Localization.BaseChange
 import Mathlib.LinearAlgebra.BilinearMap
 import Mathlib.LinearAlgebra.TensorProduct.Basic
+
 import VERSEIM2025.PolynomialModuleDegree.Misc
+import VERSEIM2025.Forms.RationalFunctionFields.PolynomialModule
 
 namespace RationalFunctionFields
 
@@ -89,9 +91,7 @@ theorem toRatFuncTensor_Injective' (a b: V[F] ) : (a: V(F)) = b ↔ a=b := by
   have := @toRatFuncTensor_Injective F V _ _ _
   exact Function.Injective.eq_iff this
 
-theorem FooSumWork {α}(v w: α →₀ V) (g : α → V →+ V):
-  (v+w).sum (fun a => fun v => g a v) = (v.sum (fun a => fun v => g a v)) + (w.sum (fun a => fun v => g a v)) := by
-    exact Finsupp.sum_hom_add_index g
+
 
 @[simp]
 noncomputable def FooFunPolynomial: ℕ → V →ₗ[F] V[F] := fun n => {
@@ -107,13 +107,8 @@ noncomputable def FooFunPolynomial: ℕ → V →ₗ[F] V[F] := fun n => {
 --  is relevant (but does things in multivariable polynomials)
 
 /-- An isomorphism between the two notions of `V[X]`-/
-noncomputable def PolynomialEquiv: PolynomialModule F V ≃ₗ[F[X]] V[F] where
-  toFun := fun f => f.sum (fun n => fun v => FooFunPolynomial n v)
-  map_add' := sorry
-  map_smul' := sorry
-  invFun := sorry
-  left_inv := sorry
-  right_inv := sorry
+noncomputable def PolynomialEquiv: PolynomialModule F V ≃ₗ[F[X]] V[F]
+  :=
 
 @[coe]
 noncomputable abbrev coePolynomialModule: PolynomialModule F V → V[F] := PolynomialEquiv
