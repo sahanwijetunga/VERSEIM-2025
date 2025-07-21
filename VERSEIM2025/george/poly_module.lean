@@ -39,9 +39,8 @@ def bmap (R M:Type) [CommRing R] [AddCommGroup M] [Module R M] :
      rw [ RingHom.id_apply ]
      ext
      unfold mul_by_poly
-     simp only [ LinearMap.coe_mk, AddHom.coe_mk , 
+     simp only [ LinearMap.coe_mk, AddHom.coe_mk,
                  smul_assoc,  LinearMap.smul_apply ]
-
 
 /-- 
 There is a `R[X]`-linear mapping `R[X] ⊗[R] M → PolynomialModule R M`
@@ -68,8 +67,8 @@ def tensor_map (R M:Type) [CommRing R] [AddCommGroup M] [Module R M]  :
         | tmul h y => 
             unfold φ
             rw [ smul_tmul', lift.tmul, lift.tmul , smul_eq_mul ]
-            simp only [bmap, mul_by_poly, LinearMap.coe_mk, AddHom.coe_mk]
-            rw [ ←smul_eq_mul, smul_assoc ] 
+            simp only [bmap, mul_by_poly, LinearMap.coe_mk, AddHom.coe_mk ]
+            rw [ ←smul_eq_mul, smul_assoc]
         | add x y hx hy => 
             rw [ smul_add, map_add, map_add, smul_add ]
             rw [ hx ,hy ]        
@@ -138,9 +137,8 @@ def poly_mod_equiv_tensor_product  : (R[X] ⊗[R] M) ≃ₗ[R[X]] (PolynomialMod
            rw [ pm_sum_single_index ( hg := by apply tmul_zero ) ]
            simp [ incl ]
            sorry
-           -- #check smul_assoc ((monomial m) 1) t (1 ⊗ₜ[R] y : R[X] ⊗[R] M)
-           -- rw [ ←]
-           -- --rw [ ←TensorProduct.smul_tmul ]
+           -- rw [ Polynomial.smul_monomial t m 1 ]
+           -- rw [ ←TensorProduct.smul_tmul ]
            -- simp only [smul_eq_C_mul t, C_mul_monomial, mul_one]
      
      | add w₁ w₂ hw₁ hw₂ => 
