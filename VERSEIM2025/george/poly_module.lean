@@ -7,47 +7,150 @@ open TensorProduct
 
 noncomputable section
 
-variable {R M: Type*} [CommRing R] [AddCommGroup M] [Module R M]
+variable {R M:Type} [CommRing R] [AddCommGroup M] [Module R M] 
 
-variable {N:Type*} [AddCommGroup N] [Module R[X] N] [Module R N] 
-                   [IsScalarTower R R[X] N]
+/-- 
+For a polynomial `f:R[X]`, and an R-module M, multiplication
+by f determines an R-module homomorphism `M →ₗ[R] PolynomialModule R M`
+--/
+@[simp]
+def mul_by_poly (f:R[X]) : M →ₗ[R] PolynomialModule R M where
+  toFun := fun m => f • (PolynomialModule.single R 0 m)
+  map_add' := by simp
+  map_smul' := by 
+    intro t m
+    rw [ PolynomialModule.single_smul
+       , smul_comm
+       , RingHom.id_apply ]
+    
+/--
+There is a bilinear mapping `R[X] →ₗ[R] M →ₗ[R] PolynomialModule R M`
+given by the rule `f ↦ m ↦ (mul_by_poly f) m`
+--/
+@[simp]
+def bmap (R M:Type) [CommRing R] [AddCommGroup M] [Module R M] : 
+   R[X] →ₗ[R] M →ₗ[R] PolynomialModule R M where
+   toFun :=  mul_by_poly 
+   map_add' f g := by 
+     ext
+     rw [mul_by_poly, LinearMap.coe_mk, AddHom.coe_mk, LinearMap.add_apply]
+     exact  add_smul f g _
+   map_smul' t f := by 
+     rw [ RingHom.id_apply ]
+     ext
+     unfold mul_by_poly
+     simp only [ LinearMap.coe_mk, AddHom.coe_mk,
+                 smul_assoc,  LinearMap.smul_apply ]
 
-def poly_map (f:M →ₗ[R] N) : PolynomialModule R M →ₗ[R[X]] N where
-  toFun :=  fun v => 
-    v.sum  fun (n:ℕ) _ => (Polynomial.monomial n (1:R)) • f (v n)
-  map_add' := by 
-    intro x y
-    have (x y : PolynomialModule R M) (n:ℕ): f ((x + y) n) = f (x n) + f (y n) := by
-      rw [PolynomialModule.add_apply R x y n]
-      simp
-    rw [ this x y ]
-    --sorry
-  map_smul' := by
-    intro m x
-    sorry
+/-- 
+There is a `R[X]`-linear mapping `R[X] ⊗[R] M → PolynomialModule R M`
+determined (via `TensorProduct.lift`) by the bilinear mapping `bmap`
 
-example (f:ℕ →₀ ℤ) (g:ℕ →₀ ℤ) (h:(n:ℕ) → f n = g n) :
-  Finsupp.sum f (fun n _ => f n) = Finsupp.sum g (fun n _ => g n)  := by 
-  rw [h]
+The mapping property of the tensor product gives the underyling
+`R`-linear mapping, which is then confirmed (using
+`TensorProduct.induction_on`) to be `R[X]`-linear.
+--/
+@[simp]
+def tensor_map (R M:Type) [CommRing R] [AddCommGroup M] [Module R M]  : 
+  R[X] ⊗[R] M →ₗ[R[X]] PolynomialModule R M := by
+  let φ : R[X] ⊗[R] M →ₗ[R] PolynomialModule R M := lift (bmap R M)
+  exact 
+    { toFun := φ.toFun,
+      map_add' := φ.map_add,
+      map_smul' := by 
+        intro g x
+        rw [ RingHom.id_apply 
+           , AddHom.toFun_eq_coe
+           , LinearMap.coe_toAddHom ]
+        induction x using TensorProduct.induction_on with
+        | zero => simp
+        | tmul h y => 
+            unfold φ
+            rw [ smul_tmul', lift.tmul, lift.tmul , smul_eq_mul ]
+            simp only [bmap, mul_by_poly, LinearMap.coe_mk, AddHom.coe_mk ]
+            rw [ ←smul_eq_mul, smul_assoc]
+        | add x y hx hy => 
+            rw [ smul_add, map_add, map_add, smul_add ]
+            rw [ hx ,hy ]        
+    }
 
 
+example : IsScalarTower R R[X] (PolynomialModule R M) := inferInstance
 
--- inclusion of `M` into `PolynomialModule R M` is an R-module
--- homomorphism it is important to use PolynomialModule.single rather
--- than FinSupp.single here, to get easy proofs for map_add and
--- map_smul
-def const_incl : M →ₗ[R] PolynomialModule R M where
-  toFun := PolynomialModule.single R 0
-  map_add' :=  by simp only [ map_add, implies_true ]
-  map_smul' := PolynomialModule.single_smul R 0 
+lemma pm_sum_single_index {N:Type} [AddCommGroup N] [Module R N] {m:ℕ} {y:M} 
+  {g:ℕ → M → N} (hg : g m 0 = 0): 
+  Finsupp.sum ((PolynomialModule.single R m) y) g = g m y :=  by
+  apply Finsupp.sum_single_index
+  · exact hg
 
-def poly_mod_equiv_tensor_product  : PolynomialModule R M ≃ₗ[R[X]] R[X] ⊗[R] M  where
-  toFun := (poly_map const_incl).toFun
-  map_add' := (poly_map const_incl).map_add
-  map_smul' := by
-    intro f m
-    simp
-    (poly_map const_incl).map_smul 
-  invFun := by sorry
-  left_inv := by sorry
-  right_inv := by sorry
+def poly_mod_equiv_tensor_product  : (R[X] ⊗[R] M) ≃ₗ[R[X]] (PolynomialModule R M) := by
+ let incl : ℕ → M →+ R[X] ⊗[R] M := by
+   intro n
+   exact 
+    {
+      toFun := fun x => monomial n 1 ⊗ₜ[R] x
+      map_zero' := by simp
+      map_add' m₁ m₂ := tmul_add _ m₁ m₂
+    }
+
+ let ψ : PolynomialModule R M →+ R[X] ⊗[R] M := 
+    {
+     toFun := fun v => v.sum fun n => (incl n).toFun 
+     map_zero' := by simp
+     map_add' := (Finsupp.liftAddHom incl).map_add
+    }
+
+ exact
+ { toFun := (tensor_map R M).toFun
+
+   map_add' := (tensor_map R M).map_add
+
+   map_smul' := (tensor_map R M).map_smul
+
+   invFun := ψ
+
+   left_inv := by 
+     unfold Function.LeftInverse
+     intro x
+     induction x using TensorProduct.induction_on with
+     | zero => simp
+     | tmul h y  => 
+        simp only [tensor_map, bmap, mul_by_poly, 
+                   AddHom.toFun_eq_coe, LinearMap.coe_toAddHom,
+                   AddHom.coe_mk, lift.tmul, LinearMap.coe_mk
+                   ] 
+        induction h using Polynomial.induction_on' with
+        | add p q hp hq => 
+           rw [ add_smul ]
+           unfold ψ; simp only [AddMonoidHom.coe_mk, ZeroHom.coe_mk]
+           unfold ψ at hp; simp only [AddMonoidHom.coe_mk, ZeroHom.coe_mk] at hp
+           unfold ψ at hq; simp only [AddMonoidHom.coe_mk, ZeroHom.coe_mk] at hq
+           rw [ Finsupp.sum_add_index (h_zero := by simp) ]
+           · rw [ hp, hq ] 
+             rw [ add_tmul ]
+           · intro _ _ b₁ b₂  
+             exact tmul_add _ b₁ b₂
+        | monomial m t => 
+           rw [ PolynomialModule.monomial_smul_single  ] 
+           rw [add_zero]
+           unfold ψ; simp only [AddMonoidHom.coe_mk, ZeroHom.coe_mk] 
+           rw [ pm_sum_single_index ( hg := by apply tmul_zero ) ]
+           simp [ incl ]
+           sorry
+           -- rw [ Polynomial.smul_monomial t m 1 ]
+           -- rw [ ←TensorProduct.smul_tmul ]
+           -- simp only [smul_eq_C_mul t, C_mul_monomial, mul_one]
+     
+     | add w₁ w₂ hw₁ hw₂ => 
+        rw [ (tensor_map R M).map_add' w₁ w₂ ]
+        rw [ ψ.map_add ]
+        rw [ hw₁, hw₂ ]
+       
+   right_inv := by sorry
+   }
+
+example (f:ℕ →₀ ℝ) (g:ℕ →₀ ℝ) (h:f = g) : 
+  Finsupp.sum f (fun _ r => r) = Finsupp.sum g (fun _ r => r) :=
+  by rw [ h]
+
+
