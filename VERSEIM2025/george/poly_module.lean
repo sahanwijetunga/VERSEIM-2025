@@ -14,15 +14,14 @@ For a polynomial `f:R[X]`, and an R-module M, multiplication
 by f determines an R-module homomorphism `M →ₗ[R] PolynomialModule R M`
 --/
 @[simp]
-def mul_by_poly 
-  (f:R[X]) : M →ₗ[R] PolynomialModule R M where
+def mul_by_poly (f:R[X]) : M →ₗ[R] PolynomialModule R M where
   toFun := fun m => f • (PolynomialModule.single R 0 m)
   map_add' := by simp
   map_smul' := by 
     intro t m
-    rw [ PolynomialModule.single_smul ]
-    rw [ smul_comm ]
-    simp only [RingHom.id_apply]
+    rw [ PolynomialModule.single_smul
+       , smul_comm
+       , RingHom.id_apply ]
     
 /--
 There is a bilinear mapping `R[X] →ₗ[R] M →ₗ[R] PolynomialModule R M`
@@ -31,19 +30,18 @@ given by the rule `f ↦ m ↦ (mul_by_poly f) m`
 @[simp]
 def bmap (R M:Type) [CommRing R] [AddCommGroup M] [Module R M] : 
    R[X] →ₗ[R] M →ₗ[R] PolynomialModule R M where
-   toFun := by 
-     intro f
-     apply mul_by_poly f
-   map_add' := by 
-     intro f g
+   toFun :=  mul_by_poly 
+   map_add' f g := by 
      ext
-     simp only [mul_by_poly, LinearMap.coe_mk, AddHom.coe_mk, LinearMap.add_apply]
+     rw [mul_by_poly, LinearMap.coe_mk, AddHom.coe_mk, LinearMap.add_apply]
      exact  add_smul f g _
-   map_smul' := by 
-     intro t f
+   map_smul' t f := by 
+     rw [ RingHom.id_apply ]
      ext
-     simp only [mul_by_poly, smul_assoc, LinearMap.coe_mk, AddHom.coe_mk, RingHom.id_apply,
-                LinearMap.smul_apply ]
+     unfold mul_by_poly
+     simp only [ LinearMap.coe_mk, AddHom.coe_mk , 
+                 smul_assoc,  LinearMap.smul_apply ]
+
 
 /-- 
 There is a `R[X]`-linear mapping `R[X] ⊗[R] M → PolynomialModule R M`
@@ -62,7 +60,9 @@ def tensor_map (R M:Type) [CommRing R] [AddCommGroup M] [Module R M]  :
       map_add' := φ.map_add,
       map_smul' := by 
         intro g x
-        simp
+        rw [ RingHom.id_apply 
+           , AddHom.toFun_eq_coe
+           , LinearMap.coe_toAddHom ]
         induction x using TensorProduct.induction_on with
         | zero => simp
         | tmul h y => 
@@ -94,7 +94,6 @@ def poly_mod_equiv_tensor_product  : (R[X] ⊗[R] M) ≃ₗ[R[X]] (PolynomialMod
       map_add' m₁ m₂ := tmul_add _ m₁ m₂
     }
 
-    
  let ψ : PolynomialModule R M →+ R[X] ⊗[R] M := 
     {
      toFun := fun v => v.sum fun n => (incl n).toFun 
@@ -134,7 +133,7 @@ def poly_mod_equiv_tensor_product  : (R[X] ⊗[R] M) ≃ₗ[R[X]] (PolynomialMod
              exact tmul_add _ b₁ b₂
         | monomial m t => 
            rw [ PolynomialModule.monomial_smul_single  ] 
-           simp only [add_zero]
+           rw [add_zero]
            unfold ψ; simp only [AddMonoidHom.coe_mk, ZeroHom.coe_mk] 
            rw [ pm_sum_single_index ( hg := by apply tmul_zero ) ]
            simp [ incl ]
