@@ -45,16 +45,19 @@ theorem ConversionIff (a b: F[X]): (a: F(X))=b ↔ a=b := by
     rw[h]
 
 theorem ExtensionScalarsCommutesWithScalars (p: F[X]) (v: V(F) ) : p • v = (p: F(X)) • v := by
-  sorry
+  unfold RatFunc.coePolynomial
+  rw [@IsScalarTower.algebraMap_smul]
+
 
 theorem PolynomialScalarSmul (c: F) (u: F[X]): (Polynomial.C c) * u = c • u := by
-  sorry
+  exact Polynomial.C_mul' c u
 
 theorem TensorPolynomialScalarSmul (c: F) (u: V[F]): (Polynomial.C c) • u = c • u := by
-  sorry
+  rw [Polynomial.C_eq_algebraMap, IsScalarTower.algebraMap_smul]
 
 theorem RatFunc_coePolynomialMultiplication (f g: F[X]): (f*g: F[X]) = (f: F(X))*(g: F(X)) := by
-  sorry
+  unfold RatFunc.coePolynomial
+  rw [← algebraMap.coe_mul]
 
 theorem RatFunc_coePolynomialScalarMultiplication (f: F[X]) (g: F(X)): ↑f * g = f • g:= by
   rw [@Algebra.smul_def',@mul_eq_mul_right_iff]; left
@@ -70,21 +73,15 @@ noncomputable def coeRatFunc: V[F] → V(F) := toRatFuncTensor
 noncomputable scoped instance : Coe (V[F]) (V(F)) := ⟨coeRatFunc⟩
 
 /-- The map `toRatFuncTensor` is injective. -/
-theorem toRatFuncTensor_Injective : Function.Injective (@toRatFuncTensor F V _ _ _):= sorry
-
-/-- The map `toRatFuncTensor` commutes with polynomial scalar multiplication -/
-theorem toRatFuncTensor_CommutePolynomialScalars (p: F[X]) (v: (V[F])):
-  ((p • v): V(F)) = p • (v: V(F)) := sorry
-
-/-- The map `toRatFuncTensor` commutes with scalar multiplication. -/
-theorem toRatFuncTensor_CommuteScalars (a: F) (v: (V[F])):
-  ((a • v): V(F)) = a • (v: V(F)) := sorry
+theorem toRatFuncTensor_Injective : Function.Injective (@toRatFuncTensor F V _ _ _):= by
+  unfold toRatFuncTensor
+  -- rw [@injective_iff_map_eq_zero]
+  -- intro a h
+  sorry
 
 /-- The map `toRatFuncTensor` commutes with quadratic forms. -/
 theorem toRatFuncTensor_CommuteQuadraticForm (φ: QuadraticForm F V) (v: (V[F])) [Invertible (2:F)]:
   φ.baseChange F[X] v = (φ.baseChange F(X)) v := sorry
-
-
 
 /-- The map `toRatFuncTensor` is injective, stated elementwise as an iff. -/
 theorem toRatFuncTensor_Injective' (a b: V[F] ) : (a: V(F)) = b ↔ a=b := by
@@ -92,23 +89,9 @@ theorem toRatFuncTensor_Injective' (a b: V[F] ) : (a: V(F)) = b ↔ a=b := by
   exact Function.Injective.eq_iff this
 
 
-
-@[simp]
-noncomputable def FooFunPolynomial: ℕ → V →ₗ[F] V[F] := fun n => {
-  toFun := fun v =>  (Polynomial.monomial n 1) ⊗ₜ v
-  map_add' := fun a b => TensorProduct.tmul_add ((Polynomial.monomial n) 1) a b
-  map_smul' := fun c a => TensorProduct.tmul_smul c ((Polynomial.monomial n) 1) a
-}
-
--- https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/BigOperators/Finsupp/Basic.html#Finsupp.sum_hom_add_index
--- https://leanprover-community.github.io/mathlib4_docs/Mathlib/LinearAlgebra/Finsupp/LSum.html#Finsupp.sum_smul_index_linearMap'
-
--- https://leanprover-community.github.io/mathlib4_docs/Mathlib/RingTheory/TensorProduct/MvPolynomial.html#MvPolynomial.rTensor
---  is relevant (but does things in multivariable polynomials)
-
 /-- An isomorphism between the two notions of `V[X]`-/
 noncomputable def PolynomialEquiv: PolynomialModule F V ≃ₗ[F[X]] V[F]
-  :=
+  := (PolyEquiv.PolynomialModuleEquivTensorProduct (R := F) (M := V)).symm
 
 @[coe]
 noncomputable abbrev coePolynomialModule: PolynomialModule F V → V[F] := PolynomialEquiv
@@ -116,14 +99,10 @@ noncomputable abbrev coePolynomialModule: PolynomialModule F V → V[F] := Polyn
 noncomputable scoped instance : Coe (PolynomialModule F V) (V[F]) := ⟨coePolynomialModule⟩
 
 theorem PolynomialEquivSingle (v: V): (PolynomialModule.single F 0) v = (1 ⊗ₜ v: V[F]) := by
-  simp only [coePolynomialModule,PolynomialEquiv,FooFunPolynomial,DFunLike.coe,
-    EquivLike.coe,PolynomialModule.single,Finsupp.singleAddHom, Mathlib.Tactic.Module.NF.eval,]
-  rw[Finsupp.sum ]
-  by_cases h:v=0
-  . rw[h]
-    simp
-  . rw [Finsupp.support_single_ne_zero 0 h]
-    simp
+  simp only [coePolynomialModule, DFunLike.coe, EquivLike.coe, PolynomialEquiv,
+    PolynomialModule.single, Finsupp.singleAddHom]
+  simp[PolyEquiv.PolynomialModuleEquivTensorProduct]
+
 
 theorem FooSummWork {α}(v w: α →₀ V) (g : α → V →+ V):
   (v+w).sum (fun a => fun v => g a v) = (v.sum (fun a => fun v => g a v)) + (w.sum (fun a => fun v => g a v)) := by

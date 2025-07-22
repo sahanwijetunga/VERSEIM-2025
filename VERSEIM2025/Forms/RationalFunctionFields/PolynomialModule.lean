@@ -9,7 +9,7 @@ open TensorProduct
 
 noncomputable section
 
-variable {R M:Type} [CommRing R] [AddCommGroup M] [Module R M]
+variable {R M:Type*} [CommRing R] [AddCommGroup M] [Module R M]
 
 /--
 For a polynomial `f:R[X]`, and an R-module M, multiplication
@@ -27,7 +27,7 @@ def MulByPoly (f:R[X]) : M →ₗ[R] PolynomialModule R M where
 /-- The bilinear mapping `R[X] →ₗ[R] M →ₗ[R] PolynomialModule R M`
 given by the rule `f ↦ m ↦ (MulByPoly f) m`
 --/
-def BilinToPolyMod (R M:Type) [CommRing R] [AddCommGroup M] [Module R M] :
+def BilinToPolyMod (R M:Type*) [CommRing R] [AddCommGroup M] [Module R M] :
    R[X] →ₗ[R] M →ₗ[R] PolynomialModule R M where
    toFun :=  MulByPoly
    map_add' f g := by
@@ -49,7 +49,7 @@ The mapping property of the tensor product gives the underyling
 `R`-linear mapping, which is then confirmed (using
 `TensorProduct.induction_on`) to be `R[X]`-linear.
 --/
-def TensorMap (R M:Type) [CommRing R] [AddCommGroup M] [Module R M]  :
+def TensorMap (R M:Type*) [CommRing R] [AddCommGroup M] [Module R M]  :
   R[X] ⊗[R] M →ₗ[R[X]] PolynomialModule R M := by
   let φ : R[X] ⊗[R] M →ₗ[R] PolynomialModule R M := lift (BilinToPolyMod R M)
   exact
@@ -76,7 +76,7 @@ def TensorMap (R M:Type) [CommRing R] [AddCommGroup M] [Module R M]  :
 
 /-- apply `Finsupp.sum_single_index` on PolynomialModule.single
 --/
-lemma pm_sum_single_index {N:Type} [AddCommGroup N] [Module R N] {m:ℕ} {y:M}
+lemma pm_sum_single_index {N:Type*} [AddCommGroup N] [Module R N] {m:ℕ} {y:M}
   {g:ℕ → M → N} (hg : g m 0 = 0):
   Finsupp.sum ((PolynomialModule.single R m) y) g = g m y :=  by
   apply Finsupp.sum_single_index
