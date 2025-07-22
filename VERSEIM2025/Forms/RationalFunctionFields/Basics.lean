@@ -15,6 +15,7 @@ import Mathlib.LinearAlgebra.QuadraticForm.Isometry
 import Mathlib.RingTheory.Localization.BaseChange
 import Mathlib.LinearAlgebra.BilinearMap
 import Mathlib.LinearAlgebra.TensorProduct.Basic
+import Mathlib.RingTheory.Flat.Basic
 
 import VERSEIM2025.PolynomialModuleDegree.Misc
 import VERSEIM2025.Forms.RationalFunctionFields.PolynomialModule
@@ -72,16 +73,74 @@ noncomputable def coeRatFunc: V[F] → V(F) := toRatFuncTensor
 
 noncomputable scoped instance : Coe (V[F]) (V(F)) := ⟨coeRatFunc⟩
 
+
 /-- The map `toRatFuncTensor` is injective. -/
-theorem toRatFuncTensor_Injective : Function.Injective (@toRatFuncTensor F V _ _ _):= by
-  unfold toRatFuncTensor
-  -- rw [@injective_iff_map_eq_zero]
-  -- intro a h
-  sorry
+theorem toRatFuncTensor_Injective : Function.Injective (toRatFuncTensor (F := F) (V := V)):= by
+  -- TensorProduct.AlgebraTensorModule.map (Algebra.linearMap F[X] (F(X))) LinearMap.id: V[F] → V(F)
+  have: (toRatFuncTensor: V[F] → V(F))
+   = TensorProduct.map (AlgHom.toLinearMap (Algebra.algHom F F[X] F(X))) LinearMap.id := rfl
+  rw[this]
+  rw[<- LinearMap.rTensor_def]
+  exact Module.Flat.rTensor_preserves_injective_linearMap (hf := RatFunc.algebraMap_injective F)
+
+theorem RatFunc_CoePolynomial_add (a b: F[X]): ↑(a+b)=(a+b: F(X)) := by
+  exact algebraMap.coe_add a b
+
+theorem RatVec_CoeVec_add (v w: V[F]): ↑(v+w)=(v+w: V(F)) := by
+  unfold coeRatFunc toRatFuncTensor
+  rw[LinearMap.map_add]
+
+noncomputable instance RatFuncInvertible2 [Invertible (2: F)]: Invertible (2: F(X)) where
+  invOf := RatFunc.C (⅟2: F)
+  invOf_mul_self := by
+    have h1: (2: F(X))=RatFunc.C (2:F) := by
+      simp only [<- one_add_one_eq_two,map_add, map_one]
+    have h2: (1: F(X))=RatFunc.C (1:F) := by simp
+    have h3: (⅟ 2 * 2: F) = 1 := by
+      simp
+    rw[h1,h2, <- RingHom.map_mul,h3]
+  mul_invOf_self := by
+    have h1: (2: F(X))=RatFunc.C (2:F) := by
+      simp only [<- one_add_one_eq_two,map_add, map_one]
+    have h2: (1: F(X))=RatFunc.C (1:F) := by simp
+    have h3: (2*⅟ 2: F) = 1 := by
+      simp
+    rw[h1,h2, <- RingHom.map_mul,h3]
+
+theorem toRatFuncTensor_CommuteAssociateForm_Pure (φ: QuadraticForm F V) [Invertible (2:F)] (v w: V) (a b: F[X]):
+  QuadraticMap.associated (φ.baseChange F[X]) (a ⊗ₜ v) (b ⊗ₜ w) =
+    QuadraticMap.associated (φ.baseChange F(X)) (a ⊗ₜ v) (b ⊗ₜ w) := by
+  -- have: Invertible (2: F[X]) := inferInstance
+  -- have: Invertible (2: F(X)) := inferInstance
+  repeat rw[QuadraticForm.associated_baseChange]
+  generalize (QuadraticMap.associated φ)=B
+  repeat rw[LinearMap.BilinForm.baseChange_tmul]
+  rw[Eq.symm (PolynomialScalarSmul _ _)]
+  rw[RatFunc.smul_eq_C_mul]
+  simp[RatFunc.coePolynomial]
+
+theorem toRatFuncTensor_CommuteAssociateForm (φ: QuadraticForm F V) [Invertible (2:F)] (v w: V[F]):
+   ↑(QuadraticMap.associated (QuadraticForm.baseChange F[X] φ) v w) =
+  QuadraticMap.associated (QuadraticForm.baseChange F(X) φ) v w  := by
+  induction v using TensorProduct.induction_on with
+  | zero => simp[coeRatFunc,RatFunc.coePolynomial]
+  | tmul a v =>
+    induction w using TensorProduct.induction_on with
+    | zero => simp[coeRatFunc,RatFunc.coePolynomial]
+    | tmul b w => exact toRatFuncTensor_CommuteAssociateForm_Pure φ v w a b
+    | add w w' hw hw' =>
+      rw[LinearMap.BilinForm.add_right, RatFunc_CoePolynomial_add,
+        hw, hw', RatVec_CoeVec_add, LinearMap.BilinForm.add_right]
+  | add v v' hv hv' =>
+    rw[LinearMap.BilinForm.add_left, RatFunc_CoePolynomial_add,
+      hv, hv', RatVec_CoeVec_add, LinearMap.BilinForm.add_left]
 
 /-- The map `toRatFuncTensor` commutes with quadratic forms. -/
 theorem toRatFuncTensor_CommuteQuadraticForm (φ: QuadraticForm F V) (v: (V[F])) [Invertible (2:F)]:
-  φ.baseChange F[X] v = (φ.baseChange F(X)) v := sorry
+φ.baseChange F[X] v = (φ.baseChange F(X)) v := by
+  rw[<- QuadraticMap.associated_eq_self_apply F[X]]
+  rw[<- QuadraticMap.associated_eq_self_apply F(X)]
+  exact toRatFuncTensor_CommuteAssociateForm φ v v
 
 /-- The map `toRatFuncTensor` is injective, stated elementwise as an iff. -/
 theorem toRatFuncTensor_Injective' (a b: V[F] ) : (a: V(F)) = b ↔ a=b := by
