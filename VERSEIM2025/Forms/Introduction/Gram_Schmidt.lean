@@ -1,5 +1,7 @@
 import Mathlib.Tactic
 
+/- This replicates much of the material in Mathlib and was done for learning purposes. -/
+
 def Def {V : Type} [AddCommGroup V] [Module ℝ V] (β:V →ₗ[ℝ] V →ₗ[ℝ] ℝ) : Prop :=
   ∀ x : V, x ≠ 0 → β x x ≠ 0
 
