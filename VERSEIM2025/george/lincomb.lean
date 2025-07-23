@@ -1,7 +1,8 @@
 import Mathlib.Tactic
 
 variable {k : Type} [ Field k ]
-variable {V : Type} [ AddCommGroup V ] [ Module k V ]
+variable {V W : Type} [ AddCommGroup V ] [ Module k V ]
+  [ AddCommGroup W ] [ Module k W ]
 
 variable {ι:Type} [Fintype ι]
 
@@ -18,5 +19,7 @@ lemma fintype_linear_combination_repr (v:V) : (Fintype.linearCombination k b) (b
   simp
 
 
+example (φ:V →ₗ[k] W) (f:ι → V) : φ (∑ i, f i) = ∑ i, φ (f i) := by 
+  apply map_sum φ f Finset.univ
      
-  
+
