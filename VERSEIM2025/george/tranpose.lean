@@ -29,8 +29,19 @@ equiv : V₁ ≃ₗ[k] V₂
 compat : ∀ (v w : V₁), (β₁ v) w = (β₂ (equiv v)) (equiv w)
 
 def equiv_from_bases (b₁:Basis ι k V₁) (b₂:Basis ι k V₂)
-: V₁ ≃ₗ[k] V₂ :=
-LinearEquiv.trans b₁.repr (b₂.repr.symm)
+  : V₁ ≃ₗ[k] V₂ :=
+  LinearEquiv.trans b₁.repr (b₂.repr.symm)
+
+lemma equiv_from_bases_apply (b₁:Basis ι k V₁) (b₂:Basis ι k V₂) (i:ι) : 
+  (equiv_from_bases b₁ b₂) (b₁ i) = b₂ i := by 
+  unfold equiv_from_bases 
+  rw [ LinearEquiv.trans_apply ]
+  rw [ Basis.repr_self ]
+  rw [ Basis.repr_symm_apply ]
+  rw [ Finsupp.linearCombination_single ]
+  apply one_smul
+
+  
 
 lemma equiv_of_series {ι:Type} [Fintype ι] (β:BilinForm k V) (b : Basis ι k V)
 (s t : ι → k)
@@ -91,7 +102,7 @@ theorem equiv_via_matrices {ι:Type} [Fintype ι] [DecidableEq ι]
   
   rw [ Fintype.linearCombination_apply, Fintype.linearCombination_apply]
   rw [ map_sum eq, map_sum eq] 
-  rw [  map_smul eq, map_smul eq ]   
+  rw [ Fintype.sum_congr ]
 
 --  unfold Fintype.linearCombination
   
