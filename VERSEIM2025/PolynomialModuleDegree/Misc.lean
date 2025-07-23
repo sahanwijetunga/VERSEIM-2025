@@ -128,4 +128,12 @@ lemma DivisionAlgorithm(v: PolynomialModule F V) {f: F[X]} (hf: f.natDegree >0):
   ∃w r, v = f • w + r ∧ r.natDegree < f.natDegree :=
     PolynomialModule.DivisionAlgorithmAux v v.natDegree rfl hf
 
+
+@[elab_as_elim]
+theorem induction_on_max_particular {motive : PolynomialModule F V → Prop} (f : PolynomialModule F V)
+    (zero : motive 0) (add : ∀ f g, f ≠ 0 → g ≠ 0 → f.natDegree < g.natDegree → motive f → motive g → motive (f + g))
+    (single : ∀ a b, b ≠ 0 → motive (single F a b)) : motive f := by
+  -- Finsupp.induction_linear f zero add single'
+  sorry
+
 end PolynomialModule

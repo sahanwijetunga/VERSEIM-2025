@@ -157,7 +157,12 @@ noncomputable abbrev coePolynomialModule: PolynomialModule F V → V[F] := Polyn
 
 noncomputable scoped instance : Coe (PolynomialModule F V) (V[F]) := ⟨coePolynomialModule⟩
 
-theorem PolynomialEquivSingle (v: V): (PolynomialModule.single F 0) v = (1 ⊗ₜ v: V[F]) := by
+theorem PolynomialEquivSingleConstant (v: V): (PolynomialModule.single F 0) v = (1 ⊗ₜ v: V[F]) := by
+  simp only [coePolynomialModule, DFunLike.coe, EquivLike.coe, PolynomialEquiv,
+    PolynomialModule.single, Finsupp.singleAddHom]
+  simp[PolyEquiv.PolynomialModuleEquivTensorProduct]
+
+theorem PolynomialEquivSingle (v: V) (n: ℕ): (PolynomialModule.single F n) v = ((Polynomial.monomial n 1) ⊗ₜ v: V[F]) := by
   simp only [coePolynomialModule, DFunLike.coe, EquivLike.coe, PolynomialEquiv,
     PolynomialModule.single, Finsupp.singleAddHom]
   simp[PolyEquiv.PolynomialModuleEquivTensorProduct]
@@ -273,7 +278,7 @@ theorem exists_denominator  (v: V(F)): ∃ (f: F[X]), in_polynomial_module (f �
       simp only [AddHom.toFun_eq_coe,
         LinearMap.coe_toAddHom, map_smul, LinearEquiv.coe_coe]
       show f.denom • f ⊗ₜ[F] v = ↑(f.num • ((PolynomialModule.single F 0) v): V[F])
-      rw[PolynomialEquivSingle, ExtensionScalarsCommutesWithScalars]
+      rw[PolynomialEquivSingleConstant, ExtensionScalarsCommutesWithScalars]
       have: ↑f.denom • f ⊗ₜ[F] v  = (↑f.denom • f) ⊗ₜ[F] v  := by
         exact rfl
       rw[TensorProduct.smul_tmul' ]
@@ -455,9 +460,73 @@ lemma CancellationLemmaExtensionScalars {v w: V(F)} {f: F[X]} (hvwf: f • v = f
   rw[ExtensionScalarsCommutesWithScalars, ExtensionScalarsCommutesWithScalars] at hvwf
   exact CancellationLemmaExtensionScalars' hvwf hf'
 
+
+theorem PolynomialModule_coe_add(u v: PolynomialModule F V): (u+v: V[F])=(u+v: PolynomialModule F V) := by
+    unfold coePolynomialModule
+    rw[LinearEquiv.map_add]
+
+theorem DegreeBilinForm (B : LinearMap.BilinMap F V F)(n m : ℕ) {v w: V} (hv: v ≠ 0) (hw: w ≠ 0):
+ (((LinearMap.BilinForm.baseChange F[X] B) ↑((PolynomialModule.single F n) v))
+      ↑((PolynomialModule.single F m) w)).natDegree ≤
+  ((PolynomialModule.single F n) v).natDegree + ((PolynomialModule.single F m) w).natDegree
+  := by
+  repeat rw[PolynomialEquivSingle]
+  rw[LinearMap.BilinForm.baseChange_tmul]
+  have h1: ((Polynomial.monomial n) 1 * (Polynomial.monomial m) 1: F[X]).natDegree = n+m := by
+    rw[Polynomial.monomial_mul_monomial, one_mul]
+    exact Polynomial.natDegree_monomial_eq (n + m) one_ne_zero
+  have h2:  ((PolynomialModule.single F n) v).natDegree = n := by
+    exact PolynomialModule.natDegree_single_eq n hv
+  have h3:  ((PolynomialModule.single F m) w).natDegree = m := by
+    exact PolynomialModule.natDegree_single_eq m hw
+  have h4:  ((B v) w • ((Polynomial.monomial n) 1 * (Polynomial.monomial m) 1: F[X])).natDegree
+    ≤ ((Polynomial.monomial n) 1 * (Polynomial.monomial m) 1: F[X]).natDegree := by
+    exact Polynomial.natDegree_smul_le _ _
+  rw[h2,h3]
+  omega
+
+theorem DegreeAssociateToQuadraticForm (φ: QuadraticForm F V) [Invertible (2:F)] (v w: PolynomialModule F V):
+   ↑(QuadraticMap.associated (QuadraticForm.baseChange F[X] φ) v w).natDegree ≤ v.natDegree + w.natDegree:= by
+  rw[QuadraticForm.associated_baseChange]
+  generalize (QuadraticMap.associated φ)=B
+  induction v using PolynomialModule.induction_on_max_particular with
+  | zero => simp
+  | add f g _ _ hfg hf hg =>
+    -- hfg' holds as they both equal g.natDegree since f.natDegree < g.natDegree
+    have hfg': (f+g).natDegree = g.natDegree := by
+      exact PolynomialModule.natDegree_add_eq_right_of_natDegree_lt hfg
+    rw[hfg']
+    rw[<- PolynomialModule_coe_add]
+    rw[LinearMap.BilinForm.add_left]
+    have h1:  (((LinearMap.BilinForm.baseChange F[X] B) f) ↑w + ((LinearMap.BilinForm.baseChange F[X] B) g) ↑w).natDegree
+      ≤ max (((LinearMap.BilinForm.baseChange F[X] B) f) ↑w).natDegree (((LinearMap.BilinForm.baseChange F[X] B) g) ↑w).natDegree
+      := Polynomial.natDegree_add_le _ _
+    generalize (LinearMap.BilinForm.baseChange F[X] B)=C at *
+    omega
+  | single n v v_neq_zero =>
+    induction w using PolynomialModule.induction_on_max_particular with
+    | zero => simp
+    | add f g _ _ hfg hf hg =>
+      generalize ((PolynomialModule.single F n) v)=v at *
+      have hfg': (f+g).natDegree = g.natDegree := by
+        exact PolynomialModule.natDegree_add_eq_right_of_natDegree_lt hfg
+      rw[hfg']
+      rw[<- PolynomialModule_coe_add]
+      rw[LinearMap.BilinForm.add_right]
+      have h1:  ( LinearMap.BilinForm.baseChange F[X] B v f + LinearMap.BilinForm.baseChange F[X] B v g).natDegree
+        ≤ max (LinearMap.BilinForm.baseChange F[X] B v f).natDegree (LinearMap.BilinForm.baseChange F[X] B v g).natDegree
+        := Polynomial.natDegree_add_le (LinearMap.BilinForm.baseChange F[X] B v f) (LinearMap.BilinForm.baseChange F[X] B v g)
+      generalize (LinearMap.BilinForm.baseChange F[X] B)=C at *
+      omega
+    | single m w w_neq_zero => exact DegreeBilinForm B n m v_neq_zero w_neq_zero
+
+
 /-- The degree of `φ(v): F[X]` is at most twice of the degree of `v: V[X]`-/
 lemma DegreeQuadraticForm (φ: QuadraticForm F V) (v: PolynomialModule F V)
 [Invertible (2:F)]: (φ.baseChange F[X] v).natDegree ≤ 2*v.natDegree := by
-  sorry
+  rw[<- QuadraticMap.associated_eq_self_apply F[X]]
+  have: 2 * v.natDegree=v.natDegree+v.natDegree := Nat.two_mul v.natDegree
+  rw[this]
+  exact DegreeAssociateToQuadraticForm φ v v
 
 end RationalFunctionFields
