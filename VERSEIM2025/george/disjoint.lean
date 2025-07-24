@@ -42,8 +42,3 @@ def eq : { i : ι₁ ⊕ ι₂ // ¬ p i } ≃ ι₂ where
   right_inv := by
      intro i
      
-
-  
-#check Sum.recOn
-
-#check Nat.noConfusion
