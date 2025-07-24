@@ -28,8 +28,36 @@ structure hyperbolic_two_space (β:BilinForm k V) (h:IsRefl β)
   span : W = Submodule.span k { e , f }
   
   
-lemma hyp_is_nondeg (W:Submodule k V) (β:BilinForm k V) { h : IsRefl β } (hyp : hyperbolic_two_space β  h W) : 
-  Nondegenerate β := by 
-  unfold Nondegenerate
+lemma symm_or_alt_of_reflexive (β:BilinForm k V) ( h : IsRefl β ): 
+ IsSymm β ∨ IsAlt β := by
+  
+  have id₁ (x y z : V) : β x ( (β x y)• z - (β x z) • y ) = 0 := by calc 
+    β x ( (β x y)• z - (β x z) • y) = (β x y) * (β x z) - (β x z) * ( β x y) := by simp
+                                  _ = 0 := by ring
+
+  have id₂ (x y z : V) : β ((β x y) • z - (β x z) • y) x = 0 := by 
+    apply LinearMap.IsRefl.eq_zero h (id₁ x y z)
+
+  have id₃ (x y z : V) : (β x y) * (β z x) = (β x z) * (β y x) := by
+    suffices h : (β x y) * (β z x) - (β x z) * (β y x) = 0 by grind
+    have : (β ((β x) y • z - (β x) z • y)) x = 0 := id₂ x y z
+    rw [ β.sub_left ] at this
+    rw [ β.smul_left, β.smul_left ] at this
+    exact this
+
+  have id₄ (x y : V) : (β x y)*(β x x) =  (β y x)*(β x x) := by
+    rw [ id₃ x y x ] 
+    ring
+
   
 
+    
+
+
+
+lemma hyp_is_nondeg (W:Submodule k V) (β:BilinForm k V) { h : IsRefl β } (hyp : hyperbolic_two_space β  h W) : 
+  Nondegenerate (β.restrict W) := by 
+    unfold Nondegenerate
+  
+
+example (a b  : k) (h: a - b = 0)  : a = b := by grind
