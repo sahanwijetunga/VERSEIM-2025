@@ -1,9 +1,9 @@
 import Mathlib.Tactic
 
-variable {k : Type} [ Field k ]
-variable {V : Type} [ AddCommGroup V ] [ Module k V ]
+variable {k : Type*} [ Field k ]
+variable {V : Type*} [ AddCommGroup V ] [ Module k V ]
 
-variable {ι:Type} [Fintype ι]
+variable {ι:Type*} [Fintype ι]
 
 variable {b:Basis ι k V}
 
@@ -48,12 +48,45 @@ lemma symm_or_alt_of_reflexive (β:BilinForm k V) ( h : IsRefl β ):
   have id₄ (x y : V) : (β x y)*(β x x) =  (β y x)*(β x x) := by
     rw [ id₃ x y x ] 
     ring
-
   
+  have hs (x y : V) (hx : β x x ≠ 0) : β x y = β y x := by
+    apply mul_right_cancel₀ hx 
+    exact id₄ x y
+
+   
+  by_cases ks:β.IsSymm 
+  case pos => exact Or.inl ks
+  case neg => 
+    apply Or.intro_right
+    rw [ not_forall ] at ks
+    unfold IsAlt 
+    by_contra l
+    apply ks
 
     
+example (h: ¬ ∀ x y:V, β x y = β y x) : ∃ x y:V, β x y ≠ β y x := by
+  have : ∃ x, ¬ ∀ y, β x y = β y x := by 
+    apply not_forall.mp h
+  rcases this with ⟨x,hx⟩
+  use x
+  apply not_forall.mp hx
 
 
+lemma not_symm {X:Type*} (f : X → X → Prop)
+  (h : ¬ ∀ x y, f x y = f y x) : ∃ x y, f x y ≠ f y x := by
+  rcases not_forall.mp h with ⟨ x , hx ⟩
+  use x
+  apply not_forall.mp hx
+
+example (hs: ¬ β.IsSymm) : ∃ x y:V, β x y ≠ β y x := by 
+  have : ∃ x, ¬ ∀ y, β x y = β y x := by 
+    apply not_forall.mp hs
+  rcases this with ⟨x,hx⟩
+  use x
+  apply not_forall.mp hx
+
+example (hs: ¬ ∀ x y, β x y = β y x ) : ∃ x y:V, β x y ≠ β y x := by 
+  apply not_symm β 
 
 lemma hyp_is_nondeg (W:Submodule k V) (β:BilinForm k V) { h : IsRefl β } (hyp : hyperbolic_two_space β  h W) : 
   Nondegenerate (β.restrict W) := by 
