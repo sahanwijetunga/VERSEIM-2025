@@ -49,7 +49,7 @@ noncomputable instance PolynomialRingInvertible2 (R: Type*) [CommRing R] [Invert
 
 /-- See `DivisionAlgorithm_PolynomialModule`-/
 protected lemma DivisionAlgorithmAux (v: PolynomialModule F V) {f: F[X]}
-  (n: ℕ) (hnv: v.natDegree =n) (hf: f.natDegree >0):  ∃w r, v = f • w + r ∧ r.natDegree < f.natDegree := by
+  (n: ℕ) (hnv: v.natDegree =n) (hf: f.natDegree > 0):  ∃w r, v = f • w + r ∧ r.natDegree < f.natDegree := by
   induction' n using Nat.strong_induction_on with n h generalizing v
   by_cases hnf: n < f.natDegree
   . use 0, v

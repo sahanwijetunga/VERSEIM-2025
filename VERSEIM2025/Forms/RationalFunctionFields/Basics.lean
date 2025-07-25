@@ -33,11 +33,6 @@ scoped[RationalFunctionFields] notation:1000 V "(" F:1000 ")"  => F(X) ⊗[F] V
 
 variable {F V: Type*} [Field F] [AddCommGroup V] [Module F V]
 
-example:= PolynomialModule F V -- V[X]
-example:= V[F] -- Another way to express V[X] (which is not definitionally equal)
-
-example:= V(F) -- F(X) ⊗ V, e.g. V(X)
-
 theorem ConversionIff (a b: F[X]): (a: F(X))=b ↔ a=b := by
   constructor
   . intro h
@@ -76,7 +71,6 @@ noncomputable scoped instance : Coe (V[F]) (V(F)) := ⟨coeRatFunc⟩
 
 /-- The map `toRatFuncTensor` is injective. -/
 theorem toRatFuncTensor_Injective : Function.Injective (toRatFuncTensor (F := F) (V := V)):= by
-  -- TensorProduct.AlgebraTensorModule.map (Algebra.linearMap F[X] (F(X))) LinearMap.id: V[F] → V(F)
   have: (toRatFuncTensor: V[F] → V(F))
    = TensorProduct.map (AlgHom.toLinearMap (Algebra.algHom F F[X] F(X))) LinearMap.id := rfl
   rw[this]
@@ -110,8 +104,6 @@ noncomputable instance RatFuncInvertible2 [Invertible (2: F)]: Invertible (2: F(
 theorem toRatFuncTensor_CommuteAssociateForm_Pure (φ: QuadraticForm F V) [Invertible (2:F)] (v w: V) (a b: F[X]):
   QuadraticMap.associated (φ.baseChange F[X]) (a ⊗ₜ v) (b ⊗ₜ w) =
     QuadraticMap.associated (φ.baseChange F(X)) (a ⊗ₜ v) (b ⊗ₜ w) := by
-  -- have: Invertible (2: F[X]) := inferInstance
-  -- have: Invertible (2: F(X)) := inferInstance
   repeat rw[QuadraticForm.associated_baseChange]
   generalize (QuadraticMap.associated φ)=B
   repeat rw[LinearMap.BilinForm.baseChange_tmul]
@@ -430,14 +422,6 @@ def in_BaseChangePolynomialModule_of_isGoodPair_constant (p: F[X]) (φ: Quadrati
   have: a⁻¹ ^ 2 * a ^ 2 = 1 := by field_simp
   rw[this]
 
-/--Given `φ: V → F` is Anisotropic, `φ: V[X] → F[X]` is also Anisotropic.-/
-theorem AnisotropicExtend {φ: QuadraticForm F V} (h: QuadraticMap.Anisotropic φ) [Invertible (2:F)]:
-  QuadraticMap.Anisotropic (φ.baseChange F[X]) := sorry
-
-/--Given `φ: V → F` is Anisotropic, `φ: V(X) → F(X)` is also Anisotropic.-/
-theorem AnisotropicExtend' {φ: QuadraticForm F V} (h: QuadraticMap.Anisotropic φ) [Invertible (2:F)]:
-  QuadraticMap.Anisotropic (φ.baseChange F(X)) := sorry
-
 
 lemma CancellationLemmaExtensionScalars' {v w: V(F)} {f: F(X)} (hvwf: f • v = f • w) (hf: f ≠ 0) : v=w := by
   rw[<- one_smul (F(X)) v]
@@ -528,5 +512,66 @@ lemma DegreeQuadraticForm (φ: QuadraticForm F V) (v: PolynomialModule F V)
   have: 2 * v.natDegree=v.natDegree+v.natDegree := Nat.two_mul v.natDegree
   rw[this]
   exact DegreeAssociateToQuadraticForm φ v v
+
+/--Given `φ: V → F` is Anisotropic, `φ: V[X] → F[X]` is also Anisotropic.-/
+theorem AnisotropicExtend {φ: QuadraticForm F V} (h: QuadraticMap.Anisotropic φ) [Invertible (2:F)]:
+  QuadraticMap.Anisotropic (φ.baseChange F[X]) := by
+  unfold QuadraticMap.Anisotropic
+  suffices ∀ (v: PolynomialModule F V), (QuadraticForm.baseChange F[X] φ) v = 0 → v = 0 from ?_
+  . intro x
+    intro hx
+    let v := PolynomialEquiv.invFun x
+    have hvx: x = v := by
+      rw[<- EquivLike.inv_apply_eq_iff_eq_apply]
+      rfl
+    have hv_form: (QuadraticForm.baseChange F[X] φ) v=0 := by
+      rw[<- hvx, hx]
+    have hv_eqzero: v=0 := this v hv_form
+    rw[hvx, hv_eqzero]
+    simp
+  intro v
+  intro hv
+  suffices ((QuadraticForm.baseChange F[X] φ) ↑v).coeff (2*v.natDegree) = φ v.leadingCoeff from ?_
+  . suffices v.leadingCoeff = 0 from ?_
+    . exact PolynomialModule.leadingCoeff_eq_zero.mp this
+    apply h
+    rw[<- this, hv]
+    simp
+  let n := v.natDegree
+  show ((QuadraticForm.baseChange F[X] φ) ↑v).coeff (2 * n) = φ v.leadingCoeff
+  nth_rewrite 1[<- Finsupp.sum_single v]
+  unfold coePolynomialModule
+  rw[<- LinearEquiv.toFun_eq_coe]
+  sorry
+
+  -- rw[<- QuadraticMap.associated_eq_self_apply (S := F)] at hv
+  -- rw[<- Finsupp.sum_single v] at hv
+
+
+/--Given `φ: V → F` is Anisotropic, `φ: V(X) → F(X)` is also Anisotropic.-/
+theorem AnisotropicExtend' {φ: QuadraticForm F V} (h: QuadraticMap.Anisotropic φ) [Invertible (2:F)]:
+  QuadraticMap.Anisotropic (φ.baseChange F(X)) := by
+  intro v hv
+  obtain ⟨f, ⟨w, hwvf⟩ , hf⟩ := exists_denominator v
+  have hw: φ.baseChange F[X] w = 0 := by
+    suffices ( (QuadraticForm.baseChange F[X] φ) ↑w = (0: F(X) ) ) from ?_
+    . have h': (0: F[X])=(0: F(X)) := by simp[RatFunc.coePolynomial]
+      rw[<- h'] at this
+      unfold RatFunc.coePolynomial at this
+      exact (ConversionIff _ _).mp this
+    rw[toRatFuncTensor_CommuteQuadraticForm, <- hwvf, ExtensionScalarsCommutesWithScalars,
+      QuadraticMap.map_smul, hv, smul_zero]
+  have: w=0 := by
+    have h1: (w: V[F])=0 := by
+      exact (AnisotropicExtend h) w hw
+    have h2: (0: V[F])=(0: PolynomialModule F V) := rfl
+    rw[h2] at h1
+    rw[EquivLike.apply_eq_iff_eq] at h1
+    exact h1
+  rw[this] at hwvf
+  simp only [coeRatFunc, map_zero] at hwvf
+  exact CancellationLemmaExtensionScalars hwvf hf
+
+
 
 end RationalFunctionFields
