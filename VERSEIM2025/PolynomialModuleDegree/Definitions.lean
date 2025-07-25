@@ -277,13 +277,18 @@ theorem nextCoeff_of_natDegree_pos (hv : 0 < vp.natDegree) :
   contrapose! hv
   simpa
 
-#check AddMonoidAlgebra.sup_support_add_le
-#check Polynomial.support_toFinsupp
-#check Polynomial.toFinsupp_add
 theorem degree_add_le (vp wp : (PolynomialModule F V)) : degree (vp + wp) ≤ max (degree vp) (degree wp) := by
-  -- simpa only [degree, ← support_toFinsupp, toFinsupp_add]
-  --   using AddMonoidAlgebra.sup_support_add_le _ _ _
-  sorry
+  unfold degree
+  refine Finset.max_le_iff.mpr ?_
+  rintro x hx
+  have: (vp+wp) x ≠ 0 := mem_support_iff.mp hx
+  have: vp x ≠ 0 ∨ wp x ≠ 0 := by
+    rw[add_apply] at this
+    contrapose! this
+    rw[this.1,this.2,add_zero]
+  rcases this with hv | hw
+  . exact le_sup_of_le_left (Finset.le_max (mem_support_iff.mpr hv))
+  . exact le_sup_of_le_right (Finset.le_max (mem_support_iff.mpr hw))
 
 theorem degree_add_le_of_degree_le {vp wp : (PolynomialModule F V)} {n : ℕ} (hv : degree vp ≤ n) (hw : degree wp ≤ n) :
     degree (vp + wp) ≤ n :=
