@@ -70,12 +70,15 @@ theorem symm_or_alt_of_reflexive (β:BilinForm k V) ( h : IsRefl β ):
   case neg => 
     apply Or.intro_right
 
-    have (h:∀ x y, β x y ≠ β y x) : β x x = 0 ∧ β y y = 0 := by 
+    have (x y : V) (h: β x y ≠ β y x) : β x x = 0 ∧ β y y = 0 := by 
       constructor
       case left => sorry
       case right => sorry
 
-    have : ∃ x y, β x y ≠ β y x := not_symm ks
+    by_contra l
+    
+    
+    
     
     
     
