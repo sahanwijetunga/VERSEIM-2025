@@ -38,6 +38,8 @@ lemma not_symm' (X:Type*) (f:X → X → Prop)
   (h : ¬ ∀ (z: (_:X) × X), f z.fst z.snd ) : ∃ z:(_:X) × X, ¬ f z.fst z.snd := by
   apply not_forall.mp h
 
+lemma eq_zero_of_no_cancel {a b c : k} (_:b ≠ c) (_:a*b = a*c ) : a = 0 := by
+  simp_all only [ne_eq, mul_eq_mul_left_iff, false_or]
 
 theorem symm_or_alt_of_reflexive (β:BilinForm k V) ( h : IsRefl β ): 
  IsSymm β ∨ IsAlt β := by
@@ -68,19 +70,48 @@ theorem symm_or_alt_of_reflexive (β:BilinForm k V) ( h : IsRefl β ):
   by_cases ks:β.IsSymm 
   case pos => exact Or.inl ks
   case neg => 
+
     apply Or.intro_right
 
-    have (x y : V) (h: β x y ≠ β y x) : β x x = 0 ∧ β y y = 0 := by 
+    have hxxyy (x y : V) (h: β x y ≠ β y x) : β x x = 0 ∧ β y y = 0 := by 
       constructor
       case left => sorry
       case right => sorry
 
     by_contra l
+
+    have hue : ∃ u, β u u ≠ 0 := not_forall.mp l
+    rcases hue with ⟨u,hu⟩
+
+    have lvw : ∃ v w, β v w ≠ β w v := not_symm ks
+    rcases lvw with ⟨ v, w, hvw ⟩
+
+    have huv : β u v = β v u := by exact hs u v hu
+    have huw : β u w = β w u:= by exact hs u w hu 
+
+    have hvw₂ : (β v w) * (β u v) = (β v u) * (β w v) := id₃ _ _ _
+    have hvw₃ : (β w v) * (β u w) = (β w u) * (β v w) := id₃ _ _ _    
+
+    rw [ huv, mul_comm ] at hvw₂ 
+    rw [ huw, mul_comm ] at hvw₃
+        
+    have hv₁ : β v u = 0 := by apply eq_zero_of_no_cancel hvw hvw₂
+
+    have hv₂ : β w u = 0 := by apply eq_zero_of_no_cancel hvw.symm hvw₃ 
+
+    have : β (u+v) w ≠ f (u+v w)
+    
+lemma grove_lemma (β:BilinForm k V) (h:∀ u v w : V, (β u v)*(β w u) = (β v u)*(β u w)) :
+  IsSymm β ∨ IsAlt β := by
+ 
+    have : (β u v)*()
+
+    by_cases ks:β.IsSymm 
+    case pos => exact Or.inl ks
+    case neg =>  
     
     
-    
-    
-    
+--------------------------------------------------------------------------------
     
 example (h: ¬ ∀ x y:V, β x y = β y x) : ∃ x y:V, β x y ≠ β y x := by
   have : ∃ x, ¬ ∀ y, β x y = β y x := by 
@@ -97,8 +128,6 @@ example (hs: ¬ β.IsSymm) : ∃ x y:V, β x y ≠ β y x := by
   use x
   apply not_forall.mp hx
 
-example (φ : V → V → k) (hs: ¬ ∀ x y, φ x y = φ y x ) : ∃ x y:V, φ x y ≠ φ y x := by 
-  apply not_symm (f := fun x y => φ x y = φ y x) 
 
 lemma hyp_is_nondeg (W:Submodule k V) (β:BilinForm k V) { h : IsRefl β } (hyp : hyperbolic_two_space β  h W) : 
   Nondegenerate (β.restrict W) := by 
