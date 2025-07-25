@@ -134,10 +134,14 @@ theorem natDegree_le_natDegree  {wp : PolynomialModule F V} (hpq : vp.degree ≤
 variable (F) in
 abbrev C: V →ₗ[F] PolynomialModule F V := lsingle F 0
 
+theorem support_lsingle (n) {v : V} (H : v ≠ 0) : (lsingle F n v).support = singleton n := by
+  rw [support]
+  exact Finsupp.support_single_ne_zero _ H
+
 @[simp]
 theorem degree_C (hv : v ≠ 0) : degree (C F v) = (0 : WithBot ℕ) := by
-  sorry
-
+  rw [degree, C , support_lsingle 0 hv, max_eq_sup_coe, sup_singleton,
+    WithBot.coe_zero]
 
 theorem degree_C_le : degree (C F v) ≤ 0 := by
   by_cases h : v = 0
@@ -174,10 +178,12 @@ theorem degree_single (n : ℕ) (hv : v ≠ 0) : degree (single F n v) = n := by
   rw [degree, support_single n hv, max_singleton, Nat.cast_withBot]
 
 theorem X_pow_smul_C_eq_single : ∀ {n : ℕ}, (Polynomial.X ^ n: F[X]) • C F v = single F n v
-  | 0 => sorry
+  | 0 => by
+    simp only [pow_zero, C, lsingle, one_smul, toFinsupp_single]
+    exact rfl
   | n + 1 => by
-    rw [pow_succ, mul_comm, ← smul_smul, X_pow_smul_C_eq_single]
-    sorry
+    rw [pow_succ, mul_comm, ← smul_smul, X_pow_smul_C_eq_single,
+      Polynomial.X , PolynomialModule.monomial_smul_single, add_comm 1 n, one_smul]
 
 variable (F) in
 @[simp]
@@ -369,48 +375,55 @@ theorem degree_sum_le (s : Finset ι) (f : ι → (PolynomialModule F V)) :
         rw [Finset.sum_cons]; exact degree_add_le _ _
       _ ≤ _ := by rw [sup_cons]; exact max_le_max le_rfl ih
 
--- Rename to degree_smul_le
-/-
-simpa only [degree, ← support_toFinsupp, toFinsupp_mul]
-    using AddMonoidAlgebra.sup_support_mul_le (WithBot.coe_add _ _).le _ _
--/
-theorem degree_smul_le (p: F[X]) (vp : (PolynomialModule F V)) : degree (p • vp) ≤ p.degree + degree vp := by
-  simp_all [degree, Polynomial.degree, WithBot.coe_add]
-  sorry
 
-theorem degree_smul_le_of_le {a b : WithBot ℕ} (hp : p.degree ≤ a) (hv : degree vp ≤ b) :
-    degree (p • vp) ≤ a + b :=
-  (vp.degree_smul_le _).trans <| add_le_add ‹_› ‹_›
 
-@[simp]
-theorem leadingCoeff_single (v : V) (n : ℕ) : leadingCoeff (single F n v) = v := by
-  classical
-  by_cases hv : v = 0
-  · simp only [hv, (single F n).map_zero, leadingCoeff_zero]
-  · rw [leadingCoeff, natDegree_single, if_neg hv]
-    simp
+theorem natDegree_lt_natDegree {wp : PolynomialModule F V} (hp : vp ≠ 0) (hpq : vp.degree < wp.degree) :
+    vp.natDegree < wp.natDegree := by
+  by_cases hq : wp = 0
+  · exact (not_lt_bot <| hq ▸ hpq).elim
+  rwa [degree_eq_natDegree hp, degree_eq_natDegree hq, Nat.cast_lt] at hpq
 
-theorem leadingCoeff_X_pow_smul_C (v : V) (n : ℕ) : leadingCoeff ((Polynomial.X^n: F[X]) • C F v) = v := by
-  rw [X_pow_smul_C_eq_single, leadingCoeff_single]
 
-theorem leadingCoeff_X_smul_C (v : V) : leadingCoeff ((Polynomial.X: F[X]) • C F v) = v := by
-  simpa only [pow_one] using leadingCoeff_X_pow_smul_C v 1
+@[elab_as_elim]
+theorem induction_on_max_particular {motive : PolynomialModule F V → Prop} (f : PolynomialModule F V)
+    (zero : motive 0) (add : ∀ f g, f ≠ 0 → g ≠ 0 → f.natDegree < g.natDegree → motive f → motive g → motive (f + g))
+    (single : ∀ a b, b ≠ 0 → motive (single F a b)) : motive f := by
+  induction f using Finsupp.induction_on_max
+  case h0 => exact zero
+  case ha n v f hf_supp v_neq_zero hf_motive =>
+    by_cases hf_zero: f=0
+    . rw[hf_zero]
+      rw[add_zero]
+      exact single n v v_neq_zero
+    rw[add_comm]
+    apply add
+    . exact hf_zero
+    . intro h_finsuppv_eq_zero
+      have h1: (Finsupp.single n v) n = v := by exact single_eq_same
+      have h2: (0: ℕ →₀ V) n = 0 := rfl
+      rw[h_finsuppv_eq_zero,h2] at h1
+      exact v_neq_zero h1.symm
+    . show  natDegree f < natDegree (PolynomialModule.single F n v)
+      apply natDegree_lt_natDegree hf_zero
+      have: ((PolynomialModule.single F n) v).degree=n := by
+        exact degree_single n v_neq_zero
+      rw[this]
+      unfold degree
+      rw[Finset.max_eq_sup_coe]
+      rw[Finset.sup_lt_iff]
+      . intro b hb
+        have h:= hf_supp b hb
+        rw[WithBot.lt_def]
+        use n; constructor; rfl
+        intro a ha
+        have: b=a := by exact ENat.coe_inj.mp ha
+        rw[this] at h
+        exact h
+      . exact compareOfLessAndEq_eq_lt.mp rfl
 
-@[simp]
-theorem leadingCoeff_C (v : V) : leadingCoeff (C F v) = v :=
-  leadingCoeff_single v 0
+    . exact hf_motive
+    . exact single n v v_neq_zero
 
-theorem natDegree_smul_le {vp : (PolynomialModule F V)} : natDegree (p • vp) ≤ p.natDegree + natDegree vp := by
-  apply natDegree_le_of_degree_le
-  apply le_trans (degree_smul_le p vp)
-  rw [Nat.cast_add]
-  apply add_le_add
-  . exact Polynomial.degree_le_natDegree
-  . apply degree_le_natDegree
-
-theorem natDegree_smul_le_of_le (hp : p.natDegree ≤ m) (hv : natDegree vp ≤ n) :
-    natDegree (p • vp) ≤ m + n :=
-natDegree_smul_le.trans <| add_le_add ‹_› ‹_›
 
 theorem natDegree_eq_zero_iff_degree_le_zero : vp.natDegree = 0 ↔ vp.degree ≤ 0 := by
   rw [← nonpos_iff_eq_zero, natDegree_le_iff_degree_le, Nat.cast_zero]
@@ -430,29 +443,35 @@ theorem degree_lt_iff_coeff_zero (vp : (PolynomialModule F V)) (n : ℕ) :
 theorem natDegree_pos_iff_degree_pos : 0 < natDegree vp ↔ 0 < degree vp :=
   lt_iff_lt_of_le_iff_le natDegree_le_iff_degree_le
 
+example (a b: V): a-b=a+-b := by
+  exact sub_eq_add_neg a b
 
 theorem degree_sub_le (vp wp : (PolynomialModule F V)) : degree (vp - wp) ≤ max (degree vp) (degree wp) := by
-  -- simp [degree_neg wp,degree_add_le vp (-wp)]
-  sorry
+  rw[sub_eq_add_neg, <- degree_neg wp]
+  exact degree_add_le vp (-wp)
 
 theorem degree_sub_le_of_le {a b : WithBot ℕ} (hv : degree vp ≤ a) (hw : degree wp ≤ b) :
     degree (vp - wp) ≤ max a b :=
   (vp.degree_sub_le wp).trans <| max_le_max ‹_› ‹_›
 
 theorem natDegree_sub_le (vp wp : (PolynomialModule F V)) : natDegree (vp - wp) ≤ max (natDegree vp) (natDegree wp) := by
-  -- simpa only [← natDegree_neg wp] using natDegree_add_le vp (-wp)
-  sorry
+  rw[sub_eq_add_neg, <- natDegree_neg wp]
+  exact natDegree_add_le vp (-wp)
 
 theorem natDegree_sub_le_of_le (hv : natDegree vp ≤ m) (hw : natDegree wp ≤ n) :
     natDegree (vp - wp) ≤ max m n :=
   (vp.natDegree_sub_le wp).trans <| max_le_max ‹_› ‹_›
 
-theorem single_add_erase (vp : PolynomialModule F V) (n : ℕ) : single F n (vp n) + vp.erase n = vp :=
-  -- toFinsupp_injective <| by
-  --   rcases vp with ⟨⟩
-  --   rw [toFinsupp_add, toFinsupp_monomial, toFinsupp_erase, coeff]
-  --   exact Finsupp.single_add_erase _ _
-  sorry
+theorem single_add_erase (vp : PolynomialModule F V) (n : ℕ) : single F n (vp n) + vp.erase n = vp := by
+  apply Finsupp.ext
+  intro i
+  by_cases hin: n=i
+  . rw[hin, add_apply, single_apply, erase_def]
+    simp
+  . rw[add_apply, single_apply]
+    simp only [hin, ↓reduceIte, zero_add]
+    rw[erase_def]
+    exact erase_ne fun a ↦ hin (id (Eq.symm a))
 
 theorem degree_sub_lt (hd : degree vp = degree wp) (hp0 : vp ≠ 0)
     (hlc : leadingCoeff vp = leadingCoeff wp) : degree (vp - wp) < degree vp :=

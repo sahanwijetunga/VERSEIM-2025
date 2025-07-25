@@ -128,46 +128,4 @@ lemma DivisionAlgorithm(v: PolynomialModule F V) {f: F[X]} (hf: f.natDegree >0):
   ∃w r, v = f • w + r ∧ r.natDegree < f.natDegree :=
     PolynomialModule.DivisionAlgorithmAux v v.natDegree rfl hf
 
-
-@[elab_as_elim]
-theorem induction_on_max_particular {motive : PolynomialModule F V → Prop} (f : PolynomialModule F V)
-    (zero : motive 0) (add : ∀ f g, f ≠ 0 → g ≠ 0 → f.natDegree < g.natDegree → motive f → motive g → motive (f + g))
-    (single : ∀ a b, b ≠ 0 → motive (single F a b)) : motive f := by
-  -- Finsupp.induction_linear f zero add single'
-  induction f using Finsupp.induction_on_max
-  case h0 => exact zero
-  case ha n v f hf_supp v_neq_zero hf_motive =>
-    by_cases hf_zero: f=0
-    . rw[hf_zero]
-      rw[add_zero]
-      exact single n v v_neq_zero
-    rw[add_comm]
-    apply add
-    . exact hf_zero
-    . intro h_finsuppv_eq_zero
-      have h1: (Finsupp.single n v) n = v := by exact single_eq_same
-      have h2: (0: ℕ →₀ V) n = 0 := rfl
-      rw[h_finsuppv_eq_zero,h2] at h1
-      exact v_neq_zero h1.symm
-    . show  natDegree f < natDegree (PolynomialModule.single F n v)
-      apply natDegree_lt_natDegree hf_zero
-      have: ((PolynomialModule.single F n) v).degree=n := by
-        exact degree_single n v_neq_zero
-      rw[this]
-      unfold degree
-      rw[Finset.max_eq_sup_coe]
-      rw[Finset.sup_lt_iff]
-      . intro b hb
-        have h:= hf_supp b hb
-        rw[WithBot.lt_def]
-        use n; constructor; rfl
-        intro a ha
-        have: b=a := by exact ENat.coe_inj.mp ha
-        rw[this] at h
-        exact h
-      . exact compareOfLessAndEq_eq_lt.mp rfl
-
-    . exact hf_motive
-    . exact single n v v_neq_zero
-
 end PolynomialModule
