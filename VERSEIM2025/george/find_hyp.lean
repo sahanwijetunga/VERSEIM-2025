@@ -26,9 +26,26 @@ structure hyperbolic_two_space (β:BilinForm k V) (h:IsRefl β)
   nondeg : (β: BilinForm k V) e f = 1
   lin_indep : LinearIndependent k (fun_two e f)
   span : W = Submodule.span k { e , f }
-  
-  
-lemma symm_or_alt_of_reflexive (β:BilinForm k V) ( h : IsRefl β ): 
+
+lemma not_symm {X:Type*} (f : X → X → Prop)
+  (h : ¬ ∀ x y, f x y ) : ∃ x y, ¬ f x y := by
+  rcases not_forall.mp h with ⟨ x , hx ⟩
+  use x
+  apply not_forall.mp hx
+
+
+example (X:Type*) (x y: X) : X × X := ⟨x,y⟩
+
+
+example (X:Type*) (f:X → X → Prop)
+
+
+
+example (X:Type*) (f:X → X → Prop) (x y : X)
+  (h: ∀ z:X × X, Sigma.uncurry f z) : Prop := by
+  exact h ⟨ x , y ⟩
+
+theorem symm_or_alt_of_reflexive (β:BilinForm k V) ( h : IsRefl β ): 
  IsSymm β ∨ IsAlt β := by
   
   have id₁ (x y z : V) : β x ( (β x y)• z - (β x z) • y ) = 0 := by calc 
@@ -72,12 +89,6 @@ example (h: ¬ ∀ x y:V, β x y = β y x) : ∃ x y:V, β x y ≠ β y x := by
   apply not_forall.mp hx
 
 
-lemma not_symm {X:Type*} (f : X → X → Prop)
-  (h : ¬ ∀ x y, f x y = f y x) : ∃ x y, f x y ≠ f y x := by
-  rcases not_forall.mp h with ⟨ x , hx ⟩
-  use x
-  apply not_forall.mp hx
-
 example (hs: ¬ β.IsSymm) : ∃ x y:V, β x y ≠ β y x := by 
   have : ∃ x, ¬ ∀ y, β x y = β y x := by 
     apply not_forall.mp hs
@@ -85,12 +96,12 @@ example (hs: ¬ β.IsSymm) : ∃ x y:V, β x y ≠ β y x := by
   use x
   apply not_forall.mp hx
 
-example (hs: ¬ ∀ x y, β x y = β y x ) : ∃ x y:V, β x y ≠ β y x := by 
-  apply not_symm β 
+example (φ : V → V → k) (hs: ¬ ∀ x y, φ x y = φ y x ) : ∃ x y:V, φ x y ≠ φ y x := by 
+  apply not_symm (f := fun x y => φ x y = φ y x) 
 
 lemma hyp_is_nondeg (W:Submodule k V) (β:BilinForm k V) { h : IsRefl β } (hyp : hyperbolic_two_space β  h W) : 
   Nondegenerate (β.restrict W) := by 
-    unfold Nondegenerate
+    sorry
   
 
 example (a b  : k) (h: a - b = 0)  : a = b := by grind
