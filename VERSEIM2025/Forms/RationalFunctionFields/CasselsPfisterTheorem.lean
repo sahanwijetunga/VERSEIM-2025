@@ -258,7 +258,8 @@ protected lemma CasselsPfisterTheorem_TrivialContainmentExtension (φ: Quadratic
 
     *Auxillary version of `CasselsPfisterTheorem` which requires `φ` is `Nondegenerate`*
 -/
-theorem CasselsPfisterTheoremAux (φ: QuadraticForm F V) [Invertible (2: F)] (hn: LinearMap.BilinForm.Nondegenerate (QuadraticMap.polarBilin φ)):
+theorem CasselsPfisterTheoremAux (φ: QuadraticForm F V) [Invertible (2: F)]
+  (hn: LinearMap.BilinForm.Nondegenerate (QuadraticMap.polarBilin φ)):
   (↑)⁻¹' (Set.range (φ.baseChange (F(X))))
    = Set.range (φ.baseChange F[X]) := by
   apply le_antisymm
@@ -268,7 +269,7 @@ theorem CasselsPfisterTheoremAux (φ: QuadraticForm F V) [Invertible (2: F)] (hn
 /-- The values taken by the extension of a quadratic map `φ: V → F` to `V(X) → F(X)`
     that are in `F[X]` are taken by the extension `V[X] → F[X]` as well.
 -/
-theorem CasselsPfisterTheorem (φ: QuadraticForm F V) [Invertible (2: F)] (hn: (QuadraticMap.polarBilin φ).Nondegenerate):
+theorem CasselsPfisterTheorem (φ: QuadraticForm F V) [Invertible (2: F)]:
   (↑)⁻¹' (Set.range (φ.baseChange (F(X))))
    = Set.range (φ.baseChange F[X]) := sorry
 

@@ -249,37 +249,71 @@ theorem leadingCoeff_add_of_degree_eq (h : degree vp = degree wp)
     rw [degree_add_eq_of_leadingCoeff_add_ne_zero hlc, h, max_self]
   simp only [leadingCoeff, this, natDegree_eq_of_degree_eq h, add_apply]
 
+@[elab_as_elim]
+theorem induction_on_max_particular {motive : PolynomialModule F V → Prop} (f : PolynomialModule F V)
+    (zero : motive 0) (add : ∀ f g, f ≠ 0 → g ≠ 0 → f.natDegree < g.natDegree → motive f → motive g → motive (f + g))
+    (single : ∀ a b, b ≠ 0 → motive (single F a b)) : motive f := by
+  -- Finsupp.induction_linear f zero add single'
+  induction f using Finsupp.induction_on_max
+  case h0 => exact zero
+  case ha n v f hf_supp v_neq_zero hf_motive =>
+    by_cases hf_zero: f=0
+    . rw[hf_zero]
+      rw[add_zero]
+      exact single n v v_neq_zero
+    rw[add_comm]
+    apply add
+    . exact hf_zero
+    . intro h_finsuppv_eq_zero
+      have h1: (Finsupp.single n v) n = v := by exact single_eq_same
+      have h2: (0: ℕ →₀ V) n = 0 := rfl
+      rw[h_finsuppv_eq_zero,h2] at h1
+      exact v_neq_zero h1.symm
+    . show  natDegree f < natDegree (PolynomialModule.single F n v)
+      apply natDegree_lt_natDegree hf_zero
+      have: ((PolynomialModule.single F n) v).degree=n := by
+        exact degree_single n v_neq_zero
+      rw[this]
+      unfold degree
+      rw[Finset.max_eq_sup_coe]
+      rw[Finset.sup_lt_iff]
+      . intro b hb
+        have h:= hf_supp b hb
+        rw[WithBot.lt_def]
+        use n; constructor; rfl
+        intro a ha
+        have: b=a := by exact ENat.coe_inj.mp ha
+        rw[this] at h
+        exact h
+      . exact compareOfLessAndEq_eq_lt.mp rfl
+
+    . exact hf_motive
+    . exact single n v v_neq_zero
+
 @[simp]
 theorem coeff_smul_degree_add_degree (p: F[X]) (vp : PolynomialModule F V) :
-    (p • vp) (p.natDegree + natDegree wp) = p.leadingCoeff • leadingCoeff vp :=
-  -- calc
-  --   coeff (vp * wp) (natDegree vp + natDegree wp) =
-  --       ∑ x ∈ antidiagonal (natDegree vp + natDegree wp), coeff vp x.1 * coeff wp x.2 :=
-  --     coeff_mul _ _ _
-  --   _ = coeff vp (natDegree vp) * coeff wp (natDegree wp) := by
-  --     refine Finset.sum_eq_single (natDegree vp, natDegree wp) ?_ ?_
-  --     · rintro ⟨i, j⟩ h₁ h₂
-  --       rw [mem_antidiagonal] at h₁
-  --       by_cases H : natDegree vp < i
-  --       · rw [coeff_eq_zero_of_degree_lt
-  --             (lt_of_le_of_lt degree_le_natDegree (WithBot.coe_lt_coe.2 H)),
-  --           zero_mul]
-  --       · rw [not_lt_iff_eq_or_lt] at H
-  --         rcases H with H | H
-  --         · simp_all
-  --         · suffices natDegree wp < j by
-  --             rw [coeff_eq_zero_of_degree_lt
-  --                 (lt_of_le_of_lt degree_le_natDegree (WithBot.coe_lt_coe.2 this)),
-  --               mul_zero]
-  --           by_contra! H'
-  --           exact
-  --             ne_of_lt (Nat.lt_of_lt_of_le (Nat.add_lt_add_right H j) (Nat.add_le_add_left H' _))
-  --               h₁
-  --     · intro H
-  --       exfalso
-  --       apply H
-  --       rw [mem_antidiagonal]
-  sorry
+(p • vp) (p.natDegree + natDegree vp) = p.leadingCoeff • leadingCoeff vp := by
+  induction vp using PolynomialModule.induction_on_max_particular with
+  | zero => simp
+  | add  vp wp vp_neq_zero wp_neq_zero hvw_deg_lt hv_motive hw_motive =>
+    have h1: (vp+wp).leadingCoeff = wp.leadingCoeff := by
+      rw[leadingCoeff_add_of_degree_lt]
+      exact (natDegree_lt_natDegree_iff vp_neq_zero).mp hvw_deg_lt
+    have h2: (p • vp) (p.natDegree + wp.natDegree)= 0 := by
+      refine coeff_eq_zero_of_natDegree_lt ?_
+      have:  (p • vp).natDegree ≤ p.natDegree + vp.natDegree := natDegree_smul_le
+      omega
+    rw[natDegree_add_eq_right_of_natDegree_lt hvw_deg_lt, h1,
+      smul_add, add_apply, h2, hw_motive, zero_add]
+  | single n v v_neq_zero =>
+    let P (p: F[X]): Prop := (p • (single F n) v) (p.natDegree +
+       ((single F n) v).natDegree) = p.leadingCoeff • ((single F n) v).leadingCoeff
+    let N := p.natDegree
+    have P_0: P 0 := sorry
+    have P_C_mul_pow: ∀ (n : ℕ) (r : F), r ≠ 0 → n ≤ N → P (Polynomial.C r * Polynomial.X ^ n) := sorry
+    have P_C_add: ∀ (f g : F[X]), f.natDegree < g.natDegree →
+      g.natDegree ≤ N → P f → P g → P (f + g) := sorry
+    exact Polynomial.induction_with_natDegree_le P p.natDegree P_0 P_C_mul_pow P_C_add p (by rfl)
 
 theorem degree_smul' (h : p.leadingCoeff • leadingCoeff vp ≠ 0):
     degree (p • vp) = p.degree + degree vp :=
