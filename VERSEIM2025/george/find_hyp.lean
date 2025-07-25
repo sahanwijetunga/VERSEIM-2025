@@ -27,23 +27,17 @@ structure hyperbolic_two_space (β:BilinForm k V) (h:IsRefl β)
   lin_indep : LinearIndependent k (fun_two e f)
   span : W = Submodule.span k { e , f }
 
-lemma not_symm {X:Type*} (f : X → X → Prop)
+lemma not_symm {X:Type*} {f : X → X → Prop}
   (h : ¬ ∀ x y, f x y ) : ∃ x y, ¬ f x y := by
   rcases not_forall.mp h with ⟨ x , hx ⟩
   use x
   apply not_forall.mp hx
 
 
-example (X:Type*) (x y: X) : X × X := ⟨x,y⟩
+lemma not_symm' (X:Type*) (f:X → X → Prop)
+  (h : ¬ ∀ (z: (_:X) × X), f z.fst z.snd ) : ∃ z:(_:X) × X, ¬ f z.fst z.snd := by
+  apply not_forall.mp h
 
-
-example (X:Type*) (f:X → X → Prop)
-
-
-
-example (X:Type*) (f:X → X → Prop) (x y : X)
-  (h: ∀ z:X × X, Sigma.uncurry f z) : Prop := by
-  exact h ⟨ x , y ⟩
 
 theorem symm_or_alt_of_reflexive (β:BilinForm k V) ( h : IsRefl β ): 
  IsSymm β ∨ IsAlt β := by
@@ -75,11 +69,15 @@ theorem symm_or_alt_of_reflexive (β:BilinForm k V) ( h : IsRefl β ):
   case pos => exact Or.inl ks
   case neg => 
     apply Or.intro_right
-    rw [ not_forall ] at ks
-    unfold IsAlt 
-    by_contra l
-    apply ks
 
+    have (h:∀ x y, β x y ≠ β y x) : β x x = 0 ∧ β y y = 0 := by 
+      constructor
+      case left => sorry
+      case right => sorry
+
+    have : ∃ x y, β x y ≠ β y x := not_symm ks
+    
+    
     
 example (h: ¬ ∀ x y:V, β x y = β y x) : ∃ x y:V, β x y ≠ β y x := by
   have : ∃ x, ¬ ∀ y, β x y = β y x := by 
