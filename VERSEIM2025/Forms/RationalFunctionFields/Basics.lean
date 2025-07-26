@@ -450,8 +450,8 @@ theorem PolynomialModule_coe_add(u v: PolynomialModule F V): (u+v: V[F])=(u+v: P
     rw[LinearEquiv.map_add]
 
 theorem DegreeBilinForm (B : LinearMap.BilinMap F V F)(n m : ℕ) {v w: V} (hv: v ≠ 0) (hw: w ≠ 0):
- (((LinearMap.BilinForm.baseChange F[X] B) ↑((PolynomialModule.single F n) v))
-      ↑((PolynomialModule.single F m) w)).natDegree ≤
+ (((LinearMap.BilinForm.baseChange F[X] B) ((PolynomialModule.single F n) v))
+      ((PolynomialModule.single F m) w)).natDegree ≤
   ((PolynomialModule.single F n) v).natDegree + ((PolynomialModule.single F m) w).natDegree
   := by
   repeat rw[PolynomialEquivSingle]
@@ -470,7 +470,7 @@ theorem DegreeBilinForm (B : LinearMap.BilinMap F V F)(n m : ℕ) {v w: V} (hv: 
   omega
 
 theorem DegreeAssociateToQuadraticForm (φ: QuadraticForm F V) [Invertible (2:F)] (v w: PolynomialModule F V):
-   ↑(QuadraticMap.associated (QuadraticForm.baseChange F[X] φ) v w).natDegree ≤ v.natDegree + w.natDegree:= by
+   (QuadraticMap.associated (QuadraticForm.baseChange F[X] φ) v w).natDegree ≤ v.natDegree + w.natDegree:= by
   rw[QuadraticForm.associated_baseChange]
   generalize (QuadraticMap.associated φ)=B
   induction v using PolynomialModule.induction_on_max_particular with
@@ -513,6 +513,76 @@ lemma DegreeQuadraticForm (φ: QuadraticForm F V) (v: PolynomialModule F V)
   rw[this]
   exact DegreeAssociateToQuadraticForm φ v v
 
+protected lemma foo_polarpolarbilinextendeq {φ: QuadraticForm F V} [Invertible (2:F)]
+  (x y: V[F]):
+   (QuadraticMap.polar (⇑(QuadraticForm.baseChange F[X] φ)) x y) = LinearMap.BilinForm.baseChange
+    F[X] (QuadraticMap.polarBilin φ) x y := by
+    rw[<- QuadraticForm.polarBilin_baseChange]
+    simp
+
+theorem QuadraticFormExtensionPolynomial (φ: QuadraticForm F V)[Invertible (2:F)]
+  (v: PolynomialModule F V):  ((QuadraticForm.baseChange F[X] φ) ↑v).coeff (2 * v.natDegree) = φ v.leadingCoeff
+  := by
+  let n := v.natDegree
+  show ((QuadraticForm.baseChange F[X] φ) ↑v).coeff (2 * n) = φ v.leadingCoeff
+  nth_rewrite 1[<- Finsupp.sum_single v]
+  unfold coePolynomialModule
+  unfold Finsupp.sum
+  rw[map_sum]
+  rw[QuadraticMap.map_sum]
+  rw[Polynomial.coeff_add]
+  have h1: (∑ i ∈ v.support, (QuadraticForm.baseChange F[X] φ)
+    (PolynomialEquiv (Finsupp.single i (v i)))).coeff (2 * n) = φ v.leadingCoeff := by
+    rw[Polynomial.finset_sum_coeff]
+    have (k: ℕ): (Finsupp.single k (v k))= (PolynomialModule.single F k) (v k) := rfl
+    have h1 (k: ℕ): (QuadraticForm.baseChange F[X] φ) (PolynomialEquiv (Finsupp.single k (v k)))
+      =  Polynomial.monomial (2*k) (φ (v k)) := by
+      rw[this, <- coePolynomialModule, PolynomialEquivSingle, QuadraticForm.baseChange_tmul,
+        Polynomial.monomial_mul_monomial, mul_one, two_mul, Polynomial.smul_monomial, smul_eq_mul, mul_one]
+    have h2: φ v.leadingCoeff =
+      ((QuadraticForm.baseChange F[X] φ) (PolynomialEquiv (Finsupp.single n (v n)))).coeff (2 * n) := by
+      rw[h1, Polynomial.coeff_monomial_same]
+      rfl
+    rw[h2]
+    by_cases hv_zero: v=0
+    . have h1: v.support = ∅ := Finsupp.support_eq_empty.mpr hv_zero
+      have h2: v n = 0 := by rw[hv_zero, Finsupp.coe_zero, Pi.zero_apply]
+      rw[h1, h2]
+      simp
+    apply Finset.sum_eq_single_of_mem n
+    . unfold n
+      rw[Finsupp.mem_support_iff, <- PolynomialModule.leadingCoeff, PolynomialModule.leadingCoeff_ne_zero]
+      exact hv_zero
+    intro i hi hi_neq_n
+    rw[h1]
+    apply Polynomial.coeff_monomial_of_ne
+    omega
+  have h2: (∑ ij ∈ v.support.sym2 with ¬ij.IsDiag,
+          QuadraticMap.polarSym2 (⇑(QuadraticForm.baseChange F[X] φ))
+            (Sym2.map (fun x ↦ PolynomialEquiv (Finsupp.single x (v x))) ij)).coeff (2*n) = 0 := by
+    rw[Polynomial.finset_sum_coeff]
+    apply Finset.sum_eq_zero
+    intro b
+    induction b using Sym2.inductionOn with
+    | hf x y =>
+    have h1 (i: ℕ): (PolynomialEquiv (Finsupp.single i (v i)): V[F]) = (PolynomialModule.single F i) (v i) := by
+     rw [PolynomialModule.toFinsupp_single]
+    have h2: ((Polynomial.monomial x) 1 * (Polynomial.monomial y) 1) = (Polynomial.monomial (x+y) 1: F[X]) := by
+      rw [@Polynomial.monomial_mul_monomial, mul_one]
+    have h3 (a: F) (k: ℕ): a • (Polynomial.monomial k 1) = Polynomial.monomial k a := by
+      rw[Polynomial.smul_monomial, smul_eq_mul, mul_one]
+    intro hxy
+    have: (¬v x = 0 ∧ ¬v y = 0) ∧ ¬x = y := by simpa using hxy
+    obtain ⟨⟨ (hx: v x ≠ 0),(hy: v y ≠ 0)⟩, (hxy: x ≠  y)⟩ := this
+    rw [Sym2.map_pair_eq, QuadraticMap.polarSym2_sym2Mk,
+      RationalFunctionFields.foo_polarpolarbilinextendeq, h1 x, h1 y, PolynomialEquivSingle,
+      PolynomialEquivSingle, LinearMap.BilinForm.baseChange_tmul, h2, h3,
+      Polynomial.coeff_monomial_of_ne]
+    have hxn: x ≤ n := PolynomialModule.le_natDegree_of_ne_zero hx
+    have hyn: y ≤ n := PolynomialModule.le_natDegree_of_ne_zero hy
+    omega
+  rw[h1,h2, add_zero]
+
 /--Given `φ: V → F` is Anisotropic, `φ: V[X] → F[X]` is also Anisotropic.-/
 theorem AnisotropicExtend {φ: QuadraticForm F V} (h: QuadraticMap.Anisotropic φ) [Invertible (2:F)]:
   QuadraticMap.Anisotropic (φ.baseChange F[X]) := by
@@ -531,22 +601,11 @@ theorem AnisotropicExtend {φ: QuadraticForm F V} (h: QuadraticMap.Anisotropic �
     simp
   intro v
   intro hv
-  suffices ((QuadraticForm.baseChange F[X] φ) ↑v).coeff (2*v.natDegree) = φ v.leadingCoeff from ?_
-  . suffices v.leadingCoeff = 0 from ?_
-    . exact PolynomialModule.leadingCoeff_eq_zero.mp this
-    apply h
-    rw[<- this, hv]
-    simp
-  let n := v.natDegree
-  show ((QuadraticForm.baseChange F[X] φ) ↑v).coeff (2 * n) = φ v.leadingCoeff
-  nth_rewrite 1[<- Finsupp.sum_single v]
-  unfold coePolynomialModule
-  rw[<- LinearEquiv.toFun_eq_coe]
-  sorry
-
-  -- rw[<- QuadraticMap.associated_eq_self_apply (S := F)] at hv
-  -- rw[<- Finsupp.sum_single v] at hv
-
+  suffices v.leadingCoeff = 0 from ?_
+  . exact PolynomialModule.leadingCoeff_eq_zero.mp this
+  apply h
+  rw[<- QuadraticFormExtensionPolynomial φ v, hv]
+  simp
 
 /--Given `φ: V → F` is Anisotropic, `φ: V(X) → F(X)` is also Anisotropic.-/
 theorem AnisotropicExtend' {φ: QuadraticForm F V} (h: QuadraticMap.Anisotropic φ) [Invertible (2:F)]:
@@ -572,6 +631,26 @@ theorem AnisotropicExtend' {φ: QuadraticForm F V} (h: QuadraticMap.Anisotropic 
   simp only [coeRatFunc, map_zero] at hwvf
   exact CancellationLemmaExtensionScalars hwvf hf
 
+theorem QuadraticFormDegree (φ: QuadraticForm F V)[Invertible (2:F)]
+  (v: PolynomialModule F V) (hv: φ v.leadingCoeff ≠ 0):
+  ((QuadraticForm.baseChange F[X] φ) ↑v).natDegree = 2*v.natDegree := by
+    apply le_antisymm
+    . exact DegreeQuadraticForm φ v
+    refine Polynomial.le_natDegree_of_mem_supp (2 * v.natDegree) ?_
+    rw[Polynomial.mem_support_iff, QuadraticFormExtensionPolynomial]
+    exact hv
 
+theorem AnisotropicFormDegree {φ: QuadraticForm F V} (h: φ.Anisotropic) [Invertible (2:F)]
+  (v: PolynomialModule F V): ((QuadraticForm.baseChange F[X] φ) v).natDegree = 2*v.natDegree := by
+    by_cases hv: v=0
+    . rw[hv]
+      simp
+    apply le_antisymm
+    . exact DegreeQuadraticForm φ v
+    refine Polynomial.le_natDegree_of_mem_supp (2 * v.natDegree) ?_
+    rw[Polynomial.mem_support_iff, QuadraticFormExtensionPolynomial]
+    contrapose! hv
+    rw[<- PolynomialModule.leadingCoeff_eq_zero]
+    exact h _ hv
 
 end RationalFunctionFields
