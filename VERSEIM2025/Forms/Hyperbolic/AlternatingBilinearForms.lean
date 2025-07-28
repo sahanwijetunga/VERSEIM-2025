@@ -11,7 +11,7 @@ import VERSEIM2025.Forms.Hyperbolic.HyperbolicBilinearForms
 
 /-
   Major results (Completed)
-  - Any nondegenerate alternating bilinear form is hyperbolic (`alternating_is_hyperbolic_aux`)
+  - Any nondegenerate alternating bilinear form is hyperbolic (`alternating_is_hyperbolic`)
     - Corollary: Nondegenerate alternating bilinear form is dimension 2n (`alternate_is_even_dimension`)
   - - Corollary: Nondegenerate alternating bilinear forms of equal (finite) dimension
       are isomorphic (as bilinear form spaces)  (`alternate_iso`)
@@ -36,8 +36,10 @@ lemma ex_nonzero (h: Module.finrank k V > 0) : ∃(v: V), v ≠ 0  := by
   refine Module.finrank_eq_zero_of_rank_eq_zero ?_
   exact rank_zero_iff_forall_zero.mpr h
 
-protected theorem alternating_is_hyperbolic_aux (B: BilinForm k V) (balt: IsAlt B) [FiniteDimensional k V]
-(n: ℕ) (hn: n = Module.finrank k V) (hd: B.Nondegenerate): Hypspace_pred B  := by
+noncomputable def alternating_is_hyperbolic {B: BilinForm k V} (balt: IsAlt B) (hd: B.Nondegenerate) [FiniteDimensional k V]:
+  Hypspace B := by
+  suffices ∀ n, n=Module.finrank k V → Hypspace_pred B from Hypspace_of_Hypspace_pred (this (Module.finrank k V) rfl)
+  intro n hn
   induction' n using Nat.strong_induction_on with n h generalizing V
   have hr : IsRefl B := IsAlt.isRefl balt
   case h =>
@@ -81,25 +83,17 @@ protected theorem alternating_is_hyperbolic_aux (B: BilinForm k V) (balt: IsAlt 
         apply (restrict_nondegenerate_iff_isCompl_orthogonal hr).mpr
         rw[orthogonal_orthogonal hd (hr) H.toSubmodule]
         exact id (IsCompl.symm hIsComplW'H)
-      exact h m hmm2 (B.restrict W') hbW'IsGoodProp hWrankeqm hBW'Nondegenerate
+      exact h m hmm2 hbW'IsGoodProp hBW'Nondegenerate hWrankeqm
     have ⟨H', _⟩ := Hypsubspace_of_Hypspace_pred_restrict hpredW'
     have h: is_orthog_direct_sum B H.toSubmodule H'.toSubmodule := by
       simp_all
     exact Hypspace_pred_of_Hypspace (Hypspace_of_orthog_direct_sum' h)
 
 
-noncomputable def alternating_is_hyperbolic {B: BilinForm k V} (balt: IsAlt B) (hd: B.Nondegenerate) [FiniteDimensional k V]:
-  Hypspace B :=
-    Hypspace_of_Hypspace_pred <| Alternating.alternating_is_hyperbolic_aux B balt (Module.finrank k V) rfl hd
-
-
-theorem alternate_is_even_dimension {B: BilinForm k V} (balt: IsAlt B) (hd: B.Nondegenerate) [FiniteDimensional k V]:
-  Even (Module.finrank k V) := (alternating_is_hyperbolic balt hd).is_even_dimension
-
-theorem alternate_is_even_dimension' {B: BilinForm k V} (balt: IsAlt B) (hd: B.Nondegenerate):
+theorem alternate_is_even_dimension {B: BilinForm k V} (balt: IsAlt B) (hd: B.Nondegenerate):
   Even (Module.rank k V) := by
   by_cases FiniteDimensional k V
-  . have h := alternate_is_even_dimension balt hd
+  . have h := (alternating_is_hyperbolic balt hd).is_even_dimension
     suffices Module.finrank k V = Module.rank k V from ?_
     . let ⟨r,hr⟩ := h
       rw[<- this]
@@ -134,7 +128,5 @@ noncomputable def alternate_iso {B: BilinForm k V} {B': BilinForm k V'} (balt: I
     rw[bskew]
     rw[b'skew]
     simp
-
-#print axioms alternate_iso
 
 end Alternating
