@@ -126,5 +126,3 @@ def ConsOrthog (β:BilinForm k V) {h:IsSymm β} (v:V) (S:OrthogSet β) (hv : ∀
     
   
     
-example (p q r : Prop) (h : p ∨ q) : p ∨ q ∨ r := by
-  generalize p = x at *
