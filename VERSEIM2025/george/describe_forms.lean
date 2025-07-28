@@ -3,6 +3,9 @@ import Mathlib.LinearAlgebra.BilinearForm.Properties
 
 noncomputable section
 
+open Module
+  
+  
 variable {k : Type} [ Field k ]
 variable {V : Type} [ AddCommGroup V ] [ Module k V ]
 
@@ -55,27 +58,27 @@ lemma nondeg_pair (β:BilinForm k V) [Nontrivial V] (hnd : β.Nondegenerate )
   simp
   exact l₁ x
 
-lemma anisotropic_vector (β:BilinForm k V) [Nontrivial V] (hnd : β.Nondegenerate ) 
-  (hsymm: β.IsSymm) 
-  : ∃ v, anisotropic β v := by
-  rcases nondeg_pair β hnd with ⟨ v,w,hvw ⟩
-  by_cases h₁ : β v v = 0 
-  case neg => exact ⟨v,h₁⟩
-  case pos => 
-    by_cases h₂ : β w w = 0
-    case neg => exact ⟨w,h₂⟩
-    case pos => 
-      #check BilinForm.isSymm_def.mp hsymm v w
-      have : β (v+w) (v+w) = 2*(β v w) := by calc
-        β (v+w) (v+w) = β v (v+w) + β w (v+w) := by simp
-                   _ = β v v + β v w + β w v + β w w := by simp_all only [ne_eq, map_add, zero_add, add_zero]
-                   _ = β v w + β w v := by rw [ h₁, h₂ ] ; simp
-                   _ = 2*β v w := by 
-                                  rw [ BilinForm.isSymm_def.mp hsymm v w ] 
-                                  ring
-      use v+w
-      unfold anisotropic
-      rw [ this ]
+-- lemma anisotropic_vector (β:BilinForm k V) [Nontrivial V] (hnd : β.Nondegenerate ) 
+--   (hsymm: β.IsSymm) 
+--   : ∃ v, anisotropic β v := by
+--   rcases nondeg_pair β hnd with ⟨ v,w,hvw ⟩
+--   by_cases h₁ : β v v = 0 
+--   case neg => exact ⟨v,h₁⟩
+--   case pos => 
+--     by_cases h₂ : β w w = 0
+--     case neg => exact ⟨w,h₂⟩
+--     case pos => 
+--       #check BilinForm.isSymm_def.mp hsymm v w
+--       have : β (v+w) (v+w) = 2*(β v w) := by calc
+--         β (v+w) (v+w) = β v (v+w) + β w (v+w) := by simp
+--                    _ = β v v + β v w + β w v + β w w := by simp_all only [ne_eq, map_add, zero_add, add_zero]
+--                    _ = β v w + β w v := by rw [ h₁, h₂ ] ; simp
+--                    _ = 2*β v w := by 
+--                                   rw [ BilinForm.isSymm_def.mp hsymm v w ] 
+--                                   ring
+--       use v+w
+--       unfold anisotropic
+--       rw [ this ]
                    
 
 
@@ -123,7 +126,5 @@ def ConsOrthog (β:BilinForm k V) {h:IsSymm β} (v:V) (S:OrthogSet β) (hv : ∀
     
   
     
-    
-  
-  
-  
+example (p q r : Prop) (h : p ∨ q) : p ∨ q ∨ r := by
+  generalize p = x at *
