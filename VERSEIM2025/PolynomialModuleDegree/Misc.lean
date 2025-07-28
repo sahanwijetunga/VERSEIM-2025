@@ -50,7 +50,7 @@ noncomputable instance PolynomialRingInvertible2 (R: Type*) [CommRing R] [Invert
 
 /-- The division algorithm holds in `V[X]` dividing by elements of `F[X]` -/
 -- TODO: Reformulate in way more similar to mathlib style (i.e. with v/f and v%f defined and a theorem about them)
-lemma DivisionAlgorithm(v: PolynomialModule F V) {f: F[X]} (hf: f.natDegree >0):
+lemma DivisionAlgorithm (v: PolynomialModule F V) {f: F[X]} (hf: f.natDegree >0):
   ∃w r, v = f • w + r ∧ r.natDegree < f.natDegree := by
   suffices ∀ n, v.natDegree=n → ∃w r, v = f • w + r ∧ r.natDegree < f.natDegree from this v.natDegree rfl
   intro n hnv
