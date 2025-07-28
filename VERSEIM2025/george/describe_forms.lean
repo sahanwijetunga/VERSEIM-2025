@@ -107,22 +107,4 @@ theorem orthog_set_is_lin_indep (β:BilinForm k V)
 def diag_matrix (ι:Type) [Fintype ι] [DecidableEq ι] (f : ι → k) : Matrix ι ι k := fun i j =>
   by if h : i=j then exact f i else exact 0
 
-def ConsOrthog (β:BilinForm k V) {h:IsSymm β} (v:V) (S:OrthogSet β) (hv : ∀ (t:S.carrier), β v t = 0) :
-  OrthogSet β where
-    carrier := insert v S.carrier
-    orthog := by
-      rintro x hx
-      rintro y hy
-      if hh : x = v then 
-        intro hxny
-        have : y ∈ S.carrier := by
-          apply Set.mem_of_mem_insert_of_ne
-        if hmem : a ∈ S.carrier then
-          sorry
-        else
-          sorry
-      else
-        sorry
-    
-  
     
