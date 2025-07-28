@@ -25,6 +25,10 @@ structure equiv_of_spaces_with_form
   where
     equiv : V₁ ≃ₗ[k] V₂
     compat : ∀ (x y : V₁), β₁ x y = β₂ (equiv v₁) (equiv v₂) 
+
+notation:100 lhs:100 "["lhb:100"]≃["rhb:100"]" rhs:100 => equiv_of_spaces_with_form (V₁ := lhs) (V₂ := rhs) lhb rhb
+
+
   
 -- the "target theorem" below says that the pair (V₁,β₁) is equivalent
 -- to (V₂,β₂) if and only if there is a basis b₁ for V₁ and a basis b₂
@@ -43,5 +47,12 @@ structure equiv_of_spaces_with_form
 theorem equiv_via_matrices  {ι:Type} [Fintype ι] [DecidableEq ι] 
   (β₁:BilinForm k V₁)   (β₂:BilinForm k V₂)
   : Nonempty (equiv_of_spaces_with_form β₁ β₂) ↔  ∃ b₁:Basis ι k V₁, ∃ b₂:Basis ι k V₂, 
+    (BilinForm.toMatrix b₁ β₁) =  (BilinForm.toMatrix b₂ β₂)
+  := by sorry
+
+
+theorem equiv_via_matrices'  {ι:Type} [Fintype ι] [DecidableEq ι] 
+  (β₁:BilinForm k V₁)   (β₂:BilinForm k V₂)
+  : Nonempty (V₁ [β₁]≃[β₂] V₂) ↔  ∃ b₁:Basis ι k V₁, ∃ b₂:Basis ι k V₂, 
     (BilinForm.toMatrix b₁ β₁) =  (BilinForm.toMatrix b₂ β₂)
   := by sorry
