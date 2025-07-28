@@ -15,8 +15,7 @@ open LinearMap
 open LinearMap (BilinForm)
 
 
-def anisotropic {V : Type} [ AddCommGroup V ] [ Module k V ] 
-  (β:BilinForm k V) (v:V) : Prop := β v v ≠ 0
+
 
 abbrev OrthogSubsets (β:BilinForm k V) (S₁ S₂ : Set V) : Prop :=
   ∀ x ∈ S₁, ∀ y ∈ S₂, β x y = 0
