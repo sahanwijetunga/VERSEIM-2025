@@ -74,15 +74,13 @@ noncomputable def Hypspace_zero {B: BilinForm k V} (h: ∀ (v: V), v=0): Hypspac
 @[simp]
 abbrev Hypspace.basis_index {B: BilinForm k V} (H: Hypspace B) := H.I ⊕ H.I
 
-protected theorem Hypspace_of_Hypspace_pred_aux {B: BilinForm k V} (h: Hypspace_pred B): Nonempty (Hypspace B) := by
-    have ⟨I, b, hbI⟩ := h
-    constructor
-    exact Hypspace.mk I b hbI
-
 /-- Noncomputably yields a `Hypspace` from `Hypspace_pred`-/
 noncomputable def Hypspace_of_Hypspace_pred {B: BilinForm k V} (h: Hypspace_pred B): Hypspace B := by
     apply Classical.choice
-    have ⟨H⟩ := Hyperbolic.Hypspace_of_Hypspace_pred_aux h
+    have ⟨H⟩: Nonempty (Hypspace B) := by
+      have ⟨I, b, hbI⟩ := h
+      constructor
+      exact Hypspace.mk I b hbI
     constructor
     exact H
 

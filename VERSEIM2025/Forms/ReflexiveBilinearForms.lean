@@ -158,7 +158,8 @@ theorem sum_radForm_nondegenerate (B: BilinForm k V) (hr: B.IsRefl):
   hence B(w₁,w₂) = B(w₂,w₁) a contradiction.
 -/
 
-theorem refl_is_alt_or_symm {B: BilinForm k V} (h: IsRefl B) [FiniteDimensional k V] : IsAlt B ∨ IsSymm B := sorry
+theorem refl_is_alt_or_symm {B: BilinForm k V} (h: IsRefl B) [FiniteDimensional k V] :
+  IsAlt B ∨ IsSymm B := sorry
 
 def quot_form {B: BilinForm k V} (hb: B.IsRefl): BilinForm k (V ⧸ (radForm B)) := sorry
 
