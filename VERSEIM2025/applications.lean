@@ -41,12 +41,13 @@ def p (ι₁ ι₂ : Type) [Fintype ι₁] [Fintype ι₂] [DecidableEq ι₁] [
   exact (∃ (y : ι₁), i = Sum.inl y)
 
 
-theorem finrank_sup_eq_neg_finrank_inf_add {u v : Type} {K : Type u} {V : Type v} [DivisionRing K] [AddCommGroup V] [Module K V]
+theorem finrank_sup_eq_neg_finrank_inf_add {K : Type u} {V : Type v} [DivisionRing K] [AddCommGroup V] [Module K V]
   (s t : Submodule K V) [FiniteDimensional K ↥s] [FiniteDimensional K ↥t] :
   Module.finrank K ↥(s ⊔ t) = Module.finrank K ↥s + Module.finrank K ↥t - (Module.finrank K ↥(s ⊓ t)) := by
     rw[Nat.sub_eq_of_eq_add']
     rw[← Submodule.finrank_sup_add_finrank_inf_eq]
     rw[add_comm]
+
 
 lemma left_mem_basis_direct_sum {ι₁ ι₂ :Type}
               (W₁ W₂ : Submodule k V)
@@ -172,8 +173,6 @@ theorem ortho_complement_nondeg (β:BilinForm k V) [FiniteDimensional k V]
             apply Submodule.finrank_le
           · exact bnd
           · exact href
-          · exact V
-          · exact k
         apply Submodule.eq_top_of_finrank_eq at k₁₁
         rw[← k₁₀]
         rw[k₁₁]
