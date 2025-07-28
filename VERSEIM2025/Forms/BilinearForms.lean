@@ -30,19 +30,36 @@ example : (V →ₗ[k] V →ₗ[k] k) = (BilinForm k V) := rfl
 def Skew (β:BilinForm k V) : Prop :=
   ∀ v w : V, β v w = - β w v
 
-lemma skew_of_alt (β:BilinForm k V) (ha : β.IsAlt) :
+def Symm (β:BilinForm k V) : Prop :=
+  ∀ v w : V, β v w = β w v
+
+-- a bilinear form is said to be reflexive if `∀ x y, β x y = 0 → β y
+-- x = 0`.
+
+
+lemma skew_of_alt (β:BilinForm k V) (ha : Alt β) :
   Skew β := by
-  intro v w
-  suffices β v w + β w v = 0 from ?_
-  . exact Eq.symm (LinearMap.BilinForm.IsAlt.neg_eq ha w v)
-  calc
-    β v w + β w v = β w v + β v w + β v v + β w w := by
-      rw[ha v, ha w]
-      abel
-    _ = β (v+w) (v+w) := by
-      simp
-      abel
-    _ = 0 := ha _
+    intro v w
+  have h0 : β (v+w) = β v + β w := by simp
+  have h : β (v+w) (v+w) = (β v) v + (β w) v + (β v) w + (β w) w :=
+    calc
+    (β (v+w)) (v+w) = (β v) (v+w) + (β w) (v+w) := by rw [LinearMap.BilinForm.add_left]
+    _ = (β v) v + (β w) v + (β v) w + (β w) w := by
+      rw [LinearMap.BilinForm.add_right v v w, LinearMap.BilinForm.add_right w v w, ← add_assoc]; ring
+  have hv : β v v = 0 := by apply ha
+  have hw : β w w = 0 := by apply ha
+  have hvw : β (v+w) (v+w) = 0 := by apply ha
+  rw [hv, hw, hvw, zero_add, add_zero, add_comm] at h
+  have h1: 0 + -(β w) v = (β v) w + (β w) v + -(β w) v := by
+    apply (@add_right_cancel_iff _ _ _ (-(β w) v) 0 ((β v) w + (β w) v)).mpr h
+  rw [zero_add] at h1
+  rw [← sub_eq_add_neg] at h1
+  rw [← add_sub ((β v) w) ((β w) v) ((β w) v)] at h1
+  rw [sub_self ((β w) v)] at h1
+  rw [add_zero] at h1
+  symm at h1
+  exact h1
+
 
 -- the next lemma says that for a vector space over a field k of
 -- characteristic different from 2, for v in V the equation `2v=0`
@@ -92,18 +109,31 @@ lemma eq_zero_of_two_mul_eq_zero_vector (k: Type*) { V : Type* }
        smul_ne_zero two_neq_zero v_neq_zero
     exact two_smul_ne_zero two_smul_eq_zero
 
-lemma alt_iff_skew (β:V →ₗ[k] V →ₗ[k] k)
-   [CharP k p] (hn2 : p ≠ 2)
-   : β.IsAlt ↔ BilinearForms.Skew β := by
-  constructor
-  . apply BilinearForms.skew_of_alt
-  . intro h
-    simp only [LinearMap.BilinForm.IsAlt, Skew] at *
-    intro v
-    have: β v v + β v v = 0 := eq_neg_iff_add_eq_zero.mp (h v v)
-    have: 2 • β v v = 0 := by rw[(two_nsmul ((β v) v)), this]
-    apply eq_zero_of_two_mul_eq_zero_vector k hn2 (β v v) this
+lemma zero_of_two_mul_eq_zero  { k : Type } [ Field k]
+  [CharZero k] (x:k) (h:2*x = 0) : x = 0 := by
+  have nz2_inst : NeZero ↑2 := inferInstance
+  have nz2 : (2:k) ≠ 0 := NeZero.ne ↑2
+  by_contra x_neq_zero
+  have two_mul_ne_zero : ↑2*x ≠ 0 :=
+    mul_ne_zero nz2 x_neq_zero
+  exact two_mul_ne_zero h
 
+lemma alt_iff_skew (β:V →ₗ[k] V →ₗ[k] k)
+   [CharZero k]
+   : Alt β ↔ Skew β := by
+   constructor
+   intro ha
+   apply skew_of_alt
+   exact ha
+   intro hs
+   intro v
+   have h1 : β v v = -β v v := by apply hs
+   have h2 : β v v + β v v = β v v + -β v v := by
+     apply (@add_left_cancel_iff _ _ _ (β v v) (β v v) (-β v v)).mpr  h1
+   rw [← sub_eq_add_neg, sub_self ((β v) v)] at h2
+   rw [← two_mul] at h2
+   apply zero_of_two_mul_eq_zero at h2
+   exact h2
 
 -- REMARK: we are really only interested in the case of forms which
 -- are either alternating or symmetric.  We are going to formulate a
@@ -125,36 +155,38 @@ lemma skew_is_reflexive (β:BilinForm k V) (h:Skew β) : IsRefl β := by
   simp
   assumption
 
-lemma alt_is_reflexive (β:BilinForm k V) (h: β.IsAlt) : IsRefl β := IsAlt.isRefl h
+lemma alt_is_reflexive (β:BilinForm k V) (h:Alt β) : IsRefl β := by
+  intro v w l
+  have hv : β v v = 0 := by apply h
+  have hw : β w w = 0 := by apply h
+  have h1 : β (v+w) (v+w) = (β v) v + (β w) v + (β v) w + (β w) w :=
+    calc
+    (β (v+w)) (v+w) = (β v) (v+w) + (β w) (v+w) := by rw [LinearMap.BilinForm.add_left]
+    _ = (β v) v + (β w) v + (β v) w + (β w) w := by
+      rw [LinearMap.BilinForm.add_right v v w, LinearMap.BilinForm.add_right w v w, ← add_assoc]; ring
+  have hvw : β (v+w) (v+w) = 0 := by apply h
+  rw [hv, hw, hvw, zero_add, add_zero, add_comm] at h1
+  have h2: 0 + -(β w) v = (β v) w + (β w) v + -(β w) v := by
+    apply (@add_right_cancel_iff _ _ _ (-(β w) v) 0 ((β v) w + (β w) v)).mpr h1
+  rw [l, zero_add] at h1
+  symm at h1
+  exact h1
 
-lemma symm_is_reflexive (β:BilinForm k V) (h: β.IsSymm) : IsRefl β := IsSymm.isRefl h
 
-abbrev OrthogSubspacesWeak (β:BilinForm k V) (W₁ W₂ : Submodule k V) : Prop :=
-  ∀ x ∈ W₁, ∀ y ∈ W₂, β x y = 0
+lemma symm_is_reflexive (β:BilinForm k V) (h:Symm β) : IsRefl β := by
+  intro v w l
+  have h1: (β v) w = (β w) v := by apply h
+  rw [l] at h1
+  symm at h1
+  exact h1
 
-lemma swap_OrthogSubspacesWeak {β: BilinForm k V} {W₁ W₂: Submodule k V}
-  (h: OrthogSubspacesWeak β W₁ W₂) (hr: IsRefl β): OrthogSubspacesWeak β W₂ W₁ := by
-  intro x hx y hy
-  rw[hr]
-  exact h y hy x hx
+def OrthogSubspaces (β:BilinForm k V) (W₁ W₂ : Submodule k V) : Prop :=
+  ∀ (x:W₁), ∀ (y:W₂), β x y = 0
 
-abbrev OrthogSubspaces (β:BilinForm k V) (W₁ W₂ : Submodule k V) : Prop :=
-  OrthogSubspacesWeak β W₁ W₂ ∧ OrthogSubspacesWeak β W₂ W₁
 
-theorem OrthogSubspaces_of_OrthogSubspacesWeak_refl {β: BilinForm k V} {W₁ W₂: Submodule k V}
-  (h: OrthogSubspacesWeak β W₁ W₂) (hr: IsRefl β): OrthogSubspaces β W₁ W₂ := by
-  constructor
-  . exact h
-  . exact swap_OrthogSubspacesWeak h hr
-
-theorem OrthogSubspacesWeak_of_orthogonal_complement (β: BilinForm k V) (W: Submodule k V) :
-    OrthogSubspacesWeak β W (β.orthogonal W) := by
-    unfold OrthogSubspacesWeak
-    rintro a ha b hb
-    simp at hb
-    show β a b =0
-    apply hb
-    exact ha
+theorem OrthogSubspaces_of_orthogonal (β: BilinForm k V) (W: Submodule k V) :
+    OrthogSubspaces β W (β.orthogonal W) := by
+    sorry
 
 
 -- The mathlib predicate `LinearMap.IsOrthoᵢ` is used to indicate that
