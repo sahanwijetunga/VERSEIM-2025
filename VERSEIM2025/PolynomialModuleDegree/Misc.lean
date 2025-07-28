@@ -47,9 +47,13 @@ noncomputable instance PolynomialRingInvertible2 (R: Type*) [CommRing R] [Invert
     rw[<- Polynomial.C_mul]
     simp
 
-/-- See `DivisionAlgorithm_PolynomialModule`-/
-protected lemma DivisionAlgorithmAux (v: PolynomialModule F V) {f: F[X]}
-  (n: ℕ) (hnv: v.natDegree =n) (hf: f.natDegree > 0):  ∃w r, v = f • w + r ∧ r.natDegree < f.natDegree := by
+
+/-- The division algorithm holds in `V[X]` dividing by elements of `F[X]` -/
+-- TODO: Reformulate in way more similar to mathlib style (i.e. with v/f and v%f defined and a theorem about them)
+lemma DivisionAlgorithm(v: PolynomialModule F V) {f: F[X]} (hf: f.natDegree >0):
+  ∃w r, v = f • w + r ∧ r.natDegree < f.natDegree := by
+  suffices ∀ n, v.natDegree=n → ∃w r, v = f • w + r ∧ r.natDegree < f.natDegree from this v.natDegree rfl
+  intro n hnv
   induction' n using Nat.strong_induction_on with n h generalizing v
   by_cases hnf: n < f.natDegree
   . use 0, v
@@ -120,12 +124,5 @@ protected lemma DivisionAlgorithmAux (v: PolynomialModule F V) {f: F[X]}
       simp only [neg_smul, map_neg, smul_neg]
       abel
     . exact degless'
-
-
-/-- The division algorithm holds in `V[X]` dividing by elements of `F[X]` -/
--- TODO: Reformulate in way more similar to mathlib style (i.e. with v/f and v%f defined and a theorem about them)
-lemma DivisionAlgorithm(v: PolynomialModule F V) {f: F[X]} (hf: f.natDegree >0):
-  ∃w r, v = f • w + r ∧ r.natDegree < f.natDegree :=
-    PolynomialModule.DivisionAlgorithmAux v v.natDegree rfl hf
 
 end PolynomialModule

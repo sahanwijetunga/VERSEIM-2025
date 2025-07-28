@@ -266,6 +266,8 @@ theorem CasselsPfisterTheoremAux (φ: QuadraticForm F V) [Invertible (2: F)]
   . apply CasselsPfister.CasselsPfisterTheorem_NontrivialContainmentExtension φ hn
   . apply CasselsPfister.CasselsPfisterTheorem_TrivialContainmentExtension
 
+#print axioms CasselsPfisterTheoremAux
+
 /-- The values taken by the extension of a quadratic map `φ: V → F` to `V(X) → F(X)`
     that are in `F[X]` are taken by the extension `V[X] → F[X]` as well.
 -/
