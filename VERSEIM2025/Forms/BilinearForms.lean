@@ -30,16 +30,13 @@ example : (V →ₗ[k] V →ₗ[k] k) = (BilinForm k V) := rfl
 def Skew (β:BilinForm k V) : Prop :=
   ∀ v w : V, β v w = - β w v
 
-def Symm (β:BilinForm k V) : Prop :=
-  ∀ v w : V, β v w = β w v
-
 -- a bilinear form is said to be reflexive if `∀ x y, β x y = 0 → β y
 -- x = 0`.
 
 
-lemma skew_of_alt (β:BilinForm k V) (ha : Alt β) :
+lemma skew_of_alt (β:BilinForm k V) (ha : IsAlt β) :
   Skew β := by
-    intro v w
+  intro v w
   have h0 : β (v+w) = β v + β w := by simp
   have h : β (v+w) (v+w) = (β v) v + (β w) v + (β v) w + (β w) w :=
     calc
@@ -109,8 +106,8 @@ lemma eq_zero_of_two_mul_eq_zero_vector (k: Type*) { V : Type* }
        smul_ne_zero two_neq_zero v_neq_zero
     exact two_smul_ne_zero two_smul_eq_zero
 
-lemma zero_of_two_mul_eq_zero  { k : Type } [ Field k]
-  [CharZero k] (x:k) (h:2*x = 0) : x = 0 := by
+lemma zero_of_two_mul_eq_zero  { k : Type* } [ Field k]
+  [NeZero (2: k)] (x:k) (h:2*x = 0) : x = 0 := by
   have nz2_inst : NeZero ↑2 := inferInstance
   have nz2 : (2:k) ≠ 0 := NeZero.ne ↑2
   by_contra x_neq_zero
@@ -119,21 +116,19 @@ lemma zero_of_two_mul_eq_zero  { k : Type } [ Field k]
   exact two_mul_ne_zero h
 
 lemma alt_iff_skew (β:V →ₗ[k] V →ₗ[k] k)
-   [CharZero k]
-   : Alt β ↔ Skew β := by
-   constructor
-   intro ha
-   apply skew_of_alt
-   exact ha
-   intro hs
-   intro v
-   have h1 : β v v = -β v v := by apply hs
-   have h2 : β v v + β v v = β v v + -β v v := by
-     apply (@add_left_cancel_iff _ _ _ (β v v) (β v v) (-β v v)).mpr  h1
-   rw [← sub_eq_add_neg, sub_self ((β v) v)] at h2
-   rw [← two_mul] at h2
-   apply zero_of_two_mul_eq_zero at h2
-   exact h2
+  [NeZero (2: k)]: IsAlt β ↔ Skew β := by
+  constructor
+  . intro ha
+    apply skew_of_alt _ ha
+  intro hs
+  intro v
+  have h1 : β v v = -β v v := by apply hs
+  have h2 : β v v + β v v = β v v + -β v v := by
+    apply (@add_left_cancel_iff _ _ _ (β v v) (β v v) (-β v v)).mpr  h1
+  rw [← sub_eq_add_neg, sub_self ((β v) v)] at h2
+  rw [← two_mul] at h2
+
+  exact zero_of_two_mul_eq_zero _ h2
 
 -- REMARK: we are really only interested in the case of forms which
 -- are either alternating or symmetric.  We are going to formulate a
@@ -155,7 +150,7 @@ lemma skew_is_reflexive (β:BilinForm k V) (h:Skew β) : IsRefl β := by
   simp
   assumption
 
-lemma alt_is_reflexive (β:BilinForm k V) (h:Alt β) : IsRefl β := by
+lemma alt_is_reflexive (β:BilinForm k V) (h:IsAlt β) : IsRefl β := by
   intro v w l
   have hv : β v v = 0 := by apply h
   have hw : β w w = 0 := by apply h
@@ -173,20 +168,39 @@ lemma alt_is_reflexive (β:BilinForm k V) (h:Alt β) : IsRefl β := by
   exact h1
 
 
-lemma symm_is_reflexive (β:BilinForm k V) (h:Symm β) : IsRefl β := by
+lemma symm_is_reflexive (β:BilinForm k V) (h:IsSymm β) : IsRefl β := by
   intro v w l
   have h1: (β v) w = (β w) v := by apply h
   rw [l] at h1
   symm at h1
   exact h1
 
-def OrthogSubspaces (β:BilinForm k V) (W₁ W₂ : Submodule k V) : Prop :=
-  ∀ (x:W₁), ∀ (y:W₂), β x y = 0
+abbrev OrthogSubspacesWeak (β:BilinForm k V) (W₁ W₂ : Submodule k V) : Prop :=
+  ∀ x ∈ W₁, ∀ y ∈ W₂, β x y = 0
 
+lemma swap_OrthogSubspacesWeak {β: BilinForm k V} {W₁ W₂: Submodule k V}
+  (h: OrthogSubspacesWeak β W₁ W₂) (hr: IsRefl β): OrthogSubspacesWeak β W₂ W₁ := by
+  intro x hx y hy
+  rw[hr]
+  exact h y hy x hx
 
-theorem OrthogSubspaces_of_orthogonal (β: BilinForm k V) (W: Submodule k V) :
-    OrthogSubspaces β W (β.orthogonal W) := by
-    sorry
+abbrev OrthogSubspaces (β:BilinForm k V) (W₁ W₂ : Submodule k V) : Prop :=
+  OrthogSubspacesWeak β W₁ W₂ ∧ OrthogSubspacesWeak β W₂ W₁
+
+theorem OrthogSubspaces_of_OrthogSubspacesWeak_refl {β: BilinForm k V} {W₁ W₂: Submodule k V}
+  (h: OrthogSubspacesWeak β W₁ W₂) (hr: IsRefl β): OrthogSubspaces β W₁ W₂ := by
+  constructor
+  . exact h
+  . exact swap_OrthogSubspacesWeak h hr
+
+theorem OrthogSubspacesWeak_of_orthogonal_complement (β: BilinForm k V) (W: Submodule k V) :
+    OrthogSubspacesWeak β W (β.orthogonal W) := by
+    unfold OrthogSubspacesWeak
+    rintro a ha b hb
+    simp at hb
+    show β a b =0
+    apply hb
+    exact ha
 
 
 -- The mathlib predicate `LinearMap.IsOrthoᵢ` is used to indicate that
