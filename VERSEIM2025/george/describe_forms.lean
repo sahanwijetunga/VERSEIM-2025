@@ -110,3 +110,4 @@ def diag_matrix (ι:Type) [Fintype ι] [DecidableEq ι] (f : ι → k) : Matrix 
     
 
 
+
