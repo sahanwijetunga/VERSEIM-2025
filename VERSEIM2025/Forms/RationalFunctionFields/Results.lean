@@ -23,7 +23,7 @@ variable {F R: Type*} [Field F] [CommRing R]
 #check QuadraticMap.weightedSumSquares_apply
 
 def standard_quadratic_form (n: ℕ): QuadraticForm R (Fin n → R) :=
-    QuadraticMap.weightedSumSquares R (fun (_: Fin n) => (1:R))
+    QuadraticMap.weightedSumSquares R (fun _ => 1)
 
 theorem standard_quadratic_form_apply (n: ℕ) (f: Fin n → R):
     standard_quadratic_form n f = ∑ i, f i * f i := by
@@ -38,13 +38,13 @@ theorem extend_standard_quadratic_form {A: Type*} [CommRing A] [Algebra F A] (n:
 (equiv_tensor (I := Fin n) (F := F) (A := A)) = (standard_quadratic_form (R := F) n).baseChange A := by
     unfold equiv_tensor
     unfold standard_quadratic_form
-    refine QuadraticMap.ext_iff.mpr ?_
-    intro x
-    sorry
+    apply baseChange_ext
+    intro a
+    simp[smul_smul,Finset.sum_smul]
 
 theorem sum_squares (f: F[X]) [Invertible (2:F)] {n: ℕ} {l: Fin n → F(X)} (hlf: f = ∑ i, l i * l i):
     ∃ l': Fin n → F[X], f = ∑ i, l' i * l' i := by
-    let φ: QuadraticForm F (Fin n → F) := standard_quadratic_form (R := F) n
+    let φ: QuadraticForm F (Fin n → F) := standard_quadratic_form n
     have:  (f: F(X) ) ∈ Set.range (φ.baseChange F(X) ) := by
         use (equiv_tensor (I := Fin n)).invFun l
         rw[<- extend_standard_quadratic_form n]
