@@ -42,6 +42,14 @@ def radForm' (B: BilinForm F V) : Submodule F V where
   zero_mem' := by simp_all
   smul_mem' := by simp_all
 
+theorem radForm_eq_kernel (B: BilinForm F V): radForm B = LinearMap.ker B := by
+  ext x; simp[radForm]
+  constructor
+  . intro h
+    ext w
+    simp_all [LinearMap.zero_apply]
+  . simp_all [LinearMap.zero_apply]
+
 theorem radForm'_eq_radForm_flip (B: BilinForm F V) :
   radForm' B = radForm B.flip := by simp_all[radForm,radForm']
 
@@ -232,7 +240,30 @@ theorem refl_is_alt_or_symm {B: BilinForm F V} (h: IsRefl B) [FiniteDimensional 
   exact hxy h3
 
 
-def quot_form {B: BilinForm F V} (hb: B.IsRefl): BilinForm F (V ⧸ (radForm B)) := sorry
+def quot_form {B: BilinForm F V} (hb: B.IsRefl): BilinForm F (V ⧸ (radForm B)) :=
+  (Submodule.liftQ _ (LinearMap.flip (Submodule.liftQ _ B (by rw[radForm_eq_kernel B]  )))
+  ( by
+    nth_rewrite 1[radForm_eq_kernel B]
+    intro v hv
+    ext w
+    apply hb
+    simp_all
+  )
+  ).flip
+
+
+example {B: BilinForm F V}: V →ₗ[F] (V ⧸ radForm B) := by
+  exact (radForm B).mkQ
+
+def quot_form_apply {B: BilinForm F V} (hb: B.IsRefl) (v w: V): B v w =
+(quot_form hb) ((radForm B).mkQ v) ((radForm B).mkQ w) := by
+  simp[quot_form]
+
+def quot_form_apply' {B: BilinForm F V} (hb: B.IsRefl):
+(quot_form hb).comp (radForm B).mkQ (radForm B).mkQ
+   = B := by
+  ext v w
+  exact quot_form_apply hb v w
 
 theorem reflexive_quotient_radForm_nondegenerate (B: BilinForm F V) (hr: B.IsRefl):
    (quot_form hr).Nondegenerate := sorry
