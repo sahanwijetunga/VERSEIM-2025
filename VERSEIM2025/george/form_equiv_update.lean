@@ -1,4 +1,5 @@
 import Mathlib.Tactic
+import Mathlib.LinearAlgebra.Charpoly.Basic
 
 open Module
 open LinearMap
@@ -33,11 +34,45 @@ theorem symm_of_equiv (eq : V₁ ≃[k,β₁,β₂] V₂) (hsymm : β₁.IsSymm)
 
 theorem alt_of_equiv (eq : V₁ ≃[k,β₁,β₂] V₂) (halt : β₁.IsAlt) : β₂.IsAlt := by sorry
 
-theorem nondeg_of_equiv (eq : V₁ ≃[k,β₁,β₂] V₂) (hnd : β₁.Nondegenerate) : β₂.Nondegenerate := by sorry
-
 
 --two more results!
 
 def equiv_of_spaces_with_form.symm {β₁:BilinForm k V₁} {β₂:BilinForm k V₂} 
   (e:V₁ ≃[k,β₁,β₂] V₂) :
-  V₂ ≃[k,β₂,β₁] V₁ = by sorry
+  V₂ ≃[k,β₂,β₁] V₁ where
+    equiv := e.equiv.symm
+    compat := by sorry
+
+variable  {V₃ :Type}
+  [AddCommGroup V₃] [Module k V₃]
+
+def equiv_of_spaces_with_form.trans  {β₁:BilinForm k V₁} {β₂:BilinForm k V₂} 
+  {β₃:BilinForm k V₃} (e₁:V₁ ≃[k,β₁,β₂] V₂) (e₂:V₂ ≃[k,β₂,β₃] V₃) :
+  V₁ ≃[k,β₁,β₃] V₃ where
+    equiv := e₁.equiv.trans  e₂.equiv
+    compat := by sorry
+    
+example : BilinForm k V₁ →ₗ[k] BilinForm k V₁ := lflip
+
+example : Module.End k (BilinForm k V₁) := LinearMap.lflip^2 
+
+theorem tsq : lflip^2 = (id:BilinForm k V₁ →ₗ[k] BilinForm k V₁) := by 
+  ext β x y
+  rw [ pow_two ]
+  rw [ Module.End.mul_eq_comp ]
+  rw [ comp_apply ]
+  rw [ lflip_apply, lflip_apply ]
+  simp
+  
+
+variable [ Module.Finite k V₁] in
+example : Module.Finite k (BilinForm k V₁) := inferInstance
+
+example  [Module.Finite k V₁]: Polynomial k := charpoly (lflip : BilinForm k V₁ →ₗ[k] BilinForm k V₁) 
+
+
+theorem cp [Module.Finite k V₁]: charpoly (lflip : BilinForm k V₁ →ₗ[k] BilinForm k V₁) 
+  = (X^2 - 1 : Polynomial k) := by 
+  sorry
+  
+#check flip 
