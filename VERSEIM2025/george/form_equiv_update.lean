@@ -68,10 +68,27 @@ theorem tsq : lflip^2 = (id:BilinForm k V₁ →ₗ[k] BilinForm k V₁) := by
 variable [ Module.Finite k V₁] in
 example : Module.Finite k (BilinForm k V₁) := inferInstance
 
-example  [Module.Finite k V₁]: Polynomial k := charpoly (lflip : BilinForm k V₁ →ₗ[k] BilinForm k V₁) 
+example  [Module.Finite k V₁] (h:V₂ = BilinForm k V₁) (T:V₂ →ₗ[k] V₂) : Polynomial k := charpoly T
+
+example : Module.End k (BilinForm k V₁) := lflip
+
+set_option pp.all true
+def foo : Algebra k (Module.End k (BilinForm k V₁)) := by 
+  exact inferInstance
+  
+#print foo 
 
 
-theorem cp [Module.Finite k V₁]: charpoly (lflip : BilinForm k V₁ →ₗ[k] BilinForm k V₁) 
+example : Ring (Module.End k (BilinForm k V₁)) := inferInstance
+
+example : Ring (Module.End k V₁) := inferInstance
+
+example : Polynomial k := minpoly k 
+  (B := Module.End k (BilinForm k V₁))
+  lflip
+
+theorem cp [Module.Finite k V₁] : minpoly k
+  (lflip : Module.End k (BilinForm k V₁))
   = (X^2 - 1 : Polynomial k) := by 
   sorry
   
