@@ -108,3 +108,4 @@ def diag_matrix (ι:Type) [Fintype ι] [DecidableEq ι] (f : ι → k) : Matrix 
   by if h : i=j then exact f i else exact 0
 
     
+
