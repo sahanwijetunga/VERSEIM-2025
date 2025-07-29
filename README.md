@@ -6,6 +6,9 @@ VERSEIM-REU](https://sites.tufts.edu/verseimreu/).
 - The repository contains [`Lean` code](/VERSEIM2025/) produced
   during the program.
 
+- Here are [slides for the presentations](Presentations) made in the REU seminar during
+  the program
+
 - this repository contains some [documents](/documents/) with notes,
   including:
 
