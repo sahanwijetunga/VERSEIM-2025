@@ -1,6 +1,11 @@
 
 import Mathlib.Tactic
+import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
+import VERSEIM2025.Forms.BilinearForms
 
+open BilinearForms -- This is the namespace in VERSEIM2025.Forms.Hyperbolic.BilinearForms
+open LinearMap.BilinForm
+open LinearMap (BilinForm)
 
 -- Let's get started trying to formalize some results in linear algebra
 -- about bilinear forms!
@@ -129,8 +134,8 @@ def Bilinear (V:Type) (k:Type) [Field k] [AddCommGroup V] [Module k V] : Type
 
 -- a mapping
 
-def Bilinear.toMatrix (V:Type) (k:Type) (B: Basis ι k V) (β:Bilinear V k) : Matrix ι ι k :=
-  sorry
+/-def Bilinear.toMatrix (V:Type) (k:Type) (B: Basis ι k V) (β:Bilinear V k) : Matrix ι ι k :=
+  sorry -/
 
 -- and eventually we want to prove this mapping "is" a linear
 -- equivalence.
@@ -172,3 +177,51 @@ def Bilinear.toMatrix (V:Type) (k:Type) (B: Basis ι k V) (β:Bilinear V k) : Ma
 -- converse holds. We'll need to read about the characteristic to do
 -- this, but the above implication should work without knowing about
 -- this...
+
+-- proposition 2.6 as a lemma
+lemma proptwopointsix {B: BilinForm k V} {u v w : V}
+(h : ∀ (u v w : V), (((B u) v) * ((B w) u)) = (((B v) u) * ((B u) w))): B.IsAlt ∨ B.IsSymm := by
+  have h₀: (((B v) v) *((B w) v) - (((B v) v) * ((B v) w))) = 0 := by
+    refine sub_eq_zero_of_eq ?_
+    rw[h]
+  by_contra j
+  simp at j
+  unfold BilinForm.IsAlt at j
+
+
+
+  sorry
+
+
+
+theorem refl_is_alt_or_symm {B: BilinForm k V} {u v w : V} (h: B.IsRefl) [FiniteDimensional k V] :
+    B.IsAlt  ∨ B.IsSymm := by
+    let x := ((B u) v) • w - (((B u) w) •  v)
+    have h₀ : (B u) x = (((B u) v) * ((B u) w)) - (((B u) w) * ((B u) v)) := by
+      aesop
+    have h₁ : (((B u) v) * ((B u) w)) - (((B u) w) * ((B u) v)) = 0 := by
+      rw[mul_comm]
+      simp
+    rw[h₁] at h₀
+    have h₂ :(B x) u =  (((B u) v) * ((B w) u)) - (((B v) u) * ((B u) w)):= by
+      sorry
+    have h₃ : ∀ (u v w : V), (((B u) v) * ((B w) u)) = (((B v) u) * ((B u) w)) := by
+      intro x y z
+      have h₃₀ : (B x) y * (B z) x = (B y) x * (B x) z ↔ (((B x) y) * ((B z) x)) - (((B y) x) * ((B x) z)) = 0 := by
+        constructor
+        · aesop
+        · intro g
+
+          sorry
+
+
+      sorry
+    apply proptwopointsix
+    · exact u
+    · exact v
+    · exact w
+    · exact h₃
+
+
+
+-- construct the iff as well
