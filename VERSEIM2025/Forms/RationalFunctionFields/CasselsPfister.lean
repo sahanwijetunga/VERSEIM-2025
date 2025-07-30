@@ -8,6 +8,7 @@ VERSEIM-2025 REU @ Tufts University
 -/
 
 import VERSEIM2025.Forms.RationalFunctionFields.Basics
+import VERSEIM2025.Forms.QuadraticNondegenerate
 import VERSEIM2025.Forms.Hyperbolic.TwoSpaceBasics
 
 namespace CasselsPfister
@@ -279,7 +280,10 @@ theorem range_quadratic_polynomial_eq_restrict_rational_aux (φ: QuadraticForm F
 -/
 theorem range_quadratic_polynomial_eq_restrict_rational (φ: QuadraticForm F V) [Invertible (2: F)]:
   (↑)⁻¹' (Set.range (φ.baseChange (F(X))))
-   = Set.range (φ.baseChange F[X]) := sorry
+   = Set.range (φ.baseChange F[X]) := by
+  rw[QuadraticForm.range_baseChange_quotient_rad_eq_range_baseChange F(X),
+  QuadraticForm.range_baseChange_quotient_rad_eq_range_baseChange F[X] ]
+  exact range_quadratic_polynomial_eq_restrict_rational_aux φ.quotient_rad φ.quotient_rad_nondegenerate
 
 
 end CasselsPfister
