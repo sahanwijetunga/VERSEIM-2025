@@ -1,0 +1,7 @@
+\beamer@sectionintoc {1}{Lean Basics}{3}{0}{1}
+\beamer@subsectionintoc {1}{1}{Propositions}{7}{0}{1}
+\beamer@sectionintoc {2}{Lean Examples}{9}{0}{2}
+\beamer@subsectionintoc {2}{1}{Basic Examples}{9}{0}{2}
+\beamer@subsectionintoc {2}{2}{Odd/Even Functions Proof}{11}{0}{2}
+\beamer@sectionintoc {3}{Future of Our Project}{15}{0}{3}
+\beamer@sectionintoc {4}{Conclusion}{17}{0}{4}

@@ -21,7 +21,8 @@ variable {F V: Type*} [Field F] [AddCommGroup V] [Module F V]
 
 set_option maxHeartbeats 800000
 
-lemma foo_foo {φ: QuadraticForm F V} (v: V(F)) (u: PolynomialModule F V) [Invertible (2: F)] (f: F[X])
+/-- Lemma for use in `range_quadratic_polynomial_eq_restrict_rational`. Do not directly use outside. -/
+protected lemma foo_foo {φ: QuadraticForm F V} (v: V(F)) (u: PolynomialModule F V) [Invertible (2: F)] (f: F[X])
   (f': F[X]) (r: PolynomialModule F V) (hur: (f: F(X)) • (v-u)=r)
  (hff'r: (QuadraticForm.baseChange F[X] φ) r = f * f') (hf_nonzero: f ≠ 0) (f'neqzero: f' ≠ 0): (f': F(X)) * (φ.baseChange F(X) (v-u))⁻¹=f := by
   have hf: (f: F(X)) ≠ 0 := by
@@ -51,7 +52,8 @@ lemma foo_foo {φ: QuadraticForm F V} (v: V(F)) (u: PolynomialModule F V) [Inver
     exact Eq.symm (RatFunc_coePolynomialMultiplication f f')
   rw[this,<- hff'r, toRatFuncTensor_CommuteQuadraticForm, <- hur, QuadraticMap.map_smul, smul_eq_mul]
 
-lemma foo {v: V(F)} {φ f} (p: F[X]) [Invertible (2:F)]
+/-- Lemma for use in `range_quadratic_polynomial_eq_restrict_rational`. Do not directly use outside. -/
+protected lemma foo {v: V(F)} {φ f} (p: F[X]) [Invertible (2:F)]
 (hvp : (QuadraticForm.baseChange F(X) φ) v = ↑p)
 (hf_nonzero : f ≠ 0)
 (vmulf : PolynomialModule F V)
@@ -78,7 +80,7 @@ lemma foo {v: V(F)} {φ f} (p: F[X]) [Invertible (2:F)]
     rw[smul_sub, <- ExtensionScalarsCommutesWithScalars, h_vmulf, hur.1,
       <- ExtensionScalarsCommutesWithScalars]
     simp[coeRatFunc, coePolynomialModule]
-  rw[<- h1, smul_smul, <- mul_assoc, foo_foo v u f f' r hur hff'r hf_nonzero f'neqzero, mul_comm, <- smul_smul, hur, hvp,
+  rw[<- h1, smul_smul, <- mul_assoc, CasselsPfister.foo_foo v u f f' r hur hff'r hf_nonzero f'neqzero, mul_comm, <- smul_smul, hur, hvp,
     <- toRatFuncTensor_CommuteQuadraticForm, h2, ExtensionScalarsCommutesWithScalars]
 
 /-- This formalizes the proof of getting (τ_w(v),f') from (v,w) in the
@@ -181,7 +183,7 @@ protected lemma GetSmallerDegree (p: F[X]) (φ: QuadraticForm F V) (f: F[X]) (v:
       rw[HyperplaneReflection_form (AnisotropicExtend' hAnsitropic) v hw_neq_zero u rfl]
       repeat rw[ExtensionScalarsCommutesWithScalars f']
       rw[smul_add]
-      exact foo p hvp hf_nonzero vmulf h_vmulf u r hur f' hff'r f'neqzero
+      exact CasselsPfister.foo p hvp hf_nonzero vmulf h_vmulf u r hur f' hff'r f'neqzero
     . unfold v_reflected
       rw [QuadraticMap.Isometry.map_app]
       exact hvp
@@ -205,8 +207,8 @@ protected lemma GetSmallerDegree (p: F[X]) (φ: QuadraticForm F V) (f: F[X]) (v:
 
 
 
-/-- Main lemma for use in CasselsPfisterTheorem. Do not directly use outside. -/
-protected lemma CasselsPfisterTheorem_NontrivialContainmentExtension (φ: QuadraticForm F V) [Invertible (2: F)]
+/-- Main lemma for use in `range_quadratic_polynomial_eq_restrict_rational`. Do not directly use outside. -/
+protected lemma NontrivialContainmentExtension (φ: QuadraticForm F V) [Invertible (2: F)]
   (hn: LinearMap.BilinForm.Nondegenerate (QuadraticMap.polarBilin φ)):
   (algebraMap F[X] (F(X)))⁻¹' (Set.range (φ.baseChange (F(X))))
   ⊆ Set.range (φ.baseChange F[X]) := by
@@ -243,8 +245,8 @@ protected lemma CasselsPfisterTheorem_NontrivialContainmentExtension (φ: Quadra
     trivial
 
 
-/-- Lemma for use in CasselsPfisterTheorem. Do not directly use outside. -/
-protected lemma CasselsPfisterTheorem_TrivialContainmentExtension (φ: QuadraticForm F V) [Invertible (2: F)]:
+/-- Lemma for use in `range_quadratic_polynomial_eq_restrict_rational`. Do not directly use outside. -/
+protected lemma TrivialContainmentExtension (φ: QuadraticForm F V) [Invertible (2: F)]:
   (algebraMap F[X] (F(X)))⁻¹' (Set.range (φ.baseChange (F(X))))
   ⊇ Set.range (φ.baseChange F[X]) := by
   rintro _ ⟨y, rfl⟩
@@ -256,19 +258,26 @@ protected lemma CasselsPfisterTheorem_TrivialContainmentExtension (φ: Quadratic
 /-- The values taken by the extension of a quadratic map `φ: V → F` to `V(X) → F(X)`
     that are in `F[X]` are taken by the extension `V[X] → F[X]` as well.
 
-    *Auxillary version of `CasselsPfisterTheorem` which requires `φ` is `Nondegenerate`*
+    *Cassels-Pfister Theorem*
+
+    *Auxillary version of `range_quadratic_polynomial_eq_restrict_rational` which requires `φ` is `Nondegenerate`*
 -/
-theorem CasselsPfisterTheoremAux (φ: QuadraticForm F V) [Invertible (2: F)] (hn: LinearMap.BilinForm.Nondegenerate (QuadraticMap.polarBilin φ)):
+theorem range_quadratic_polynomial_eq_restrict_rational_aux (φ: QuadraticForm F V) [Invertible (2: F)]
+  (hn: LinearMap.BilinForm.Nondegenerate (QuadraticMap.polarBilin φ)):
   (↑)⁻¹' (Set.range (φ.baseChange (F(X))))
    = Set.range (φ.baseChange F[X]) := by
   apply le_antisymm
-  . apply CasselsPfister.CasselsPfisterTheorem_NontrivialContainmentExtension φ hn
-  . apply CasselsPfister.CasselsPfisterTheorem_TrivialContainmentExtension
+  . exact CasselsPfister.NontrivialContainmentExtension φ hn
+  . exact CasselsPfister.TrivialContainmentExtension φ
+
+#print axioms range_quadratic_polynomial_eq_restrict_rational_aux
 
 /-- The values taken by the extension of a quadratic map `φ: V → F` to `V(X) → F(X)`
     that are in `F[X]` are taken by the extension `V[X] → F[X]` as well.
+
+    *Cassels-Pfister Theorem*
 -/
-theorem CasselsPfisterTheorem (φ: QuadraticForm F V) [Invertible (2: F)] (hn: (QuadraticMap.polarBilin φ).Nondegenerate):
+theorem range_quadratic_polynomial_eq_restrict_rational (φ: QuadraticForm F V) [Invertible (2: F)]:
   (↑)⁻¹' (Set.range (φ.baseChange (F(X))))
    = Set.range (φ.baseChange F[X]) := sorry
 

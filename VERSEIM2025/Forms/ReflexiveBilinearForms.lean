@@ -265,6 +265,7 @@ theorem refl_is_alt_or_symm {B: BilinForm k V} (h: B.IsRefl) [FiniteDimensional 
     apply proptwopointsix k V
     · exact h₄
 
+
 def quot_form {B: BilinForm k V} (hb: B.IsRefl): BilinForm k (V ⧸ (radForm B)) := sorry
 
 theorem reflexive_quotient_radForm_nondegenerate (B: BilinForm k V) (hr: B.IsRefl):
