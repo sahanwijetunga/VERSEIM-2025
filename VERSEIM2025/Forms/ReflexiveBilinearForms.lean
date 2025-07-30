@@ -266,4 +266,14 @@ def quot_form_apply' {B: BilinForm F V} (hb: B.IsRefl):
   exact quot_form_apply hb v w
 
 theorem reflexive_quotient_radForm_nondegenerate (B: BilinForm F V) (hr: B.IsRefl):
-   (quot_form hr).Nondegenerate := sorry
+   (quot_form hr).Nondegenerate := by
+  intro v hv
+  induction' v using Submodule.Quotient.induction_on with v
+  suffices v ∈ radForm B from ?_
+  . simpa using this
+  have: ∀ w, B v w = 0 := by
+    intro w
+    have: ((quot_form hr) (Submodule.Quotient.mk v)) (Submodule.Quotient.mk w) = 0 := by
+      exact hv (Submodule.Quotient.mk w)
+    simpa using this
+  exact this

@@ -6,25 +6,25 @@ open LinearMap
 open LinearMap (BilinForm)
 
 
-variable  {k V₁ V₂ :Type} [Field k] 
+variable  {k V₁ V₂ :Type} [Field k]
   [AddCommGroup V₁] [Module k V₁]
   [AddCommGroup V₂] [Module k V₂]
 
 structure equiv_of_spaces_with_form
-  (β₁:BilinForm k V₁) 
+  (β₁:BilinForm k V₁)
   (β₂:BilinForm k V₂)
   where
     equiv : V₁ ≃ₗ[k] V₂
-    compat : ∀ (x y : V₁), β₁ x y = β₂ (equiv v₁) (equiv v₂) 
+    compat : ∀ (x y : V₁), β₁ x y = β₂ (equiv v₁) (equiv v₂)
 
-notation:100 lhs:100 "≃[" field:100 "," lhb:100 "," rhb:100 "]" rhs:100 => 
+notation:100 lhs:100 "≃[" field:100 "," lhb:100 "," rhb:100 "]" rhs:100 =>
   equiv_of_spaces_with_form (k:= field) (V₁ := lhs) (V₂ := rhs) lhb rhb
 
 
-def anisotropicVector {V : Type} [ AddCommGroup V ] [ Module k V ] 
+def anisotropicVector {V : Type} [ AddCommGroup V ] [ Module k V ]
   (β:BilinForm k V) (v:V) : Prop := β v v ≠ 0
 
-def anisotropic {V : Type} [ AddCommGroup V ] [ Module k V ] 
+def anisotropic {V : Type} [ AddCommGroup V ] [ Module k V ]
   (β:BilinForm k V) : Prop := ∀ v, v ≠ 0 → anisotropicVector β v
 
 
@@ -37,7 +37,7 @@ theorem alt_of_equiv (eq : V₁ ≃[k,β₁,β₂] V₂) (halt : β₁.IsAlt) : 
 
 --two more results!
 
-def equiv_of_spaces_with_form.symm {β₁:BilinForm k V₁} {β₂:BilinForm k V₂} 
+def equiv_of_spaces_with_form.symm {β₁:BilinForm k V₁} {β₂:BilinForm k V₂}
   (e:V₁ ≃[k,β₁,β₂] V₂) :
   V₂ ≃[k,β₂,β₁] V₁ where
     equiv := e.equiv.symm
@@ -46,33 +46,34 @@ def equiv_of_spaces_with_form.symm {β₁:BilinForm k V₁} {β₂:BilinForm k V
 variable  {V₃ :Type}
   [AddCommGroup V₃] [Module k V₃]
 
-def equiv_of_spaces_with_form.trans  {β₁:BilinForm k V₁} {β₂:BilinForm k V₂} 
+def equiv_of_spaces_with_form.trans  {β₁:BilinForm k V₁} {β₂:BilinForm k V₂}
   {β₃:BilinForm k V₃} (e₁:V₁ ≃[k,β₁,β₂] V₂) (e₂:V₂ ≃[k,β₂,β₃] V₃) :
   V₁ ≃[k,β₁,β₃] V₃ where
     equiv := e₁.equiv.trans  e₂.equiv
     compat := by sorry
-    
-example : BilinForm k V₁ →ₗ[k] BilinForm k V₁ := lflip
 
-example : Module.End k (BilinForm k V₁) := LinearMap.lflip^2 
+def T : BilinForm k V₁ →ₗ[k] BilinForm k V₁ := lflip
 
-theorem tsq : lflip^2 = (id:BilinForm k V₁ →ₗ[k] BilinForm k V₁) := by 
+example : Module.End k (BilinForm k V₁) := LinearMap.lflip^2
+
+theorem tsq : lflip^2 = (id:BilinForm k V₁ →ₗ[k] BilinForm k V₁) := by
   ext β x y
   rw [ pow_two ]
   rw [ Module.End.mul_eq_comp ]
   rw [ comp_apply ]
   rw [ lflip_apply, lflip_apply ]
   simp
-  
+
 
 variable [ Module.Finite k V₁] in
 example : Module.Finite k (BilinForm k V₁) := inferInstance
 
-example  [Module.Finite k V₁]: Polynomial k := charpoly (lflip : BilinForm k V₁ →ₗ[k] BilinForm k V₁) 
+noncomputable example  {M: Type} [AddCommGroup M] [Module k M] [Module.Finite k M] (f: M →ₗ[k] M):
+   Polynomial k := charpoly f
 
 
-theorem cp [Module.Finite k V₁]: charpoly (lflip : BilinForm k V₁ →ₗ[k] BilinForm k V₁) 
-  = (X^2 - 1 : Polynomial k) := by 
+theorem cp [Module.Finite k V₁]: charpoly (lflip : BilinForm k V₁ →ₗ[k] BilinForm k V₁)
+  = (X^2 - 1 : Polynomial k) := by
   sorry
-  
-#check flip 
+
+#check flip
