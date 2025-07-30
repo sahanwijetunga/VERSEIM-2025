@@ -350,8 +350,10 @@ theorem OneDimIsFooSymm {B: BilinForm k V} (bsymm: IsSymm B) (hrank: Module.finr
   have := OneDegNonDegenerateIsAnisotropic  hrank hd
   apply FooSymm_of_anisotropic this
 
-protected theorem symmetric_is_FooSymmPred_aux (p: ℕ)  (B: BilinForm k V) (bsymm: IsSymm B) [FiniteDimensional k V]
-(n: ℕ) (hn: n = Module.finrank k V) (hd: B.Nondegenerate) [CharP k p] (hn2 : p ≠ 2): FooSymmPred bsymm  := by
+protected theorem symmetric_is_FooSymmPred (p: ℕ)  (B: BilinForm k V) (bsymm: IsSymm B) [FiniteDimensional k V]
+ (hd: B.Nondegenerate) [CharP k p] (hn2 : p ≠ 2): FooSymmPred bsymm  := by
+  suffices ∀ n, (hn: n = Module.finrank k V) → FooSymmPred bsymm from this (Module.finrank k V) rfl
+  intro n hn
   induction' n using Nat.strong_induction_on with n h generalizing V
   have hr : IsRefl B := IsSymm.isRefl bsymm
   case h =>
@@ -387,13 +389,14 @@ protected theorem symmetric_is_FooSymmPred_aux (p: ℕ)  (B: BilinForm k V) (bsy
           apply (restrict_nondegenerate_iff_isCompl_orthogonal hr).mpr
           rw[orthogonal_orthogonal hd (hr) H.toSubmodule]
           exact id (IsCompl.symm hIsComplW'H)
-        exact h m hmm2 (B.restrict W') hbW'IsGoodProp hWrankeqm hBW'Nondegenerate
+        exact h m hmm2 (B.restrict W') hbW'IsGoodProp hBW'Nondegenerate hWrankeqm
       exact FooSymmPredExpand bsymm H hHW' hpredW'
     . have: ∀ (v: V), (B v v = 0 → v=0) := by
         intro v h
         contrapose! h'
         use v
       exact FooSymm_of_anisotropic this
+
 
 noncomputable def FooSymm_of_FooSymmPred {B: BilinForm k V} {bsymm: IsSymm B} (h: FooSymmPred bsymm): FooSymm bsymm := by
     apply Classical.choice
@@ -404,9 +407,7 @@ noncomputable def FooSymm_of_FooSymmPred {B: BilinForm k V} {bsymm: IsSymm B} (h
 noncomputable def symmetric_is_FooSymm  (p: ℕ)  {B: BilinForm k V} (bsymm: IsSymm B) (hd: B.Nondegenerate) [FiniteDimensional k V]
   [CharP k p] (hn2 : p ≠ 2):
   FooSymm bsymm :=
-    FooSymm_of_FooSymmPred <| Symmetric.symmetric_is_FooSymmPred_aux p B bsymm (Module.finrank k V) rfl hd hn2
-
-#print axioms symmetric_is_FooSymm
+    FooSymm_of_FooSymmPred <| Symmetric.symmetric_is_FooSymmPred p B bsymm hd hn2
 
 
 end Symmetric
