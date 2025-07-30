@@ -1,0 +1,696 @@
+\documentclass{beamer}
+      % for syntax highlighting
+
+
+
+%%--------------------------------------------------------------------------------
+\usepackage{fontspec}
+\setmonofont{FreeMono}
+
+\usepackage{minted}
+\usepackage[svgnames]{xcolor}
+
+%% I'll use `Lavender` below, which is defined by the `svgnames` spec
+%% of xcolor (google for svgnames xcolor latex package for a full list
+%% of colornames provided by `svgnames`
+
+%% or define your own color name like this:
+
+%% \definecolor{lavender-web}{rgb}{0.9, 0.9, 0.98}
+
+%% You can find more example color specs here: https://latexcolor.com/
+
+\newmintinline[lean]{lean4}{bgcolor=Lavender}
+\newminted[leancode]{lean4}{fontsize=\footnotesize}
+\usemintedstyle{tango}  % a nice, colorful theme
+
+\setminted[lean]{bgcolor=Lavender}
+
+
+
+      
+
+\usepackage{etoolbox}    % for conditional tweaks
+
+
+
+
+
+
+% Set a dark background for minted code
+%\definecolor{bgdark}{HTML}{1E1E1E}  % VSCode dark gray
+%\definecolor{lightgray}{gray}{0.9}
+%\definecolor{mygreen}{rgb}{0,0.6,0}
+%\definecolor{mypurple}{rgb}{0.58,0,0.82}
+
+\usetheme{Antibes}
+\useoutertheme{miniframes} % Alternatively: miniframes, infolines, split
+\useinnertheme{circles}
+%\definecolor{bg}{HTML}{282828} % from https://github.com/kevinsawicki/monokai
+
+\definecolor{IITHorange}{RGB}{242, 82, 176} % orange{243, 130, 33}
+\definecolor{IITHyellow}{RGB}{9, 9, 130} % yellow {254, 203, 10}
+
+% \definecolor{fuschia}{RGB}{12, 200, 168}
+% \definecolor{deep}{RGB}{52, 200, 174}
+% \definecolor{lace}{RGB}{52, 200, 204}
+% \definecolor{blush}{RGB}{42, 200, 25}
+
+% \setbeamercolor{palette primary}{bg=IITHorange,fg=white}
+% \setbeamercolor{palette secondary}{bg=IITHorange,fg=white}
+% \setbeamercolor{palette tertiary}{bg=IITHorange,fg=white}
+% \setbeamercolor{palette quaternary}{bg=IITHorange,fg=white}
+% \setbeamercolor{structure}{fg=IITHorange} % itemize, enumerate, etc
+% \setbeamercolor{section in toc}{fg=IITHorange} % TOC sections
+
+% % Change example block colors
+
+% % 1- Block title (background and text)
+% \setbeamercolor{block title example}{fg=white, bg=gray}
+
+% % 2- Block body (background)
+% \setbeamercolor{block body example}{bg=teal!25}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Aut}{\operatorname{Aut}}
+\newcommand{\ol}{\overline}
+\newcommand{\PSL}{\operatorname{PSL}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\proj}{\text{proj}}
+\DeclareMathOperator{\Ind}{Ind}
+\DeclareMathOperator{\tr}{tr}
+\usepackage{ytableau}
+% \usepackage{emoji}
+% \usepackage{amsthm}
+% \usepackage{xcolor}
+% \usepackage{graphicx, pgfplots, mathdots}
+% \usepackage{tikz}
+% \usepackage[absolute,overlay]{textpos}
+% \usetikzlibrary{positioning}
+
+
+% Override palette coloring with secondary
+\setbeamercolor{subsection in head/foot}{bg=IITHyellow,fg=white}
+\section{Introduction}
+
+\title{Formalization in Linear Algebra}
+\date{06/26/2025}
+\author{Clea Bergsman, Katherine Buesing, 
+Sahan Wijetunga, Mentor: George McNinch}
+\institute[Formalization in Lean]{VERSEIM REU}
+
+\begin{document}
+\ytableausetup{boxsize=1.0em}
+	
+	% Begin Slide
+	
+	\begin{frame}
+		\titlepage
+	\end{frame}
+	
+	% Begin Slide
+	
+	\begin{frame}
+		\tableofcontents
+	\end{frame}
+
+
+%Clea
+\section{Bilinear Forms}
+\subsection{Definitions}
+\begin{frame} {What is a Bilinear Form?}
+   
+Definition: a \textbf {bilinear form} is a map $\beta : V\times W \to K $, where V and W are K-vector spaces and K is a field, when
+\begin{enumerate}
+    \item $\beta (v_1 + v_2 , w) = \beta (v_1 , w) +\beta ( v_2,w)$
+    \item $\beta ( v, w_1 + w_2) = \beta (v,w_1) +\beta (v , w_2)$
+    \item $\beta(\lambda v, w) = \beta (v, \lambda w) = \lambda \beta (v , w)$
+\end{enumerate}
+hold for all $v\in V$, $w\in W$, and $\lambda \in K$.
+\end{frame}
+
+\begin {frame} {Special Properties}
+A bilinear form $\beta$ is \textbf{symmetric} if 
+\begin{enumerate}
+    \item $\beta (v,w) = \beta (w,v)$ $\forall$ $v,w$
+\end{enumerate}
+\vspace{1cm}
+A bilinear form $\beta$ is \textbf{anti-symmetric} or \textbf{alternating} if
+\begin{enumerate}
+    \item $\beta (v,v) = 0$, $\forall$ $v$
+    \item $\beta (v,w) = -\beta (w,v)$, $\forall$ $v,w$
+\end{enumerate}
+\vspace{1cm}
+Otherwise, a bilinear form $\beta$ is called \textbf{nonsymmetric}.
+
+\end{frame}
+
+\begin{frame} {A Lemma on Anti-Symmetric Bilinear Forms}
+Lemma: If $\beta (v,v) = 0$, $\forall$ $v$, then $\beta (v,w) = -\beta(w,v)$, $\forall$ $v,w$ .
+Proof:
+\begin{itemize}
+    \item Let $\beta(v+w,v+w)=0$
+    \item $=\beta(v+w,v)+\beta(v+w,w)$
+    \item $=\beta(v,v)+\beta(w,v)+\beta(v,w)+\beta(w,w)$
+    \item Since $\beta (v,v)=0$, we have $\beta (w,v)+\beta(v,w)=0$
+    \item Thus, $\beta(v,w)=-\beta(w,v)$
+\end{itemize} 
+\end{frame}
+
+\subsection{Proof in Lean}
+%\begin{frame} {Proof in Lean}
+\begin{itemize}
+    \item 
+    \begin{minted}[]{lean}
+def Alt (β:V →l[k] V →l[k] k) : Prop :=
+  ∀ v : V, β v v = 0
+
+def Skew (β:V →l[k] V →ₗlk] k) : Prop :=
+  ∀ v w : V, β v w = -β w v
+    \end{minted}
+\end{itemize}
+%\end{frame}
+
+%\begin{frame}
+%\end{frame}
+
+%\begin{frame}{Proof in Lean Continued}
+
+
+{\tiny
+\begin{minted}[]{lean}
+lemma skew_of_alt (β:V →l[k] V →l[k] k) (ha : Alt β) :
+  Skew β := by
+  intro v w 
+  have h0 : β (v+w) = β v + β w := by simp
+  have h : β (v+w) (v+w) 
+  = (β v) v + (β w) v + (β v) w + (β w) w := 
+    calc 
+    (β (v+w)) (v+w) = (β v) (v+w) + (β w) (v+w) := 
+    by rw [LinearMap.BilinForm.add_left]
+    _ = (β v) v + (β w) v + (β v) w + (β w) w :=
+    by rw [LinearMap.BilinForm.add_right v v w, 
+    LinearMap.BilinForm.add_right w v w, ← add_assoc]; ring
+  have hv : β v v = 0 := by apply ha
+  have hw : β w w = 0 := by apply ha
+  have hvw : β (v+w) (v+w) = 0 := by apply ha
+  rw [hv, hw, hvw, zero_add, add_zero] at h
+  have h1 : (β v) w = -(β w) v := by 
+  exact Eq.symm (LinearMap.BilinForm.IsAlt.neg_eq ha w v)
+  exact h1
+\end{minted}
+}
+
+%\end{frame}
+
+
+% Katherine
+\section{Proofs We're Working On}
+
+
+
+\begin{frame}  {Orthogonal Complement}
+\item The following is a definition of the orthogonal complement 
+\item It also proves each of the following characteristics of the orthogonal complement
+\begin{itemize}
+    \item add\_mem'
+    \item zero\_mem'
+    \item smul\_mem'
+\end{itemize}
+\item This definition and proof was written by Clea Bergsman
+
+\end{frame}
+
+\begin{minted}[]{lean}
+def OrthogComplement {k V: Type} [AddCommGroup V] 
+[Field k] [Module k V] (S : Set V) 
+{β:V →l [k] V →l [k] k} : Subspace k V where
+  carrier := { v | ∀ (x:S), β v x = 0 }
+  add_mem' := by 
+    simp
+    intro h1 h2 h3 h4
+    exact fun a b ↦ Linarith.eq_of_eq_of_eq 
+    (h3 a b) (h4 a b)
+  zero_mem' := by
+    simp 
+  smul_mem' := by 
+    simp
+    intro h1 h2 h3 h4 h5
+    right
+    apply h3
+    exact h5
+\end{minted}
+
+
+\begin{frame} {Unique Representation of a Direct Sum}
+\item The following is a proof of the fact that if you have two disjoint subspaces $W_1$ and $W_2$ four vectors, $x_1, y_1 \in W_1 $ and $x_2, y_2 \in W_2$, then $x_1 + x_2 = y_1 + y_2 $ implies $x_1 = y_1$ and $x_2 = y_2$
+
+\item This proof was written by Sahan Wijetunga
+\end{frame}
+
+\begin{minted}[]{lean}
+theorem direct_sum_unique_repr (k V : Type) 
+  [Field k] [AddCommGroup V] [Module k V]
+  (W₁ W₂ : Submodule k V) (h_int : ⊥ = W₁ ⊓ W₂)
+  (x₁ x₂ y₁ y₂ : V) (h₁ : x₁ ∈ W₁ ∧ y₁ ∈ W₁) 
+  (h₂ : x₂ ∈ W₂ ∧ y₂ ∈ W₂ ) :
+  x₁ + x₂ = y₁ + y₂ → x₁ = y₁ ∧ x₂ = y₂ := by
+    have <hx1, hy1> := h₁
+    have <hx2, hy2> := h₂
+    intro h
+    have h': x₁-y₁ = y₂-x₂ :=
+      calc
+        x₁-y₁ = (x₁+x₂-x₂)-y₁ := by abel_nf
+        _ = (y₁+y₂-x₂)-y₁ := by rw[h]
+        _ = y₂-x₂ := by abel
+    have hw1: (x₁-y₁) ∈ W₁ := by
+      exact 
+      (Submodule.sub_mem_iff_left W₁ hy1).mpr 
+      hx1
+    have hw2: (x₁-y₁) ∈ W₂ := by
+      have: y₂-x₂ ∈ W₂ := by
+        exact 
+        (Submodule.sub_mem_iff_left W₂ hx2).mpr 
+        hy2
+      rw[h']
+      assumption
+    have hw: (x₁-y₁) ∈ (W₁: Set V) ∩ W₂ := by
+      exact Set.mem_inter hw1 hw2
+    have hw0: x₁-y₁ = 0 := by
+      have: (W₁: Set V) ∩ W₂ = {(0: V)} := calc
+        (W₁: Set V) ∩ W₂ = W₁ ⊓ W₂ := rfl
+        _ = (⊥: Submodule k V) := by
+          exact congrArg SetLike.coe 
+          (id (Eq.symm h_int))
+        _ = ({0}: Set V) := rfl
+      have: (x₁-y₁) ∈ ({0}: Set V) := by
+        rw[<- this]
+        assumption
+      exact this
+    have hxy1: x₁=y₁ := by
+      calc
+        _ = (x₁-y₁)+y₁ := by abel
+        _ = 0+y₁ := by rw[hw0]
+        _ = y₁ := by abel
+    have hxy2: x₂=y₂ := by
+      calc
+        x₂ = x₂+ 0 := by abel
+        _ = x₂+(x₁-y₁) := by rw[hw0]
+        _ = x₂+(y₂-x₂) := by rw[h']
+        _ = y₂ := by abel
+    exact <hxy1, hxy2>
+\end{minted}
+
+
+
+\begin{frame} {Disjoint Union of Functions}
+\item This is an (incomplete) proof that the disjoint union of two linearly independent bases $b_1$ and $b_2$ are linearly independent
+\item This (incomplete) proof was written by Katherine Buesing 
+\end{frame}
+
+%this proof is not quite finished yet but i will put it here once it is 
+\begin{minted}[]{lean}
+theorem lin_indep_by_transverse_subspaces
+   (k V : Type) [Field k] [AddCommGroup V] 
+   [Module k V] (I₁ I₂ : Type)
+   [Fintype I₁] [Fintype I₂]
+   (b₁ : I₁ → V) (b₂ : I₂ → V)
+   (b1_indep : LinearIndependent k b₁)
+   (b2_indep : LinearIndependent k b₂)
+   (W₁ W₂ : Submodule k V)
+   (h_int : W₁ ⊓ W₂ = ⊥)
+   (hbw1 : ∀ i, b₁ i ∈ W₁)
+   (hbw2 : ∀ i, b₂ i ∈ W₂)
+   [DecidableEq I₁] [DecidableEq I₂]
+   : LinearIndependent k 
+   (disjointUnion_funs b₁ b₂) := by
+    rw[linearIndependent_iff'']
+    intro s a g h₁ h₂
+    have k₀ : 
+    ∑ i ∈ s, a i • disjointUnion_funs b₁ b₂ i 
+    = ∑ i : (I₁ ⊕ I₂), a i • 
+    disjointUnion_funs b₁ b₂ i := by
+      sorry
+    have k₁ : ∑ i, (a (Sum.inl i)) • (b₁ i) = 
+    - ∑ j, (a (Sum.inr j)) • (b₂ j)  := by
+      rw[k₀] at h₁
+      simp at h₁
+      sorry
+    have k₂ : ∑ i, (a (Sum.inl i)) • (b₁ i) 
+    ∈ W₁ ⊓ W₂ := by
+      simp
+      have k₂₀ : ∑ i, (a (Sum.inl i)) • (b₁ i) 
+      ∈ W₁ := by
+        exact Submodule.sum_smul_mem W₁ 
+        (fun i ↦ a (Sum.inl i)) fun c a ↦ hbw1 c
+      have k₂₁ : ∑ i, (a (Sum.inl i)) • (b₁ i) 
+      ∈ W₂ := by
+        rw[k₁]
+        apply Submodule.neg_mem
+        exact Submodule.sum_smul_mem W₂ 
+        (fun i ↦ a (Sum.inr i)) fun c a ↦ hbw2 c
+      constructor
+      · exact k₂₀
+      · exact k₂₁
+    have k₃ : - ∑ j, (a  (Sum.inr j)) • (b₂ j) 
+    ∈ W₁ ⊓ W₂ := by
+      rw[k₁] at k₂
+      exact k₂
+    rw[linearIndependent_iff] at b1_indep
+    rw[linearIndependent_iff] at b2_indep
+    rw[h_int] at k₂
+    rw[h_int] at k₃
+    simp at k₂
+    simp at k₃
+    sorry
+\end{minted}
+
+
+
+
+% #2 pf, 6/20 #1 pf (both ones im working on)
+\begin{frame} {Some (More) Unsolved Proofs}
+\begin{itemize}
+    \item The linear independence of orthogonal bases
+    \item The disjoint union of sets Fin n and Fin m is equal to Fin n + m
+    \item And more properties of alternating and symmetric bilinear forms
+\end{itemize}
+\end{frame} 
+
+
+
+
+%Sahan
+\section{Gram-Schmidt Proof}
+
+% \begin{frame}{Gram-Schmidt}
+
+% \begin{quote}
+% \itshape
+% ``\dots Gram-Schmidt algorithm is a way of finding a set of two or more vectors that are perpendicular to each other.''\\
+% \hfill --- Wikipedia
+% \end{quote}
+
+% \end{frame}
+
+% \begin{frame}{Recap}
+
+% Definition: a \textbf {symmetric bilinear form} is a map $\beta : V\times W \to k $ when
+% \begin{enumerate}
+%     \item $\beta (v_1 + v_2 , w) = \beta (v_1 , w) +\beta ( v_2,w)$
+%     \item $\beta ( v, w_1 + w_2) = \beta (v,w_1) +\beta (v , w_2)$
+%     \item $\beta(\lambda v, w) = \beta (v, \lambda w) = \lambda \beta (v , w)$
+% \end{enumerate}
+% hold for all $v\in V$, $w\in W$, and $\lambda \in k$.
+% \end{frame}
+
+% \begin{frame}{Definite Form}
+
+% Definition: a \textbf {\textcolor{red}{definite} (symmetric bilinear) form} is a map $\beta : V\times W \to k $ when
+% \begin{enumerate}
+%     \item $\beta (v_1 + v_2 , w) = \beta (v_1 , w) +\beta ( v_2,w)$
+%     \item $\beta ( v, w_1 + w_2) = \beta (v,w_1) +\beta (v , w_2)$
+%     \item $\beta(\lambda v, w) = \beta (v, \lambda w) = \lambda \beta (v , w)$
+%     \item \textcolor{red}{$\beta (v,v) \neq 0, \, \forall v \neq 0$}
+% \end{enumerate}
+% hold for all $v\in V$, $w\in W$, and $\lambda \in k$.
+% \end{frame}
+
+
+\begin{frame}{Definite Form}
+
+Definition: a \textbf {\textcolor{blue}{positive definite} (symmetric bilinear) form} is a map $\beta : V\times V \to \R $ with
+\begin{enumerate}
+    \item $\beta (v_1 + v_2 , w) = \beta (v_1 , w) +\beta ( v_2,w)$, $\forall v_1,v_2,w\in V$
+    \item $\beta(\lambda v, w) = \lambda \beta (v, w)$, $\forall \lambda \in \R$, $\forall v,w \in V$
+    \item $\beta( v, w) =\beta(w,v)$, $\forall v,w \in V$
+    \item \textcolor{blue}{$\beta (v,v) >0, \, \forall v \neq 0$}
+\end{enumerate}
+\end{frame}
+
+
+\begin{frame}{Orthogonal}
+\begin{enumerate}
+\item We say $(v_1, \dots, v_n)$ are \textit{orthogonal} if $\beta(v_i, v_j)=0$ for $i \neq j$. 
+\item We say $(v_1, \dots, v_n)$ are \textit{orthonormal} if they are orthogonal and $\beta(v_i,v_i)=1$ for all $i$. 
+\end{enumerate}
+
+\end{frame}
+
+
+
+% \begin{frame}{Gram-Schmidt (Formal)}
+
+% \begin{enumerate}
+%     \item Let $V$ be a vector space over a field $k$ with a definite form $\beta$. Let $v_1, \dots, v_n \in V$. \\
+%     \item The Gram-Schmidt (orthogonalization) algorithm uses $v_1, \dots, v_n$ and outputs a list $u_1, \dots, u_n$ of orthogonal vectors with 
+%     \[\text{Span}_k(u_1, \dots, u_n)=\text{Span}_k(v_1, \dots, v_n).\]
+    
+% \end{enumerate}
+
+
+
+
+% \end{frame}
+
+
+\begin{frame}{Gram-Schmidt}
+
+\begin{enumerate}
+    \item Let $V$ be a vector space over $\R$ with a positive definite form $\beta$ and basis $(v_1, \dots, v_n)$. 
+    \item The Gram-Schmidt (orthonormalization) algorithm returns an \textit{orthonormal} basis $(u_1, \dots, u_n)$.     
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}{Gram-Schmidt Algorithm}
+
+\begin{enumerate}
+\item Let $(v_1, \dots, v_n)$ linearly independent. We define $(u_1, \dots, u_n)$ (inductively) by
+\begin{align*}
+u_1&:=v_1,\\
+u_2&:=v_2-\proj_{u_1}(v_2),\\
+u_3&:=v_2-\proj_{u_1}(v_3)-\proj_{u_2}(v_3),\\
+&\,\,\,\,\,\vdots\\
+u_n &:= v_n-\sum_{j=1}^{n-1} \proj_{u_j}(v_n).
+\end{align*}
+where $\proj_u(v) = \frac{\beta(v,u)}{\beta(u,u)} \cdot u$. These $(u_1, \dots, u_n)$ are orthogonal. 
+\end{enumerate}
+\end{frame}
+
+
+\begin{frame}{Gram-Schmidt Algorithm}
+
+\begin{enumerate}
+\item Let $(v_1, \dots, v_n)$ linearly independent. We define $(u_1, \dots, u_n)$ (inductively) by
+\begin{align*}
+u_1&:=v_1,\\
+u_2&:=v_2-\proj_{u_1}(v_2),\\
+u_3&:=v_2-\proj_{u_1}(v_3)-\proj_{u_2}(v_3),\\
+&\,\,\,\,\,\vdots\\
+u_n &:= v_n-\sum_{j=1}^{n-1} \proj_{u_j}(v_n).
+\end{align*}
+where $\proj_u(v) = \frac{\beta(v,u)}{\beta(u,u)} \cdot u$. 
+Note defining $v_i := \frac{1}{\sqrt{\beta(u_i,u_i)}}$ 
+we have $\beta(v_i,v_i)=1$. The $(v_1, \dots, v_n)$ are orthonormal. 
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Calculation}
+Recall $v_1=u_1$, $u_k  =v_k-\sum_{i=1}^{k-1}\proj_{u_i}(v_k)$. We have for $j<k$ that
+\begin{align*}
+\beta \left(u_j, u_k\right)&=\beta \left(u_j, v_k-\sum_{i=1}^{n-1} \proj_{u_j}(v_k)\right)\\
+&= \beta(u_j,v_k)-\sum_{i=1}^{n-1} \beta(u_j, \proj_{u_i}(v_k))\\
+&= \beta(u_j, v_k)-\sum_{i=1}^{n-1} \frac{\beta(u_i, u_k)}{\beta(u_i,u_i)} \beta(u_j, u_i)\\
+&= \beta(u_j,v_k)-\beta(u_j,v_k)\\
+&= 0
+\end{align*}
+As $\beta$ is symmetric, $\beta(u_k,u_j)=0$ as well. 
+
+\end{frame}
+
+
+\begin{frame}{Lean Proof Structure}
+
+\begin{enumerate}
+\item The proof took 478 lines in lean! I separated it into 15 lemmas, 10 theorems, and $\sim$15 definitions. 
+\end{enumerate}
+
+
+
+\end{frame}
+
+{
+\begin{minted}[]{lean}
+structure OrthogBasis'{V:Type}[AddCommGroup V] 
+  [Module ℝ V] (β:V → V → ℝ) (hp: Def β)
+  (hs: Symm β) (n:ℕ) where
+  
+  basis : Basis (Fin n) ℝ V
+  is_orthog : OrthogPred β basis
+\end{minted}
+}
+
+\newpage 
+
+\begin{minted}[]{lean}
+structure OrthogBasis'{V:Type}[AddCommGroup V] 
+  [Module ℝ V] (β:V → V → ℝ) (hp: Def β)
+  (hs: Symm β) (n:ℕ) where
+  
+  basis : Basis (Fin n) ℝ V
+  is_orthog : OrthogPred β basis
+
+def orthog_basis {V:Type} [AddCommGroup V] 
+[Module ℝ V] (β:V → V → ℝ) (hp: Def β)
+(hs : Symm β) {n:ℕ} (b: Basis (Fin n) ℝ V):
+OrthogBasis' β hp hs n where
+    
+    basis := ...
+    is_orthog := 
+        orthog_span_gram_schmidt β hp hs b
+\end{minted}
+
+\newpage
+
+{
+\tiny
+\begin{minted}[]{lean}
+theorem orthog_span_gram_schmidt {V:Type} [AddCommGroup V] [Module ℝ V]
+  (β:V → V → ℝ) (hp : Def β) (hs : Symm β)
+  {n:ℕ} (b:Fin n → V)
+  : OrthogPred β (gram_schmidt β hp hs b):=
+  match n with
+  | Nat.zero => by
+    intro i j h
+    have: ↑i<(0: ℕ) := by exact i.isLt
+    linarith
+  | Nat.succ n => by
+    let c := gram_schmidt β hp hs b
+    let c' := gram_schmidt β hp hs (restrict b)
+    let x := b (Fin.last n)
+    have h: c = intermediate β c' x := rfl
+    exact orthog_intermediate β hp hs c' 
+      (orthog_span_gram_schmidt β hp hs (restrict b)) x 
+\end{minted}
+}
+
+
+\newpage
+
+{
+\tiny
+\begin{minted}[]{lean}
+theorem orthog_span_gram_schmidt {V:Type} [AddCommGroup V] [Module ℝ V]
+  (β:V → V → ℝ) (hp : Def β) (hs : Symm β)
+  {n:ℕ} (b:Fin n → V)
+  : OrthogPred β (gram_schmidt β hp hs b):=
+  match n with
+  | Nat.zero => by
+    intro i j h
+    have: ↑i<(0: ℕ) := by exact i.isLt
+    linarith
+  | Nat.succ n => by
+    let c := gram_schmidt β hp hs b
+    let c' := gram_schmidt β hp hs (restrict b)
+    let x := b (Fin.last n)
+    have h: c = intermediate β c' x := rfl
+    exact orthog_intermediate β hp hs c' 
+      (orthog_span_gram_schmidt β hp hs (restrict b)) x 
+theorem orthog_intermediate {V:Type} [AddCommGroup V] [Module ℝ V]
+  (β:V → V →ℝ) (hp : Def β) (hs : Symm β)
+  {n:ℕ} (b:Fin n → V) (hb: OrthogPred β b) (x: V):
+    OrthogPred β (intermediate β b x) := by
+    have case1 (...) (h₁: i=Fin.last n): (β (...) (...)) = 0 := by
+      ... 
+      rw[this]
+      exact orthog_sub_perp_align β hp hs b hb x (j.castPred h₂)
+    have case2 (...): ... = 0 := by
+      ...
+    intro i j h
+    by_cases h₁:(i=Fin.last n)
+    . exact case1 i j h h₁
+    by_cases h₂:(j=Fin.last n)
+    . rw[hs]
+      exact case1 j i h.symm h₂
+    . exact case2 i j h h₁ h₂
+\end{minted}
+}
+
+\newpage
+
+\begin{minted}[]{lean}
+@[simp]
+def restrict {X:Type} {m:ℕ} (f:Fin (m+1) → X) 
+    : Fin m → X := fun i => f i.castSucc
+\end{minted}
+
+\newpage
+
+\begin{minted}[]{lean}
+@[simp]
+def restrict {X:Type} {m:ℕ} (f:Fin (m+1) → X) 
+    : Fin m → X := fun i => f i.castSucc
+theorem restrict_set_eq {X: Type} {m: ℕ} 
+    (f: Fin (m+1) → X) :    
+    f '' (Set.range (@Fin.castSucc m))
+    = Set.range (restrict f)
+  := by ...
+\end{minted}
+
+\newpage
+
+
+\begin{minted}[]{lean}
+@[simp]
+def restrict {X:Type} {m:ℕ} (f:Fin (m+1) → X) 
+    : Fin m → X := fun i => f i.castSucc
+theorem restrict_set_eq {X: Type} {m: ℕ} 
+    (f: Fin (m+1) → X) :    
+    f '' (Set.range (@Fin.castSucc m))
+    = Set.range (restrict f)
+  := by ...
+
+lemma linear_independence_mem (...)
+    (hb: LinearIndependent ℝ b) :
+  ¬ (b (Fin.last n))∈ 
+    Submodule.span ℝ (Set.range (restrict b)) 
+    
+    := by
+    rw[<- restrict_set_eq]
+    ...
+\end{minted}
+
+
+
+\newpage
+
+%All
+\section{Conclusion}
+
+\begin{frame}{References}
+\begin{enumerate}
+\item Avigad, J. Buzzard, K. Lewis R. Y. Massot, P. (2020). \textit{Mathematics in Lean}. 
+\item Liesen, J. Mehrmann, V. (2015). \textit{Linear Algebra}. 
+
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+	    \begin{center}
+	        \textbf{Thank you!}\\
+	        
+	        Special thanks to Dr. George McNinch and the REU
+         \bigbreak
+         \LARGE
+       
+	    \end{center}
+\end{frame}
+
+    
+\end{document}

@@ -1,0 +1,19 @@
+\documentclass{beamer}
+\usepackage{minted} % Requires -shell-escape
+
+\begin{document}
+
+
+{\tiny % can also use \scriptsize, \footnotesize, \small, etc.
+\begin{minted}[bgcolor=black!5, linenos]{lean}
+lemma foo (x y : ℕ) : x + y = y + x :=
+  Nat.add_comm x y
+\end{minted}
+}
+
+\begin{minted}[bgcolor=black!5, linenos]{lean}
+lemma foo (x y : ℕ) : x + y = y + x :=
+  Nat.add_comm x y
+\end{minted}
+
+\end{document}
