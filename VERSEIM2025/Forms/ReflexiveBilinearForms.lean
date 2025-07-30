@@ -183,7 +183,7 @@ theorem symmetry_extend {B: BilinForm F V} {v: V} (hr: IsRefl B)
   rw[huyv, huxv, huxy, hr _ _ huyv, hr _ _ huxv]
   ring
 
-theorem refl_is_alt_or_symm {B: BilinForm F V} (h: IsRefl B) [FiniteDimensional F V] :
+example {B: BilinForm F V} (h: IsRefl B) [FiniteDimensional F V] :
   IsAlt B ∨ IsSymm B := by
   by_cases ha:IsAlt B
   . left; exact ha
@@ -239,6 +239,114 @@ theorem refl_is_alt_or_symm {B: BilinForm F V} (h: IsRefl B) [FiniteDimensional 
     exact (sub_eq_zero.mp this).symm
   exfalso
   exact hxy h3
+
+lemma proptwopointsix {B: BilinForm F V}
+(h : ∀ (u v w : V), (((B u) v) * ((B w) u)) = (((B v) u) * ((B u) w))): B.IsAlt ∨ B.IsSymm := by
+  have h₁ (v w: V): ((B v) v) * (((B w) v) - ((B v) w)) = 0 := by
+    rw[mul_sub_left_distrib]
+    refine sub_eq_zero_of_eq ?_
+    rw[h]
+  have id₁ (v w : V) : (B v v)*(B w v) = (B v v)*(B v w)  :=  h v v w
+  by_contra j
+  simp at j
+  unfold BilinForm.IsAlt LinearMap.IsAlt BilinForm.IsSymm LinearMap.IsSymm at j
+  simp at j
+  rcases j with ⟨⟨e, lj⟩, ⟨f, g, rj⟩⟩
+  have h₂ : (B g) g = 0 := by
+    have i₂ : B g g * (B f g - B g f) = 0 := by
+      exact h₁ g f
+    rw[mul_sub_left_distrib] at i₂
+    apply eq_of_sub_eq_zero at i₂
+    rw[mul_eq_mul_left_iff] at i₂
+    aesop
+  have h₃ : (B f) f = 0 := by
+    have i₃ : B f f * (B g f - B f g) = 0 := by
+      exact h₁ f g
+    rw[mul_sub_left_distrib] at i₃
+    apply eq_of_sub_eq_zero at i₃
+    rw[mul_eq_mul_left_iff] at i₃
+    aesop
+  have h₄ : (B f) e = (B e) f := by
+    have i₄ : B e e * (B f e - B e f) = 0 := by
+      exact h₁ e f
+    rw[mul_sub_left_distrib] at i₄
+    apply eq_of_sub_eq_zero at i₄
+    rw[mul_eq_mul_left_iff] at i₄
+    aesop
+  have h₅ : (B g) e = (B e) g := by
+    have i₅ : B e e * (B g e - B e g) = 0 := by
+      exact h₁ e g
+    rw[mul_sub_left_distrib] at i₅
+    apply eq_of_sub_eq_zero at i₅
+    rw[mul_eq_mul_left_iff] at i₅
+    aesop
+  have h₆ : (B e) f = 0 := by
+    have i₆ : ((B f) e) * ((B g) f) = ((B e) f) * ((B f) g) := by
+      exact h f e g
+    rw[← h₄] at i₆
+    rw[mul_eq_mul_left_iff] at i₆
+    aesop
+  have h₇ : (B e) g = 0 := by
+    have i₇ : ((B g) e) * ((B f) g) = ((B e) g) * ((B g) f) := by
+      exact h g e f
+    rw[← h₅] at i₇
+    rw[mul_eq_mul_left_iff] at i₇
+    aesop
+  have h₈ : (B f) (e + g) = (B f) g := by
+    aesop
+  have h₉ : (B (e + g)) f = (B g) f := by
+    aesop
+  have h₁₀ : (B (e + g)) (e + g) = 0 := by
+    have i₁₀ : (B (e + g)) (e + g) * ((B f (e + g)) - (B (e + g) f)) = 0 := by
+      exact h₁ (e + g) f
+    rw[h₈, h₉, mul_sub_left_distrib] at i₁₀
+    apply eq_of_sub_eq_zero at i₁₀
+    rw[mul_eq_mul_left_iff] at i₁₀
+    aesop
+  have h₁₁ : (B (e + g)) (e + g) = (B e) e := by
+    simp
+    rw[h₇]
+    rw[← h₅] at h₇
+    rw[h₇, h₂]
+    simp
+  rw[h₁₀] at h₁₁
+  exact lj (_root_.id (Eq.symm h₁₁))
+
+
+
+theorem refl_is_alt_or_symm {B: BilinForm F V} (h: B.IsRefl) [FiniteDimensional F V] :
+    B.IsAlt  ∨ B.IsSymm := by
+    let x (u v w : V) := ((B u) v) • w - (((B u) w) •  v)
+    have h₀ (u v w : V):  (B u) (x u v w) = (((B u) v) * ((B u) w)) - (((B u) w) * ((B u) v)) := by
+      aesop
+    have h₁ (u v w : V) : (((B u) v) * ((B u) w)) - (((B u) w) * ((B u) v)) = 0 := by
+      rw[mul_comm]
+      simp
+    simp_rw[h₁] at h₀
+    have h₂ (u v w: V) :(B (x u v w)) u =  0:= by
+      exact h u (x u v w) (h (x u v w) u (h u (x u v w) (h₀ u v w)))
+    have h₃ (u v w : V): B (x u v w) u = B u v * B w u - (B v u) * (B u w) := by
+      have h₃₀ (u v w: V): (B (x u v w)) u = (B (((B u v) • w) - (B u w) • v)) u := by
+        aesop
+      simp at h₃₀
+      simp_rw[h₃₀]
+      rw[mul_comm (B u w)  (B v u)]
+    have h₄ : ∀ (u v w : V), (((B u) v) * ((B w) u)) = (((B v) u) * ((B u) w)) := by
+      intro u v w
+      have h₄₀ : (B u) v * (B w) u = (B v) u * (B u) w ↔ (((B u) v) * ((B w) u)) - (((B v) u) * ((B u) w)) = 0 := by
+        constructor
+        · aesop
+        · intro g
+          apply eq_of_sub_eq_zero at g
+          exact g
+      rw[h₄₀]
+      apply eq_of_sub_eq_zero
+      simp
+      simp_rw[h₂] at h₃
+      exact (AddSemiconjBy.eq_zero_iff 0 (congrFun (congrArg HAdd.hAdd (h₃ u v w)) 0)).mp rfl
+    apply proptwopointsix (F := F) (V := V)
+    · exact h₄
+
 
 
 def quot_form {B: BilinForm R M} (hb: B.IsRefl): BilinForm R (M ⧸ (radForm B)) :=
