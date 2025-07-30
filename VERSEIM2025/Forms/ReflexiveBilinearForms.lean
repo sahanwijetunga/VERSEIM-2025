@@ -28,21 +28,22 @@ open BilinearForms -- This is the namespace in VERSEIM2025.Forms.Hyperbolic.Bili
 open LinearMap.BilinForm
 open LinearMap (BilinForm)
 
-variable {F V: Type*} [AddCommGroup V][Field F][Module F V]
+variable {R M: Type*} [AddCommGroup M][CommRing R] [Module R M]
+variable {F V: Type*} [Field F] [AddCommGroup V] [Module F V]
 
-def radForm (B: BilinForm F V) : Submodule F V where
+def radForm (B: BilinForm R M) : Submodule R M where
   carrier := {v | ∀ w, B v w = 0}
   add_mem' := by simp_all
   zero_mem' := by simp_all
   smul_mem' := by simp_all
 
-def radForm' (B: BilinForm F V) : Submodule F V where
+def radForm' (B: BilinForm R M) : Submodule R M where
   carrier := {v | ∀ w, B w v = 0}
   add_mem' := by simp_all
   zero_mem' := by simp_all
   smul_mem' := by simp_all
 
-theorem radForm_eq_kernel (B: BilinForm F V): radForm B = LinearMap.ker B := by
+theorem radForm_eq_kernel (B: BilinForm R M): radForm B = LinearMap.ker B := by
   ext x; simp[radForm]
   constructor
   . intro h
@@ -50,14 +51,14 @@ theorem radForm_eq_kernel (B: BilinForm F V): radForm B = LinearMap.ker B := by
     simp_all [LinearMap.zero_apply]
   . simp_all [LinearMap.zero_apply]
 
-theorem radForm'_eq_radForm_flip (B: BilinForm F V) :
+theorem radForm'_eq_radForm_flip (B: BilinForm R M) :
   radForm' B = radForm B.flip := by simp_all[radForm,radForm']
 
-theorem radForm_eq_radForm'_flip (B: BilinForm F V) :
+theorem radForm_eq_radForm'_flip (B: BilinForm R M) :
   radForm B = radForm' B.flip := by simp_all[radForm,radForm']
 
 @[simp]
-theorem flip_orthog_eq_orthog (B: BilinForm F V) (hr: B.IsRefl) (W: Submodule F V):
+theorem flip_orthog_eq_orthog (B: BilinForm R M) (hr: B.IsRefl) (W: Submodule R M):
   B.flip.orthogonal W = B.orthogonal W := by
   ext x
   constructor
@@ -66,38 +67,38 @@ theorem flip_orthog_eq_orthog (B: BilinForm F V) (hr: B.IsRefl) (W: Submodule F 
   . intro h
     exact fun n a ↦ hr n x (h n a)
 
-theorem radForm_eq_flip_orthogonal_top (B: BilinForm F V):
+theorem radForm_eq_flip_orthogonal_top (B: BilinForm R M):
   radForm B = B.flip.orthogonal ⊤ := by
     ext x
     simp_all[BilinForm.IsOrtho,radForm]
 
-theorem radForm'_eq_orthogonal_top (B: BilinForm F V):
+theorem radForm'_eq_orthogonal_top (B: BilinForm R M):
   radForm' B = B.orthogonal ⊤ := by
     ext x
     simp_all[BilinForm.IsOrtho,radForm']
 
-theorem radForm_eq_orthogonal_top (B: BilinForm F V) (hr: B.IsRefl):
+theorem radForm_eq_orthogonal_top (B: BilinForm R M) (hr: B.IsRefl):
   radForm B = B.orthogonal ⊤ := by
     rw[<- flip_orthog_eq_orthog B hr]
     exact radForm_eq_flip_orthogonal_top B
 
-theorem radForm'_eq_flip_orthogonal_top (B: BilinForm F V) (hr: B.IsRefl):
+theorem radForm'_eq_flip_orthogonal_top (B: BilinForm R M) (hr: B.IsRefl):
   radForm' B = B.flip.orthogonal ⊤ := by
     rw[flip_orthog_eq_orthog B hr]
     exact radForm'_eq_orthogonal_top B
 
 @[simp]
-theorem radForm'_eq_radForm (B: BilinForm F V) (hr: B.IsRefl) :
+theorem radForm'_eq_radForm (B: BilinForm R M) (hr: B.IsRefl) :
   radForm' B = radForm B := by
   rw[radForm'_eq_flip_orthogonal_top _ hr, radForm_eq_flip_orthogonal_top]
 
 
-theorem form_on_radForm_eq_zero (B: BilinForm F V):
+theorem form_on_radForm_eq_zero (B: BilinForm R M):
   B.restrict (radForm B) = 0 := by
     ext ⟨x, hx⟩ _
     apply hx
 
-theorem form_on_radForm'_eq_zero (B: BilinForm F V):
+theorem form_on_radForm'_eq_zero (B: BilinForm R M):
   B.restrict (radForm' B) = 0 := by
     ext _ ⟨y, hy⟩
     apply hy
@@ -110,13 +111,13 @@ theorem orthog_direct_sum_of_radForm_isCompl (B: BilinForm F V)
   . rintro a ha b hb
     exact ha b
 
-theorem Nondegenerate_of_isCompl_of_radForm (B: BilinForm F V) (hr: B.IsRefl)
-  (W: Submodule F V) (hW: IsCompl (radForm B) W): (B.restrict W).Nondegenerate := by
+theorem Nondegenerate_of_isCompl_of_radForm (B: BilinForm R M) (hr: B.IsRefl)
+  (W: Submodule R M) (hW: IsCompl (radForm B) W): (B.restrict W).Nondegenerate := by
     intro ⟨a, ha⟩ h'
     suffices a=0 from (Submodule.mk_eq_zero W ha).mpr this
     dsimp at h'
     have: W ⊓ radForm B = ⊥ := IsCompl.inf_eq_bot (_root_.id (IsCompl.symm hW))
-    show a ∈ (⊥: Submodule F V)
+    show a ∈ (⊥: Submodule R M)
     rw[<- this]
     constructor; . exact ha
     show ∀ b, B a b = 0
@@ -143,7 +144,7 @@ theorem Nondegenerate_of_isCompl_of_radForm (B: BilinForm F V) (hr: B.IsRefl)
 -- however the choice is not canonical so it may be more difficult to construct.
 -- (Note: any such definition will have to be noncomputable)
 -- (Note: is_orthog_direct_sum and is_orthog_direct_sum' are equivalent given Reflexivity)
-theorem sum_radForm_nondegenerate (B: BilinForm F V) (hr: B.IsRefl):
+theorem sum_radForm_nondegenerate  (B: BilinForm F V) (hr: B.IsRefl):
   ∃ (W: Submodule F V), (is_orthog_direct_sum B (radForm B) W ∧ (B.restrict W).Nondegenerate) := by
     have ⟨W, h⟩ := Submodule.exists_isCompl (radForm B)
     use W
@@ -240,7 +241,7 @@ theorem refl_is_alt_or_symm {B: BilinForm F V} (h: IsRefl B) [FiniteDimensional 
   exact hxy h3
 
 
-def quot_form {B: BilinForm F V} (hb: B.IsRefl): BilinForm F (V ⧸ (radForm B)) :=
+def quot_form {B: BilinForm R M} (hb: B.IsRefl): BilinForm R (M ⧸ (radForm B)) :=
   (Submodule.liftQ _ (LinearMap.flip (Submodule.liftQ _ B (by rw[radForm_eq_kernel B]  )))
   ( by
     nth_rewrite 1[radForm_eq_kernel B]
@@ -252,20 +253,17 @@ def quot_form {B: BilinForm F V} (hb: B.IsRefl): BilinForm F (V ⧸ (radForm B))
   ).flip
 
 
-example {B: BilinForm F V}: V →ₗ[F] (V ⧸ radForm B) := by
-  exact (radForm B).mkQ
-
-def quot_form_apply {B: BilinForm F V} (hb: B.IsRefl) (v w: V): B v w =
+def quot_form_apply {B: BilinForm R M} (hb: B.IsRefl) (v w: M): B v w =
 (quot_form hb) ((radForm B).mkQ v) ((radForm B).mkQ w) := by
   simp[quot_form]
 
-def quot_form_apply' {B: BilinForm F V} (hb: B.IsRefl):
+def quot_form_apply' {B: BilinForm R M} (hb: B.IsRefl):
 (quot_form hb).comp (radForm B).mkQ (radForm B).mkQ
    = B := by
   ext v w
   exact quot_form_apply hb v w
 
-theorem reflexive_quotient_radForm_nondegenerate (B: BilinForm F V) (hr: B.IsRefl):
+theorem reflexive_quotient_radForm_nondegenerate (B: BilinForm R M) (hr: B.IsRefl):
    (quot_form hr).Nondegenerate := by
   intro v hv
   induction' v using Submodule.Quotient.induction_on with v
