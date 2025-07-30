@@ -182,6 +182,7 @@ lemma not_symm {X:Type*} {f : X → X → Prop} :
 
 lemma eq_zero_of_no_cancel {a b c : k} (_:b ≠ c) (_:a*b = a*c ) : a = 0 := by
   simp_all only [ne_eq, mul_eq_mul_left_iff, false_or]
+  
 lemma rearrange (a b c : k) (h:a*b = a*c) : a*(b-c) = 0 := by calc
   a*(b-c) = a*b - a*c := by ring
         _ = 0 := by rw [h]; ring
