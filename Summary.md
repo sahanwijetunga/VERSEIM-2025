@@ -17,7 +17,7 @@ Many of the descriptions below say 'proved' in correspondence to how we think ab
   - [RationalFunctionFields](/VERSEIM2025/Forms/RationalFunctionFields)
     - [Basics](/VERSEIM2025/Forms/RationalFunctionFields/Basics.lean) - Sahan
       - Contains definitions and results about Quadratic forms, mostly those from `V -> F` extended to `F[X] -> V[X]` and `V(X) -> F(X)`, to state/prove results in [CasselsPfister](/VERSEIM2025/Forms/RationalFunctionFields/CasselsPfister.lean)
-      - `QuadraticFormExtensionPolynomial`: `deg Q(v) = 2 * deg v` for `Q:V -> F` (so `v` in `V[X]` and `Q(v)` in `F[X]`)
+      - `QuadraticFormExtensionPolynomial`: `deg Q(v) = 2 * deg v` for `Q:V -> F` Anisotropic (note `v ∈ V[X]` and `Q(v) ∈ F[X]`)
       - `HyperplaneReflection `: Reflecting vectors across a fixed vector 
       - Various diagrams commute (e.g. `Q: V -> F` extended to `V(X) -> F(X)` agrees with `V[X] -> F[X]` on the common domain)
     - [CasselsPfister](/VERSEIM2025/Forms/RationalFunctionFields/CasselsPfister.lean) - Sahan
