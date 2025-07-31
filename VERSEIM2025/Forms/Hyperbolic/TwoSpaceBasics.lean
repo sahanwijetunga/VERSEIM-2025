@@ -17,7 +17,7 @@ import Mathlib.LinearAlgebra.BilinearMap
 import Mathlib.LinearAlgebra.TensorProduct.Basic
 import VERSEIM2025.PolynomialModuleDegree.Misc
 
-/- Partially duplicates material from `HyperbolicBilinearForms` for easier use in
+/- Partially duplicates material from `Basics` for easier use in
 CasselsPfisterTheorem -/
 
 namespace HyperbolicTwoSpace
