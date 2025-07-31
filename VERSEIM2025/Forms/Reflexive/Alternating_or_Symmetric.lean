@@ -34,10 +34,7 @@ theorem symmetry_extend {B: BilinForm F V} {v: V} (hr: IsRefl B)
     obtain ⟨c, hc⟩ := hy
     use c, z
     constructor
-    . rw[LinearMap.BilinForm.mem_orthogonal_iff] at hz
-      apply hr
-      apply hz
-      exact Submodule.mem_span_singleton_self v
+    . aesop
     rw[<- hyz, hc]
   intro x y; simp only [RingHom.id_apply]
   obtain ⟨cx, ux, huxv, hx⟩ := this x
@@ -88,15 +85,12 @@ example {B: BilinForm F V} (h: IsRefl B):
         field_simp[hv]
       simp_all
     . rw [smul_left]
-      unfold d
-      rw[mul_assoc, inv_mul_cancel₀ hxy_neqzero]
-      ring
+      aesop
 
   obtain ⟨x, y, hxv ,hyv, hxy, hxyc⟩ := this
   have h1: B (y+v) (x+v) = 0 := by
     apply h
-    rw [@add_right, add_left, add_left]
-    rw[hxv, h _ _ hyv, hxyc]
+    rw [@add_right, add_left, add_left, hxv, h _ _ hyv, hxyc]
     ring_nf
   have h2: B (y+v) (x+v) = B y x - B x y := by
     rw [@add_right, add_left, add_left, h _ _ hxv, hyv, hxyc]
@@ -105,8 +99,7 @@ example {B: BilinForm F V} (h: IsRefl B):
     have: B y x - B x y = 0 := by
       rw[<- h1,h2]
     exact (sub_eq_zero.mp this).symm
-  exfalso
-  exact hxy h3
+  tauto
 
 lemma proptwopointsix {B: BilinForm F V}
 (h : ∀ (u v w : V), (((B u) v) * ((B w) u)) = (((B v) u) * ((B u) w))): B.IsAlt ∨ B.IsSymm := by
