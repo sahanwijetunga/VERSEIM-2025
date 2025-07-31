@@ -1,8 +1,11 @@
 import Mathlib.Tactic
 
+noncomputable section
+
 open Module
 open LinearMap
 open LinearMap (BilinForm)
+
 
 variable  {k V₁ V₂ :Type} [Field k] 
   [AddCommGroup V₁] [Module k V₁]
@@ -25,7 +28,7 @@ theorem equiv_via_matrices {ι:Type} [Fintype ι] [DecidableEq ι]
     (BilinForm.toMatrix b₁ β₁) =  (BilinForm.toMatrix b₂ β₂) := by sorry
 
 
-noncomputable def alternate_iso {B₁: BilinForm k V₁} (B₂: BilinForm k V₂) 
+def alternate_iso {B₁: BilinForm k V₁} (B₂: BilinForm k V₂) 
   (balt₁: IsAlt B₁) (balt₂: IsAlt B₂)
   (hd₁: B₁.Nondegenerate) (hd₂: B₂.Nondegenerate) 
   [FiniteDimensional k V₁] [FiniteDimensional k V₂]
