@@ -34,9 +34,9 @@ of Quadratic Forms"](https://www.math.ucla.edu/~merkurev/Book/Kniga-final/Kniga.
   - [Bilinear](/VERSEIM2025/Forms/Bilinear.lean) - George, Sahan, Clea, Katherine
     - Proves various results about bilinear forms. Notably, `isCompl_orthogonal_of_restrict_nondegenerate` generalizes [`LinearMap.BilinForm.isCompl_orthogonal_of_restrict_nondegenerate`](LinearMap.BilinForm.isCompl_orthogonal_of_restrict_nondegenerate) from Mathlib (drops the reflexivity requirement)
   - [BilinearIsomorphisms](/VERSEIM2025/Forms/BilinearIsomorphisms.lean) - Sahan
-    - Proof (construction) that two spaces `(V,β)` `(V',β')` over `F` are isomorphic from a bijection of bases(really type equivalence) that commutes with the bilinear form `EquivBilin_of_basis_equiv`
+    - Proof (construction) that two spaces `(V,β)` `(V',β')` over `F` are isomorphic from a bijection of bases(really type equivalence) that commutes with the bilinear form (`EquivBilin_of_basis_equiv`)
   - [QuadraticNondegenerate](/VERSEIM2025/Forms/BilinearIsomorphisms.lean) - Sahan
-    - Given a quadratic form `Q: V -> F` gives a new quadratic form `V/rad(Q) -> F` (`quotient_rad`) such that the obvious diagram commutes (`Q` agrees with the composition `V -> V/rad(Q) -> F`; see `quotient_rad_apply`) and the new form is nondegenerate (viewed as a bilinear form; `quotient_rad_nondegenerate`) 
+    - Given a quadratic form `Q: V -> F` gives a new quadratic form `V/rad(Q) -> F` (`quotient_rad`) such that the obvious diagram commutes (`Q` agrees with the composition `V -> V/rad(Q) -> F`; `quotient_rad_apply`) and the new form is nondegenerate (viewed as a bilinear form; `quotient_rad_nondegenerate`) 
     - Proves the image of the forms are preserved and extension by scalars works nicely with the construction. 
 - [PolynomialModuleDegree](/VERSEIM2025/PolynomialModuleDegree) - Sahan
   - [Definitions](/VERSEIM2025/PolynomialModuleDegree/Definitions.lean) and [Operations](/VERSEIM2025/PolynomialModuleDegree/Operations.lean) mostly achieve results over `V[X]` (the polynomial module) that are achieved for `R[X]` (the polynomial ring) in Mathlib. 
@@ -49,6 +49,6 @@ of Quadratic Forms"](https://www.math.ucla.edu/~merkurev/Book/Kniga-final/Kniga.
 - [applications](/VERSEIM2025/applications.lean) - Katherine
   - Proves that the orthogonal complement of a subspace is nondegenerate, assuming the entire space and the original subspace are nondegenerate (`ortho_complement_nondeg`)
 - [Subspaces](/VERSEIM2025/Subspaces.lean) - Katherine
-  - Let `U` and `W` be subspaces with trivial intersection, and `u: I -> U` and `w: J -> W` be linearly independent. Then the disjoint union `I ⊔ J -> V` is linearly independent. (`lin_indep_by_transverse_subspaces`)
-  - Let `U` and `W` be subspaces with `V` the internal direct sum of `U` and `W` and `b: I -> U` and `c: J -> W` be bases. Then disjoint union of `b` and `c` is a basis for `V`. (`basis_of_direct_sum`)
+  - Let `U` and `W` be subspaces with trivial intersection, and `u: I -> U` and `w: J -> W` be linearly independent. Then the disjoint union `I ⊔ J -> V` is linearly independent (`lin_indep_by_transverse_subspaces`)
+  - Let `U` and `W` be subspaces with `V` the internal direct sum of `U` and `W` and `b: I -> U` and `c: J -> W` be bases. Then disjoint union of `b` and `c` is a basis for `V` (`basis_of_direct_sum`)
 
