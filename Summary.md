@@ -1,7 +1,6 @@
 # Results/Contributions
 
-This is the repository for the *formalization project* of the [2025
-VERSEIM-REU](https://sites.tufts.edu/verseimreu/).
+See below for a list of the major results achieved during the REU. Code inside the named folders (george, katherine, Sahan, Clea Bergsman) is just for temporary use; the final results are all found elsewhere. There is substantial code in [Verseim2025/Forms/Introduction](Verseim2025/Forms/Introduction) and [Verseim2025/intro](Verseim2025/intro), created mainly by George to teach the group Lean. 
 
 - [Forms](/VERSEIM2025/Forms)
   - [Hyperbolic](/VERSEIM2025/Forms/Hyperbolic) - Sahan
