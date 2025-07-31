@@ -214,9 +214,7 @@ theorem HyperplaneReflection_form {φ: QuadraticForm F V} (hanisotropic: Quadrat
       rw[<- sub_eq_add_neg]
       rw[<- huvw ]
       exact fun a ↦ hw (hanisotropic w a)
-    generalize φ (v + -u) =a at *
-    generalize φ v =b at *
-    generalize φ u =c at *
+    generalize φ (v + -u) =a, φ v =b, φ u =c at *
     repeat rw[sub_eq_add_neg]
     have: v + (-1: F) • (v + -u)=u := by
       simp
