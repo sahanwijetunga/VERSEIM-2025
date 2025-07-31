@@ -4,7 +4,9 @@ This is the repository for the *formalization project* of the [2025
 VERSEIM-REU](https://sites.tufts.edu/verseimreu/).
 
 - The repository contains [`Lean` code](/VERSEIM2025/) produced
-  during the program. See [here](/VERSEIM2025/Summary.md) for a list of the major results. 
+  during the program. 
+  
+- See [here](Summary.md) for a list of the major results. 
 
 - Here are [slides for the presentations](Presentations) made in the REU seminar during
   the program
