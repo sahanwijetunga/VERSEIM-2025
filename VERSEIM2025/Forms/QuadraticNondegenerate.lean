@@ -110,11 +110,11 @@ noncomputable def quotient_rad (Q: QuadraticForm R M) [Invertible (2:R)]: Quadra
     have: quot_form (B := Q.polarBilin) (LinearMap.BilinForm.IsSymm.isRefl (polarBilin_isSymm Q))
       (Submodule.Quotient.mk x) (Submodule.Quotient.mk y) = Q.polarBilin x y := by
       exact quot_form_apply (B := Q.polarBilin) (LinearMap.BilinForm.IsSymm.isRefl Q.polarBilin_isSymm) x y
-    simp only [Submodule.Quotient.mk, QuadraticMap.polarBilin_apply_apply] at this
-    symm
-    apply add_eq_of_eq_sub'
-    rw[sub_add_eq_sub_sub]
-    exact this -- why doesn't rw[this] work?
+    show Q (x + y) = Q x + Q y + quot_form (B := Q.polarBilin) (LinearMap.BilinForm.IsSymm.isRefl (polarBilin_isSymm Q))
+      (Submodule.Quotient.mk x) (Submodule.Quotient.mk y)
+    rw[this]
+    simp
+    rw [← @QuadraticMap.map_add]
 
 @[simp]
 theorem quotient_rad_apply (Q: QuadraticForm R M) (x: M)[Invertible (2:R)]: Q.quotient_rad (Submodule.Quotient.mk  x) = Q x := rfl
