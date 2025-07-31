@@ -19,8 +19,6 @@ open CasselsPfister
 
 variable {F R: Type*} [Field F] [CommRing R]
 
-#check QuadraticMap.weightedSumSquares
-#check QuadraticMap.weightedSumSquares_apply
 
 def standard_quadratic_form (n: ℕ): QuadraticForm R (Fin n → R) :=
     QuadraticMap.weightedSumSquares R (fun _ => 1)

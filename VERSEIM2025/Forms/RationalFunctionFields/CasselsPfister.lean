@@ -256,22 +256,6 @@ protected lemma TrivialContainmentExtension (φ: QuadraticForm F V) [Invertible 
   rw[<- toRatFuncTensor_CommuteQuadraticForm]
   rfl
 
-/-- The values taken by the extension of a quadratic map `φ: V → F` to `V(X) → F(X)`
-    that are in `F[X]` are taken by the extension `V[X] → F[X]` as well.
-
-    *Cassels-Pfister Theorem*
-
-    *Auxillary version of `range_quadratic_polynomial_eq_restrict_rational` which requires `φ` is `Nondegenerate`*
--/
-theorem range_quadratic_polynomial_eq_restrict_rational_aux (φ: QuadraticForm F V) [Invertible (2: F)]
-  (hn: LinearMap.BilinForm.Nondegenerate (QuadraticMap.polarBilin φ)):
-  (↑)⁻¹' (Set.range (φ.baseChange (F(X))))
-   = Set.range (φ.baseChange F[X]) := by
-  apply le_antisymm
-  . exact CasselsPfister.NontrivialContainmentExtension φ hn
-  . exact CasselsPfister.TrivialContainmentExtension φ
-
-#print axioms range_quadratic_polynomial_eq_restrict_rational_aux
 
 /-- The values taken by the extension of a quadratic map `φ: V → F` to `V(X) → F(X)`
     that are in `F[X]` are taken by the extension `V[X] → F[X]` as well.
@@ -283,7 +267,12 @@ theorem range_quadratic_polynomial_eq_restrict_rational (φ: QuadraticForm F V) 
    = Set.range (φ.baseChange F[X]) := by
   rw[QuadraticForm.range_baseChange_quotient_rad_eq_range_baseChange F(X),
   QuadraticForm.range_baseChange_quotient_rad_eq_range_baseChange F[X] ]
-  exact range_quadratic_polynomial_eq_restrict_rational_aux φ.quotient_rad φ.quotient_rad_nondegenerate
+  apply le_antisymm
+  . exact CasselsPfister.NontrivialContainmentExtension φ.quotient_rad φ.quotient_rad_nondegenerate
+  . exact CasselsPfister.TrivialContainmentExtension φ.quotient_rad
+
+
+#print axioms range_quadratic_polynomial_eq_restrict_rational
 
 
 end CasselsPfister

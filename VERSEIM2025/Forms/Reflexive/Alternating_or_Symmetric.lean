@@ -12,19 +12,9 @@ import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
 import VERSEIM2025.Forms.BilinearForms
 
 /-
-  Major results (Completed)
-  - A reflexive bilinear form can be written as a direct sum of 0
-    and a nondegenerate bilinear form
-    - `reflexive_sum_radForm_nondegenerate` (and `form_on_radForm_eq_zero`)
-
-  Major results (Planned)
-  - The quotient of a reflexive bilinear form by its radical is nondegenerate
-    - `reflexive_quotient_radForm_nondegenerate`
-
-  TODO: Clean up definitions (radForm/radForm' excessive amount of theorems?)
+  Proofs that any reflexive form is alternating or symmetric
 -/
 
-open BilinearForms -- This is the namespace in VERSEIM2025.Forms.Hyperbolic.BilinearForms
 open LinearMap.BilinForm
 open LinearMap (BilinForm)
 

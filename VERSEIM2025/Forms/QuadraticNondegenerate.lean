@@ -20,6 +20,7 @@ import Mathlib.RingTheory.Flat.Basic
 import VERSEIM2025.PolynomialModuleDegree.Misc
 import VERSEIM2025.Forms.RationalFunctionFields.PolynomialModule
 import VERSEIM2025.Forms.Reflexive.Radical
+import Mathlib.LinearAlgebra.TensorProduct.Quotient
 
 namespace QuadraticForm
 
@@ -80,9 +81,6 @@ theorem polarBilin_isSymm (Q: QuadraticForm R M): Q.polarBilin.IsSymm := by
   simp only [QuadraticMap.polarBilin_apply_apply, RingHom.id_apply]
   exact QuadraticMap.polar_comm (⇑Q) x y
 
-example (a b c: M) (h: a-b=c): a=b+c := by
-  exact Eq.symm (add_eq_of_eq_sub' (id (Eq.symm h)))
-
 noncomputable def quotient_rad (Q: QuadraticForm R M) [Invertible (2:R)]: QuadraticForm R (M ⧸ Q.rad) where
   toFun := by
     apply Quotient.lift Q
@@ -102,7 +100,7 @@ noncomputable def quotient_rad (Q: QuadraticForm R M) [Invertible (2:R)]: Quadra
     simp[Submodule.Quotient.mk]
     rw[<- smul_eq_mul _ (Q v)]
     exact QuadraticMap.map_smul Q a v
-  exists_companion' := by -- why does rewriting not work?
+  exists_companion' := by
     use quot_form (B := Q.polarBilin) (LinearMap.BilinForm.IsSymm.isRefl Q.polarBilin_isSymm)
     intro x y
     induction' x using Submodule.Quotient.induction_on with x
@@ -111,12 +109,14 @@ noncomputable def quotient_rad (Q: QuadraticForm R M) [Invertible (2:R)]: Quadra
     simp[Submodule.Quotient.mk, QuadraticMap.polar, <- Submodule.Quotient.mk_add]
     have: quot_form (B := Q.polarBilin) (LinearMap.BilinForm.IsSymm.isRefl (polarBilin_isSymm Q))
       (Submodule.Quotient.mk x) (Submodule.Quotient.mk y) = Q.polarBilin x y := by
-      exact quot_form_apply (B := Q.polarBilin) (LinearMap.BilinForm.IsSymm.isRefl (polarBilin_isSymm Q)) (v := x) (w := y)
+      exact quot_form_apply (B := Q.polarBilin) (LinearMap.BilinForm.IsSymm.isRefl Q.polarBilin_isSymm) x y
+    simp only [Submodule.Quotient.mk, QuadraticMap.polarBilin_apply_apply] at this
     symm
     apply add_eq_of_eq_sub'
     rw[sub_add_eq_sub_sub]
-    simpa [Submodule.Quotient.mk, QuadraticMap.polarBilin_apply_apply,QuadraticMap.polar] using this
+    exact this -- why doesn't rw[this] work?
 
+@[simp]
 theorem quotient_rad_apply (Q: QuadraticForm R M) (x: M)[Invertible (2:R)]: Q.quotient_rad (Submodule.Quotient.mk  x) = Q x := rfl
 
 
@@ -152,10 +152,19 @@ theorem range_quotient_rad_eq_range (Q: QuadraticForm R M)[Invertible (2:R)]: Se
   rw[<- range_comp_eq Q.quotient_rad Q.rad.mkQ (Submodule.mkQ_surjective Q.rad)]
   rw[quotient_rad_comp]
 
+theorem baseChange_agree [Invertible (2:R)] (A: Type*) [CommRing A] [Algebra R A]
+  (Q: QuadraticForm R M): Q.baseChange A =
+    (Q.quotient_rad.baseChange A).comp (LinearMap.baseChange A Q.rad.mkQ) := by
+  rw[baseChange_ext_iff]
+  intro m
+  simp
+
 theorem range_baseChange_quotient_rad_eq_range_baseChange [Invertible (2:R)] (A: Type*) [CommRing A] [Algebra R A]
-  (Q: QuadraticForm R M): Set.range (Q.baseChange A) = Set.range (Q.quotient_rad.baseChange A) :=
-  sorry
-
-
+  (Q: QuadraticForm R M): Set.range (Q.baseChange A) = Set.range (Q.quotient_rad.baseChange A) := by
+  rw[baseChange_agree]
+  refine
+    range_comp_eq (QuadraticForm.baseChange A Q.quotient_rad) (LinearMap.baseChange A Q.rad.mkQ) ?_
+  rw[LinearMap.baseChange_eq_ltensor]
+  exact LinearMap.lTensor_surjective A (Submodule.mkQ_surjective Q.rad)
 
 end QuadraticForm
