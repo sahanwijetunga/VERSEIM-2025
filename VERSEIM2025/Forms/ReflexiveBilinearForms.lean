@@ -262,7 +262,7 @@ theorem refl_is_alt_or_symm {B: BilinForm k V} (h: B.IsRefl) [FiniteDimensional 
       simp
       simp_rw[h₂] at h₃
       exact (AddSemiconjBy.eq_zero_iff 0 (congrFun (congrArg HAdd.hAdd (h₃ u v w)) 0)).mp rfl
-    apply proptwopointsix k V
+    apply proptwopointsix
     · exact h₄
 
 def quot_form {B: BilinForm k V} (hb: B.IsRefl): BilinForm k (V ⧸ (radForm B)) := sorry
