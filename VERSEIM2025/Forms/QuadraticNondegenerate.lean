@@ -134,7 +134,6 @@ theorem quotient_rad_nondegenerate (Q: QuadraticForm R M)[Invertible (2:R)]: Lin
   rw[quotient_rad_polarBilin]
   exact reflexive_quotient_radForm_nondegenerate _ _
 
--- this is amazing to me that rfl works! (finally lean working as I want it)
 theorem quotient_rad_comp (Q: QuadraticForm R M)[Invertible (2:R)]: Q.quotient_rad.comp Q.rad.mkQ = Q := rfl
 
 theorem range_comp_eq {N: Type*} [AddCommGroup N] [Module R N] (Q : QuadraticForm R M)
