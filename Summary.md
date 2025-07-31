@@ -5,25 +5,25 @@ VERSEIM-REU](https://sites.tufts.edu/verseimreu/).
 
 - [Forms](/VERSEIM2025/Forms)
   - [Hyperbolic](/VERSEIM2025/Forms/Hyperbolic)
-    - [Alternating](/VERSEIM2025/Forms/Hyperbolic/Alternating)
-    - [Basics](/VERSEIM2025/Forms/Hyperbolic/Basics)
-    - [Symmetric](/VERSEIM2025/Forms/Hyperbolic/Symmetric)
-    - [TwoSpaceBasics](/VERSEIM2025/Forms/Hyperbolic/TwoSpaceBasics)
+    - [Alternating](/VERSEIM2025/Forms/Hyperbolic/Alternating.lean)
+    - [Basics](/VERSEIM2025/Forms/Hyperbolic/Basics.lean)
+    - [Symmetric](/VERSEIM2025/Forms/Hyperbolic/Symmetric.lean)
+    - [TwoSpaceBasics](/VERSEIM2025/Forms/Hyperbolic/TwoSpaceBasics.lean)
   - [RationalFunctionFields](/VERSEIM2025/Forms/RationalFunctionFields)
-    - [Basics](/VERSEIM2025/Forms/RationalFunctionFields/Basics)
-    - [CasselsPfister](/VERSEIM2025/Forms/RationalFunctionFields/CasselsPfister)
-    - [PolynomialModule](/VERSEIM2025/Forms/RationalFunctionFields/PolynomialModule)
-    - [Results](/VERSEIM2025/Forms/RationalFunctionFields/Results)
+    - [Basics](/VERSEIM2025/Forms/RationalFunctionFields/Basics.lean)
+    - [CasselsPfister](/VERSEIM2025/Forms/RationalFunctionFields/CasselsPfister.lean)
+    - [PolynomialModule](/VERSEIM2025/Forms/RationalFunctionFields/PolynomialModule.lean)
+    - [Results](/VERSEIM2025/Forms/RationalFunctionFields/Results.lean)
   - [Reflexive](/VERSEIM2025/Forms/RationalFunctionFields)
-    - [Alternating_or_Symmetric](/VERSEIM2025/Forms/Reflexive/Alternating_or_Symmetric)
-    - [Radical](/VERSEIM2025/Forms/Reflexive/Radical)    
+    - [Alternating_or_Symmetric](/VERSEIM2025/Forms/Reflexive/Alternating_or_Symmetric.lean)
+    - [Radical](/VERSEIM2025/Forms/Reflexive/Radical.lean)    
 - [PolynomialModuleDegree](/VERSEIM2025/PolynomialModuleDegree)
-  - [Definitions](/VERSEIM2025/PolynomialModuleDegree/Definitions) and [Operations](/VERSEIM2025/PolynomialModuleDegree/Operations)
-  - [Misc](/VERSEIM2025/PolynomialModuleDegree/Misc)
+  - [Definitions](/VERSEIM2025/PolynomialModuleDegree/Definitions.lean) and [Operations](/VERSEIM2025/PolynomialModuleDegree/Operations.lean)
+  - [Misc](/VERSEIM2025/PolynomialModuleDegree/Misc.lean)
 
-- [form_equivalence](/VERSEIM2025/form_equivalence) - Clea
-- [applications](/VERSEIM2025/applications) - Katherine
-- [applications](/VERSEIM2025/Subspaces) - Katherine
+- [form_equivalence](/VERSEIM2025/form_equivalence.lean) - Clea
+- [applications](/VERSEIM2025/applications.lean) - Katherine
+- [applications](/VERSEIM2025/Subspaces.lean) - Katherine
 
 
 
