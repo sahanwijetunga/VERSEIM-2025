@@ -149,16 +149,12 @@ theorem anisotropic_of_equiv (eq : V₁ ≃[k,β₁,β₂] V₂) (han : anisotro
   rw [← h₂] at h₁
   exact h₁
 
-example (β:BilinForm k V₁) : β.IsSymm := by
-  intro v w
-
 theorem symm_of_equiv {β₁:BilinForm k V₁} {β₂:BilinForm k V₂}
-  (eq : V₁ ≃[k,β₁,β₂] V₂) (hsymm : β₂.IsSymm)
-  : β₁.IsSymm := by
-  rw [ BilinForm.isSymm_def]
+  (eq : V₁ ≃[k,β₁,β₂] V₂) (hsymm : IsSymm β₂)
+  : IsSymm β₁ := by
   intro v w
   have β₂_symm : (β₂ (eq.equiv v)) (eq.equiv w) = (β₂ (eq.equiv w)) (eq.equiv v) := by 
-    apply hsymm v w
+    apply hsymm 
   have h₁ : (β₁ v) w = (β₂ (eq.equiv v)) (eq.equiv w) := by apply eq.compat
   have h₂ : (β₁ v) w = (β₂ (eq.equiv w)) (eq.equiv v) := by rw [β₂_symm] at h₁; exact h₁
   have h₃ : (β₁ w) v = (β₂ (eq.equiv w)) (eq.equiv v) := by apply eq.compat
