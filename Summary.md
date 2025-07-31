@@ -23,7 +23,9 @@ VERSEIM-REU](https://sites.tufts.edu/verseimreu/).
 
 - [form_equivalence](/VERSEIM2025/form_equivalence.lean) - Clea
 - [applications](/VERSEIM2025/applications.lean) - Katherine
-- [applications](/VERSEIM2025/Subspaces.lean) - Katherine
-
+  - `ortho_complement_nondeg
+- [Subspaces](/VERSEIM2025/Subspaces.lean) - Katherine
+  - lin_ind_by_tran - line 46
+  - basis_of_direct_sum - last thing in file
 
 
