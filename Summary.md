@@ -13,10 +13,10 @@ Many of the descriptions below say 'proved' in correspondence to how we think ab
     - [Symmetric](/VERSEIM2025/Forms/Hyperbolic/Symmetric.lean)
       - Any nondegenerate symmetric bilinear form is the direct sum of a hyperbolic and anisotropic (definite) form
     - [TwoSpaceBasics](/VERSEIM2025/Forms/Hyperbolic/TwoSpaceBasics.lean)
-      - Partially duplicates material (with some modifications) from [Basics](/VERSEIM2025/Forms/Hyperbolic/Basics.lean) for easier use in CasselsPfisterTheorem
+      - Partially duplicates material (with some modifications) from [Basics](/VERSEIM2025/Forms/Hyperbolic/Basics.lean) for easier use in [CasselsPfister](/VERSEIM2025/Forms/RationalFunctionFields/CasselsPfister.lean)
   - [RationalFunctionFields](/VERSEIM2025/Forms/RationalFunctionFields)
     - [Basics](/VERSEIM2025/Forms/RationalFunctionFields/Basics.lean) - Sahan
-      - Contains definitions and results about Quadratic forms, mostly those from `V -> F` extended to `F[X] -> V[X]` and `V(X) -> F(X)`, to state/prove reuslts in [CasselsPfister](/VERSEIM2025/Forms/RationalFunctionFields/CasselsPfister.lean)
+      - Contains definitions and results about Quadratic forms, mostly those from `V -> F` extended to `F[X] -> V[X]` and `V(X) -> F(X)`, to state/prove results in [CasselsPfister](/VERSEIM2025/Forms/RationalFunctionFields/CasselsPfister.lean)
       - `QuadraticFormExtensionPolynomial`: `deg Q(v) = 2 * deg v` for `Q:V -> F` (so `v` in `V[X]` and `Q(v)` in `F[X]`)
       - `HyperplaneReflection `: Reflecting vectors across a fixed vector 
       - Various diagrams commute (e.g. `Q: V -> F` extended to `V(X) -> F(X)` agrees with `V[X] -> F[X]` on the common domain)
