@@ -7,7 +7,7 @@ Released under the Apache 2.0 license as described in the file LICENSE.
 VERSEIM-2025 REU @ Tufts University
 -/
 
-import VERSEIM2025.Forms.BilinearForms
+import VERSEIM2025.Forms.Bilinear
 import Mathlib.LinearAlgebra.QuadraticForm.Basic
 
 /-

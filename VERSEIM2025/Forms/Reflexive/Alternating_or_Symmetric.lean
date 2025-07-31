@@ -9,7 +9,7 @@ VERSEIM-2025 REU @ Tufts University
 
 import Mathlib.Tactic
 import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
-import VERSEIM2025.Forms.BilinearForms
+import VERSEIM2025.Forms.Bilinear
 
 /-
   Proofs that any reflexive form is alternating or symmetric
