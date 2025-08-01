@@ -33,7 +33,7 @@ of Quadratic Forms"](https://www.math.ucla.edu/~merkurev/Book/Kniga-final/Kniga.
     - [Radical](/VERSEIM2025/Forms/Reflexive/Radical.lean) - Sahan
       - Given a bilinear form `B: V x V -> F`, defines `rad(B)={v| B(v,w)=0 for all w} ` and a bilinear form on `V/rad(B)` which is nondegenerate and such that the obvious diagram commutes
   - [Bilinear](/VERSEIM2025/Forms/Bilinear.lean) - George, Sahan, Clea, Katherine
-    - Proves various results about bilinear forms. Notably, `isCompl_orthogonal_of_restrict_nondegenerate` generalizes [`LinearMap.BilinForm.isCompl_orthogonal_of_restrict_nondegenerate`](LinearMap.BilinForm.isCompl_orthogonal_of_restrict_nondegenerate) from Mathlib (drops the reflexivity requirement)
+    - Proves various results about bilinear forms. Notably, `isCompl_orthogonal_of_restrict_nondegenerate` generalizes [`LinearMap.BilinForm.isCompl_orthogonal_of_restrict_nondegenerate`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/LinearAlgebra/BilinearForm/Orthogonal.html#LinearMap.BilinForm.isCompl_orthogonal_of_restrict_nondegenerate) from Mathlib (drops the reflexivity requirement)
   - [BilinearIsomorphisms](/VERSEIM2025/Forms/BilinearIsomorphisms.lean) - Sahan
     - Proof (construction) that two spaces `(V,β)` `(V',β')` over `F` are isomorphic from a bijection of bases(really type equivalence) that commutes with the bilinear form (`EquivBilin_of_basis_equiv`)
   - [QuadraticNondegenerate](/VERSEIM2025/Forms/BilinearIsomorphisms.lean) - Sahan
