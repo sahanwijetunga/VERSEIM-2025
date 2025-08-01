@@ -1,3 +1,5 @@
+This is forked from https://github.com/gmcninch-tufts/VERSEIM-2025. I have no plans to maintain this copy. 
+
 # Formalization -- VERSEIM-REU 2025
 
 This is the repository for the *formalization project* of the [2025
