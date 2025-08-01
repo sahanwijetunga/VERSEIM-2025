@@ -3,7 +3,6 @@ import Mathlib.Tactic
 import Mathlib.LinearAlgebra.BilinearForm.Orthogonal
 
 import VERSEIM2025.Subspaces
-import VERSEIM2025.block
 
 -- Katherine and Clea, I think you can prove various things using the
 -- "basis of internal direct sum" theorem that Katherine finished
